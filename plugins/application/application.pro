@@ -2,6 +2,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = garuda
+SUBDIRS = garuda dsbpe
 
 CONFIG += ordered
