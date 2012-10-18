@@ -7,5 +7,6 @@ TARGET        = $$qtLibraryTarget(application_dsbpe)
 include(../../../common_options.qmake)
 include(../application_plugin_options.pri)
 
-HEADERS       =
-SOURCES       = plugin.cpp
+HEADERS       = findBranchesDialog.h
+SOURCES       = plugin.cpp \
+    findBranchesDialog.cpp
