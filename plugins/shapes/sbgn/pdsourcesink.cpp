@@ -30,7 +30,12 @@ using namespace dunnart;
 QPainterPath SourceOrSink::buildPainterPath(void)
 {
     QPainterPath p;
-    QRectF r(-width()/2, -height()/2, width(), height());
+
+    // make sure this glyph stays cirular
+    qreal draw_width = width();
+    if ( height() < width()) draw_width = height();
+
+    QRectF r(-draw_width/2, -draw_width/2, draw_width, draw_width);
 
     p.addEllipse(r);
     p.moveTo(r.bottomLeft());

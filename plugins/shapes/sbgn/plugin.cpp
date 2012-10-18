@@ -57,14 +57,15 @@ class SBGNShapesPlugin : public QObject, public ShapePluginInterface
         QStringList producableShapeTypes() const
         {
             QStringList shapes;
-            shapes << "org.sbgn.pd.UnspecifiedEPN";
-            shapes << "org.sbgn.pd.SourceOrSink";
-            shapes << "org.sbgn.pd.SimpleChemEPN";
-            shapes << "org.sbgn.pd.MacromolEPN";
-            shapes << "org.sbgn.pd.NucleicAcidEPN";
-            shapes << "org.sbgn.pd.ComplexEPN";
-            shapes << "org.sbgn.pd.PerturbingEPN";
-            shapes << "org.sbgn.pd.ProcessNode";
+            shapes << "org.sbgn.pd.00UnspecifiedEPN";
+            shapes << "org.sbgn.pd.01SimpleChemEPN";
+            shapes << "org.sbgn.pd.02MacromolEPN";
+            shapes << "org.sbgn.pd.03NucleicAcidEPN";
+            shapes << "org.sbgn.pd.04PerturbingEPN";
+            shapes << "org.sbgn.pd.05SourceOrSink";
+            shapes << "org.sbgn.pd.06ComplexEPN";
+            shapes << "org.sbgn.pd.ProcessNodeVertical";
+            shapes << "org.sbgn.pd.ProcessNodeHorizontal";
             shapes << "org.sbgn.pd.UnknownProcessNode";
             shapes << "org.sbgn.pd.OmittedProcessNode";
             shapes << "org.sbgn.pd.AssociationProcessNode";
@@ -74,35 +75,39 @@ class SBGNShapesPlugin : public QObject, public ShapePluginInterface
         }
         ShapeObj *generateShapeOfType(QString shapeType)
         {
-            if (shapeType == "org.sbgn.pd.UnspecifiedEPN")
+            if (shapeType == "org.sbgn.pd.00UnspecifiedEPN")
             {
-                return new UnspecifiedEPN("Unspecified cloned", true);
+                return new UnspecifiedEPN("LABEL", false);
             }
-            else if (shapeType == "org.sbgn.pd.SourceOrSink")
+            else if (shapeType == "org.sbgn.pd.05SourceOrSink")
             {
                 return new SourceOrSink();
             }
-            else if (shapeType == "org.sbgn.pd.SimpleChemEPN")
+            else if (shapeType == "org.sbgn.pd.01SimpleChemEPN")
             {
-                return new SimpleChemEPN("Hello World 1", true, true);
+                return new SimpleChemEPN("LABEL", false, false);
             }
-            else if (shapeType == "org.sbgn.pd.MacromolEPN")
+            else if (shapeType == "org.sbgn.pd.02MacromolEPN")
             {
-                return new MacromolEPN("Cloned Macromol", false, "", false);
+                return new MacromolEPN("LABEL", false, "", false);
             }
-            else if (shapeType == "org.sbgn.pd.NucleicAcidEPN")
+            else if (shapeType == "org.sbgn.pd.03NucleicAcidEPN")
             {
-                return new NucleicAcidEPN("Cloned Nucleic Acid", true, "Clone marker", true);
+                return new NucleicAcidEPN("LABEL", false, "", false);
             }
-            else if (shapeType == "org.sbgn.pd.ComplexEPN")
+            else if (shapeType == "org.sbgn.pd.06ComplexEPN")
             {
-                return new ComplexEPN("Cloned Complex", true, "Clone label", true);
+                return new ComplexEPN("LABEL", false, "", false);
             }
-            else if (shapeType == "org.sbgn.pd.PerturbingEPN")
+            else if (shapeType == "org.sbgn.pd.04PerturbingEPN")
             {
-                return new PerturbingEPN("Perturbing EPN cloned", true);
+                return new PerturbingEPN("LABEL", false);
             }
-            else if (shapeType == "org.sbgn.pd.ProcessNode")
+            else if (shapeType == "org.sbgn.pd.ProcessNodeVertical")
+            {
+                return new ProcessNode(Qt::Vertical, ProcessNode::PROCESS);
+            }
+            else if (shapeType == "org.sbgn.pd.ProcessNodeHorizontal")
             {
                 return new ProcessNode(Qt::Horizontal, ProcessNode::PROCESS);
             }
@@ -124,7 +129,7 @@ class SBGNShapesPlugin : public QObject, public ShapePluginInterface
             }
             else if (shapeType == "org.sbgn.pd.PhenotypeProcessNode")
             {
-                return new PhenotypeProcessNode("Phenotype cloned", true);
+                return new PhenotypeProcessNode("LABEL", false);
             }
             return NULL;
         }

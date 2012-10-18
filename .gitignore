@@ -16,7 +16,7 @@ githash.h
 # Makefiles are generated, so ignore.
 Makefile*
 
-Dunnart.pro.user
+dunnart.pro.user
 
 tags
 log
