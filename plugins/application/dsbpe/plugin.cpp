@@ -33,6 +33,8 @@
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/canvasapplication.h"
 
+#include "plugins/application/dsbpe/findBranchesDialog.h"
+
 using namespace dunnart;
 
 
@@ -55,7 +57,7 @@ class DSBPEApplicationPlugin : public QObject, public ApplicationPluginInterface
 
             QAction *findBranchesAction = new QAction(tr("Find branches..."), this);
             connect(findBranchesAction, SIGNAL(triggered()), this,
-                    SLOT(showFindBranchesDiaglog()));
+                    SLOT(showFindBranchesDialog()));
 
             QMenu *dsbpeMenu = canvasApplication->mainWindow()->
                     menuBar()->addMenu("SB Pathways");
@@ -70,7 +72,16 @@ class DSBPEApplicationPlugin : public QObject, public ApplicationPluginInterface
     private slots:
         void showFindBranchesDialog()
         {
-            //TODO
+            Canvas *canvas = m_canvas_application->currentCanvas();
+            QMainWindow *mainWindow = m_canvas_application->mainWindow();
+            /*
+            FindBranchesDialog *fbDialog = new FindBranchesDialog(
+                        m_canvas_application->mainWindow().canvas(), m_canvas_application->mainWindow());
+            */
+            FindBranchesDialog *fbDialog = new FindBranchesDialog(canvas, mainWindow);
+            fbDialog->show();
+            fbDialog->raise();
+            fbDialog->activateWindow();
         }
 
     private:
