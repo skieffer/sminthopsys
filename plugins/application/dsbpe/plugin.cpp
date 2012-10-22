@@ -38,7 +38,8 @@
 using namespace dunnart;
 
 
-//! @brief  Plugin class that adds support for working with the Garuda platform.
+//! @brief  Plugin that provides methods for manipulating biological pathways
+//! in systems biology diagrams.
 //!
 class DSBPEApplicationPlugin : public QObject, public ApplicationPluginInterface
 {
@@ -74,10 +75,6 @@ class DSBPEApplicationPlugin : public QObject, public ApplicationPluginInterface
         {
             Canvas *canvas = m_canvas_application->currentCanvas();
             QMainWindow *mainWindow = m_canvas_application->mainWindow();
-            /*
-            FindBranchesDialog *fbDialog = new FindBranchesDialog(
-                        m_canvas_application->mainWindow().canvas(), m_canvas_application->mainWindow());
-            */
             FindBranchesDialog *fbDialog = new FindBranchesDialog(canvas, mainWindow);
             fbDialog->show();
             fbDialog->raise();
