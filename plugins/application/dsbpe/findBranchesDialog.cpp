@@ -15,7 +15,6 @@ namespace dunnart {
 FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     : QDialog(parent)
 {
-
     m_canvas = canvas;
 
     // Build the dialog.
@@ -64,22 +63,21 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
             this, SLOT(canvasSelectionChanged()));
 }
 
-void FindBranchesDialog::findBranches()
-{
-    // TODO: Find the branches!
-    accept();
-}
-
+/* Respond to a change in the canvas selection.
+ */
 void FindBranchesDialog::canvasSelectionChanged()
 {
     getSelectedSpecies();
 }
 
+/* Consult the canvas selection, and check whether exactly one
+   shape node is selected. If so, populate edit box with its name.
+   Otherwise, put a message requesting selection of just one shape.
+
+   FIXME: We should be demanding not just shapes, but SBGN shapes.
+ */
 void FindBranchesDialog::getSelectedSpecies()
 {
-    // TODO: check for single selected node, and populate edit box accordingly.
-
-    //QList<CanvasItem*> selection = m_canvas->selectedItems();
     CanvasItemList selection = m_canvas->selectedItems();
     int n = selection.size();
     if (n != 1)
@@ -89,7 +87,6 @@ void FindBranchesDialog::getSelectedSpecies()
     else // Exactly one object was selected.
     {
         CanvasItem *item = selection.first();
-        // TODO
         ShapeObj *shape = qobject_cast<ShapeObj *> (item);
         if (shape)
         {
@@ -103,6 +100,14 @@ void FindBranchesDialog::getSelectedSpecies()
 
     }
 
+}
+
+/* Carry out the find-branches action, as specified in the dialog box.
+  */
+void FindBranchesDialog::findBranches()
+{
+    // TODO: Find the branches!
+    accept();
 }
 
 }

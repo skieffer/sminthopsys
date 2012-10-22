@@ -86,6 +86,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
         bool saveDiagramToFile(Canvas *canvas, const QFileInfo& fileInfo,
                 QString& errorMessage)
         {
+            // TODO
             return false;
         }
         bool loadDiagramFromFile(Canvas *canvas, const QFileInfo& fileInfo,
@@ -112,36 +113,40 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             Species* spec;
             std::string id;
             std::string name;
-            int cols = ceil(sqrt(numSpecies));
-            int x0 = 0, y0 = 0;
-            int u = 30; int sepUnits = 2;
-            int x, y;
+            // Will layout in a square array.
+            int cols = ceil(sqrt(numSpecies)); // number of columns in array
+            int u = 30; // unit of separation
+            int sepUnits = 2; // separation between adjacent nodes, in units u
+            int x0 = 0, y0 = 0, x, y;
+            PluginShapeFactory *factory = sharedPluginShapeFactory();
             for (unsigned int i = 0; i < numSpecies; i++) {
+                // Get species information.
                 spec = los->get(i);
                 id = spec->getId();
                 name = spec->getName();
+                // Create shape.
+                QString *type = new QString("org.sbgn.pd.01SimpleChemEPN");
+                ShapeObj *shape = factory->createShape(*type);
+                // Set its properties.
+                // Size
+                QSizeF *size = new QSizeF(u,u);
                 x = x0 + sepUnits*u*(i%cols);
                 y = y0 + sepUnits*u*(i/cols);
-                CanvasItem *newObj = NULL;
-                ShapeObj *shape = NULL;
-                QString *type = new QString("org.sbgn.pd.01SimpleChemEPN");
-
-                PluginShapeFactory *factory = sharedPluginShapeFactory();
-                shape = factory->createShape(*type);
-                QSizeF *size = new QSizeF(u,u);
+                // Position
                 QPointF *point = new QPointF(x,y);
                 shape->setPosAndSize(*point, *size);
+                // Label
                 QString *label = new QString(name.c_str());
                 shape->setLabel(*label);
-                newObj = (CanvasItem*) shape;
-
-                QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, newObj);
+                // Add it to the canvas.
+                QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, shape);
                 canvas->currentUndoMacro()->addCommand(cmd);
             }
 
-
             return true;
         }
+
+        // TODO: If not using this method, then delete it:
         static QString nodeToString(const QDomNode& node)
         {
             QString nodeString;
