@@ -1,5 +1,5 @@
 /*
- * Garuda plugin - Enables communication with other Garuda enabled apps.
+ * DSBPE plugin - For editing Systems Biology pathways.
  *
  * Copyright (C) 2011-2012  Monash University
  *
@@ -19,7 +19,7 @@
  * MA  02110-1301, USA.
  * 
  *
- * Author(s): Michael Wybrow  <http://michael.wybrow.info/>
+ * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
 //! @file

@@ -20,6 +20,7 @@
  * 
  *
  * Author(s): Michael Wybrow  <http://michael.wybrow.info/>
+ *            Steven Kieffer  <http://skieffer.info>
 */
 
 //! @file
@@ -115,7 +116,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             std::string name;
             // Will layout in a square array.
             int cols = ceil(sqrt(numSpecies)); // number of columns in array
-            int u = 30; // unit of separation
+            int u = 50; // unit of separation
             int sepUnits = 2; // separation between adjacent nodes, in units u
             int x0 = 0, y0 = 0, x, y;
             PluginShapeFactory *factory = sharedPluginShapeFactory();
@@ -125,16 +126,17 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 id = spec->getId();
                 name = spec->getName();
                 // Create shape.
-                QString *type = new QString("org.sbgn.pd.01SimpleChemEPN");
+                QString *type = new QString("org.sbgn.pd.00UnspecifiedEPN");
                 ShapeObj *shape = factory->createShape(*type);
                 // Set its properties.
-                // Size
-                QSizeF *size = new QSizeF(u,u);
+                // Size: leave as default.
+                //QSizeF *size = new QSizeF(70,50);
+                // Position
                 x = x0 + sepUnits*u*(i%cols);
                 y = y0 + sepUnits*u*(i/cols);
-                // Position
                 QPointF *point = new QPointF(x,y);
-                shape->setPosAndSize(*point, *size);
+                //shape->setPosAndSize(*point, *size);
+                shape->setCentrePos(*point);
                 // Label
                 QString *label = new QString(name.c_str());
                 shape->setLabel(*label);

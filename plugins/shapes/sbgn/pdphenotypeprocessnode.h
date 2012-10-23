@@ -30,10 +30,11 @@
 
 using namespace dunnart;
 
-// This process node is completely different to the other process nodes.  It currently only accepts horizontal alignment.
+// This process node is completely different to the other process nodes.
+// It currently only accepts horizontal alignment.
 // It uses Q_OBJECT for testing in the drawing function ...
 // This glyph can have a simple clone marker without a label.
-//  Cannot be multimeric.
+// Cannot be multimeric.
 class PhenotypeProcessNode: public ProcessNode
 {
 public:
