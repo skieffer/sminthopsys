@@ -31,6 +31,7 @@
 #define PDEPN_H
 
 #include "libdunnartcanvas/shape.h"
+#include "plugins/shapes/sbgn/species.h"
 
 #include <QGraphicsItem>
 #include <QFont>
@@ -98,8 +99,8 @@ protected:
     QString cloneLabel;
     bool multimer;
 
-  // QT
-  #if 0
+// QT
+#if 0
 protected:
     virtual QAction *buildAndExecContextMenu(
             QGraphicsSceneMouseEvent *event, QMenu& menu);

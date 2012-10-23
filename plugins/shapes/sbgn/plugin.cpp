@@ -28,18 +28,19 @@
 
 #include "libdunnartcanvas/shapeplugininterface.h"
 #include "libdunnartcanvas/shape.h"
+
 using namespace dunnart;
 
 #include "pdepn.h"
 #include "pdunspecifiedepn.h"
-#include "pdsourcesink.h"
 #include "pdsimplechemepn.h"
 #include "pdmacromolepn.h"
 #include "pdnucleicepn.h"
-#include "pdcomplexepn.h"
 #include "pdperturbingepn.h"
+#include "pdsourcesink.h"
+#include "pdcomplexepn.h"
+#include "pdprocessnode.h"
 #include "pdphenotypeprocessnode.h"
-//#include "pdprocessnode.h"
 
 class SBGNShapesPlugin : public QObject, public ShapePluginInterface
 {
@@ -79,10 +80,6 @@ class SBGNShapesPlugin : public QObject, public ShapePluginInterface
             {
                 return new UnspecifiedEPN("LABEL", false);
             }
-            else if (shapeType == "org.sbgn.pd.05SourceOrSink")
-            {
-                return new SourceOrSink();
-            }
             else if (shapeType == "org.sbgn.pd.01SimpleChemEPN")
             {
                 return new SimpleChemEPN("LABEL", false, false);
@@ -95,13 +92,17 @@ class SBGNShapesPlugin : public QObject, public ShapePluginInterface
             {
                 return new NucleicAcidEPN("LABEL", false, "", false);
             }
-            else if (shapeType == "org.sbgn.pd.06ComplexEPN")
-            {
-                return new ComplexEPN("LABEL", false, "", false);
-            }
             else if (shapeType == "org.sbgn.pd.04PerturbingEPN")
             {
                 return new PerturbingEPN("LABEL", false);
+            }
+            else if (shapeType == "org.sbgn.pd.05SourceOrSink")
+            {
+                return new SourceOrSink();
+            }
+            else if (shapeType == "org.sbgn.pd.06ComplexEPN")
+            {
+                return new ComplexEPN("LABEL", false, "", false);
             }
             else if (shapeType == "org.sbgn.pd.ProcessNodeVertical")
             {

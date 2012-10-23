@@ -37,7 +37,11 @@ using namespace dunnart;
 class UnspecifiedEPN: public PDEPN
 {
 public:
-    UnspecifiedEPN(QString t, bool cb) : PDEPN(t, cb, "", false) {}
+    UnspecifiedEPN(QString t, bool cb) : PDEPN(t, cb, "", false)
+    {
+        // Set default size.
+        setSize(QSizeF(70,50));
+    }
     QPainterPath clone_marker() const;
     QPainterPath buildPainterPath();
     QAction* buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu& menu);
