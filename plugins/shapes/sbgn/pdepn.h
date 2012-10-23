@@ -31,7 +31,6 @@
 #define PDEPN_H
 
 #include "libdunnartcanvas/shape.h"
-#include "plugins/shapes/sbgn/species.h"
 
 #include <QGraphicsItem>
 #include <QFont>
