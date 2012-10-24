@@ -24,24 +24,28 @@
 
 #include <QString>
 
-#include "libdsbpe/dsbspecies.h"
+#include "libdsbpe/dsbreaction.h"
 
 #include "sbml/SBMLTypes.h"
 
 namespace dunnart {
 
-DSBSpecies::DSBSpecies() {}
+DSBReaction::DSBReaction() {}
 
-DSBSpecies::DSBSpecies(Species *spec)
+DSBReaction::DSBReaction(Reaction *reac)
 {
-    m_name = QString(spec->getName().c_str());
-    m_id = QString(spec->getId().c_str());
-    m_compartment = QString(spec->getCompartment().c_str());
+    //m_sbmlReaction = reac;
+    m_name = QString(reac->getName().c_str());
+    m_id = QString(reac->getId().c_str());
+    m_compartment = QString(reac->getCompartment().c_str());
 }
 
-QString DSBSpecies::getCompartmentName()
+/* Give this reaction links to all species involved in it,
+   and give those species links to this reaction.
+  */
+void DSBReaction::doublyLink(QMap<QString, DSBSpecies> *map)
 {
-    return m_compartment;
+    // TODO
 }
 
 }

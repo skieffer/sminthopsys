@@ -9,9 +9,12 @@ include(../common_options.qmake)
 
 # Input
 SOURCES += \
-        dsbspecies.cpp
+        dsbspecies.cpp \
+	dsbreaction.cpp \
+        dsbabstractcontainer.cpp
 
 HEADERS += \
-        dsbspecies.h
-
+        dsbspecies.h \
+	dsbreaction.h \
+        dsbabstractcontainer.h
 

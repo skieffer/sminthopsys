@@ -22,26 +22,39 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#include <QString>
+#ifndef DSBREACTION_H
+#define DSBREACTION_H
 
-#include "libdsbpe/dsbspecies.h"
+#include <QString>
+#include <QMap>
+#include <QList>
 
 #include "sbml/SBMLTypes.h"
 
+#include "libdsbpe/dsbspecies.h"
+
+class QString;
+
 namespace dunnart {
 
-DSBSpecies::DSBSpecies() {}
-
-DSBSpecies::DSBSpecies(Species *spec)
+class DSBReaction
 {
-    m_name = QString(spec->getName().c_str());
-    m_id = QString(spec->getId().c_str());
-    m_compartment = QString(spec->getCompartment().c_str());
+
+public:
+    DSBReaction();
+    DSBReaction(Reaction *reac);
+    void doublyLink(QMap<QString,DSBSpecies> *map);
+
+private:
+    //Reaction *m_sbmlReaction;
+    QString m_name;
+    QString m_id;
+    QString m_compartment;
+    QList<DSBSpecies> *m_inputs;
+    QList<DSBSpecies> *m_outputs;
+
+};
+
 }
 
-QString DSBSpecies::getCompartmentName()
-{
-    return m_compartment;
-}
-
-}
+#endif // DSBREACTION_H

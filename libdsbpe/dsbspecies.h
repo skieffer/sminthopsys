@@ -25,6 +25,8 @@
 #ifndef DSBSPECIES_H
 #define DSBSPECIES_H
 
+#include <QString>
+
 #include "sbml/SBMLTypes.h"
 
 class QString;
@@ -33,9 +35,11 @@ namespace dunnart {
 
 class DSBSpecies
 {
+
 public:
     DSBSpecies();
     DSBSpecies(Species *spec);
+    QString getCompartmentName();
 
 private:
     QString m_name;
