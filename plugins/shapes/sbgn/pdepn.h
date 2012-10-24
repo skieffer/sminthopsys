@@ -20,6 +20,7 @@
  *
  * 
  * Author(s): Sarah Boyd  <Sarah.Boyd@monash.edu>
+ *            Steven Kieffer  <http://skieffer.info>
 */
 
 
@@ -36,6 +37,8 @@
 #include <QFont>
 #include <QObject> // need this class for the QOBJECT macro, which is needed for type checking
 #include <QPainter> // this is actually included in the coreclasses.cpp file, but needed here because of order of inclusion
+
+#include "libdsbpe/dsbspecies.h"
 
 using namespace dunnart;
 
@@ -88,6 +91,7 @@ public:
     virtual QPainterPath clone_marker() const = 0; // creates the clone marker for this glyph: MUST be instantiated in the inheriting class
     bool isCloned();
     bool isMultimeric() { return false; } // an EPN is not multimeric
+    void setSpecies(DSBSpecies spec);
 
 protected:
     PDEPN(QString l, bool cb, QString cl, bool m);
@@ -97,6 +101,7 @@ protected:
     bool cloned;
     QString cloneLabel;
     bool multimer;
+    DSBSpecies species;
 
 // QT
 #if 0

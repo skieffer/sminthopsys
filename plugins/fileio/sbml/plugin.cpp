@@ -24,8 +24,8 @@
 */
 
 //! @file
-//! Plugin that adds support for reading and writing Dunnart's native
-//! annotated SVG file format.
+//! Plugin class that adds support for loading and saving SBML
+//! files.
 
 #include <QtGui>
 #include <QObject>
@@ -43,6 +43,8 @@
 #include "libdunnartcanvas/undo.h"
 #include "libdunnartcanvas/pluginshapefactory.h"
 #include "libdunnartcanvas/shape.h"
+
+#include "libdsbpe/dsbspecies.h"
 
 using namespace dunnart;
 
@@ -123,11 +125,19 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             for (unsigned int i = 0; i < numSpecies; i++) {
                 // Get species information.
                 spec = los->get(i);
+
+                // Construct internal representation.
+                DSBSpecies *dsbspec = new DSBSpecies(spec);
+
                 id = spec->getId();
                 name = spec->getName();
                 // Create shape.
                 QString *type = new QString("org.sbgn.pd.00UnspecifiedEPN");
                 ShapeObj *shape = factory->createShape(*type);
+
+                // TODO:
+                // Should now give shape a pointer to dsbspec
+
                 // Set its properties.
                 // Size: leave as default.
                 //QSizeF *size = new QSizeF(70,50);

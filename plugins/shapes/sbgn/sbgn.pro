@@ -4,6 +4,11 @@ TEMPLATE      = lib
 CONFIG       += qt plugin
 TARGET        = $$qtLibraryTarget(shapes_sbgn)
 
+INCLUDEPATH += ../../..
+INCLUDEPATH += . $$DUNNARTBASE
+
+LIBS += -L$$DUNNARTBASE/build -ldsbpe
+
 include(../../../common_options.qmake)
 include(../shape_plugin_options.pri)
 
