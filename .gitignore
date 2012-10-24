@@ -24,3 +24,5 @@ diff
 
 #ignore the executable
 
+#ignore backup files
+*~
