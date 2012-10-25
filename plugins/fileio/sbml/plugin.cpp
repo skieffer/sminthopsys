@@ -127,8 +127,8 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             int sepUnits = 2; // separation between adjacent nodes, in units u
             int x0 = 0, y0 = 0, x, y;
             PluginShapeFactory *factory = sharedPluginShapeFactory();
-            // Build a map from species id's to the internal objects representing those species.
-            QMap<QString,dunnart::DSBSpecies> *speciesMap = new QMap<QString,dunnart::DSBSpecies>();
+            // Build a map from species id's to ptrs to the internal objects representing those species.
+            QMap<QString,dunnart::DSBSpecies*> *speciesMap = new QMap<QString,dunnart::DSBSpecies*>();
             // Also a map from container names to DSBAbstractContainer objects.
             QMap<QString,DSBAbstractContainer> *containerMap = new QMap<QString,DSBAbstractContainer>();
             for (unsigned int i = 0; i < numSpecies; i++)
@@ -137,10 +137,13 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 spec = los->get(i);
                 id = spec->getId();
                 name = spec->getName();
+
                 // Construct internal representation.
-                dunnart::DSBSpecies *dsbspec = new dunnart::DSBSpecies(spec);
+                //dunnart::DSBSpecies *dsbspec = new dunnart::DSBSpecies(spec);
+                DSBSpecies *dsbspec = new DSBSpecies(spec);
+
                 // Save it in the species map.
-                speciesMap->insert(QString(id.c_str()), *dsbspec);
+                speciesMap->insert(QString(id.c_str()), dsbspec);
                 // If it belongs to a new container, then add it to the container map.
                 QString conName = dsbspec->getCompartmentName();
                 if (!containerMap->contains(conName))
@@ -154,9 +157,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 ShapeObj *shape = factory->createShape(*type);
 
                 //FIXME
-                PDEPN *epn = (PDEPN*) &shape;
+                PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
                 //Why can't this be found at runtime?
-                //epn->setSpecies(dsbspec);
+                epn->setSpecies(dsbspec);
 
                 // Set its properties.
                 // Size: leave as default.

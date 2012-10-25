@@ -32,8 +32,8 @@
 namespace dunnart {
 
 DSBAbstractContainer::DSBAbstractContainer(QString containerName)
+    : m_containerName(containerName)
 {
-    m_containerName = containerName;
     m_species = new QList<DSBSpecies>();
     m_reactions = new QList<DSBReaction>();
 }

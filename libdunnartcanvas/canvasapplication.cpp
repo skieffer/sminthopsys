@@ -52,6 +52,10 @@ CanvasApplication::CanvasApplication(int & argc, char ** argv)
     pluginsDir.cd("plugins");
 #endif
 
+    //qDebug() << pluginsDir.absolutePath();
+    //addLibraryPath(qApp->applicationDirPath());
+    //addLibraryPath(pluginsDir.absolutePath());
+
     // Dynamically load each library in the plugins directory, and then
     // register them if they implement a given Dunnart plugin interface.
     PluginShapeFactory *shapeFactory = sharedPluginShapeFactory();
