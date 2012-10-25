@@ -22,8 +22,6 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#include <QString>
-
 #include "libdsbpe/dsbreaction.h"
 
 #include "sbml/SBMLTypes.h"
@@ -43,7 +41,7 @@ DSBReaction::DSBReaction(Reaction *reac)
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
-void DSBReaction::doublyLink(QMap<QString, DSBSpecies> *map)
+void DSBReaction::doublyLink(QMap<QString, DSBSpecies *> *map)
 {
     // TODO
 }

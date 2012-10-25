@@ -27,9 +27,7 @@
 
 #include <QString>
 
-#include "sbml/SBMLTypes.h"
-
-class QString;
+class Species;
 
 namespace dunnart {
 

@@ -29,13 +29,14 @@
 #include <QMap>
 #include <QList>
 
-#include "sbml/SBMLTypes.h"
+//#include "libdsbpe/dsbspecies.h"
 
-#include "libdsbpe/dsbspecies.h"
-
-class QString;
+//#include "sbml/SBMLTypes.h"
+class Reaction;
 
 namespace dunnart {
+
+class DSBSpecies;
 
 class DSBReaction
 {
@@ -43,10 +44,10 @@ class DSBReaction
 public:
     DSBReaction();
     DSBReaction(Reaction *reac);
-    void doublyLink(QMap<QString,DSBSpecies> *map);
+    void doublyLink(QMap<QString,DSBSpecies *> *map);
 
 private:
-    //Reaction *m_sbmlReaction;
+    Reaction *m_sbmlReaction;
     QString m_name;
     QString m_id;
     QString m_compartment;

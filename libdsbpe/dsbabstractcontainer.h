@@ -26,16 +26,16 @@
 #define DSBABSTRACTCONTAINER_H
 
 #include <QList>
+#include <QString>
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 
-class DSBSpecies;
-class DSBReaction;
-class QList<DSBSpecies>;
-class QList<DSBReaction>;
-class QString;
 
 namespace dunnart {
+
+class DSBSpecies;
+class DSBReaction;
+
 
 class DSBAbstractContainer
 {

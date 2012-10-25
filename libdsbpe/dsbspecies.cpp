@@ -22,8 +22,6 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#include <QString>
-
 #include "libdsbpe/dsbspecies.h"
 
 #include "sbml/SBMLTypes.h"
