@@ -37,6 +37,7 @@
 
 #include <string>
 #include <math.h>
+
 #include "sbml/SBMLTypes.h"
 
 #include "libdunnartcanvas/fileioplugininterface.h"
@@ -48,11 +49,11 @@
 
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
-#include "libdsbpe/dsbabstractcontainer.h"
+#include "libdsbpe/dsbcompartment.h"
+
 #include "plugins/shapes/sbgn/pdepn.h"
 
 using namespace dunnart;
-
 
 //! @brief  Plugin class that adds support for loading and saving SBML
 //! files.
@@ -97,11 +98,21 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             // TODO
             return false;
         }
+        // TODO: If not using this method, then delete it:
+        static QString nodeToString(const QDomNode& node)
+        {
+            QString nodeString;
+            QTextStream nodeTextStream(&nodeString);
+            node.save(nodeTextStream, 4);
+
+            return nodeString;
+        }
         bool loadDiagramFromFile(Canvas *canvas, const QFileInfo& fileInfo,
                 QString& errorMessage)
         {
             QString filename = fileInfo.absoluteFilePath();
-            SBMLDocument* doc = readSBML(filename.toStdString().c_str());
+            SBMLDocument *doc = readSBML(filename.toStdString().c_str());
+            Model *model = doc->getModel();
 
             // Check for errors.
             unsigned int errors = doc->getNumErrors();
@@ -115,10 +126,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             }
 
             // Get the species and reactions.
-            Model* model = doc->getModel();
-            ListOfSpecies* los = model->getListOfSpecies();
+            ListOfSpecies *los = model->getListOfSpecies();
             unsigned int numSpecies = los->size();
-            Species* spec;
+            Species *spec;
             std::string id;
             std::string name;
             // Will layout in a square array.
@@ -127,52 +137,53 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             int sepUnits = 2; // separation between adjacent nodes, in units u
             int x0 = 0, y0 = 0, x, y;
             PluginShapeFactory *factory = sharedPluginShapeFactory();
-            // Build a map from species id's to ptrs to the internal objects representing those species.
-            QMap<QString,dunnart::DSBSpecies*> *speciesMap = new QMap<QString,dunnart::DSBSpecies*>();
-            // Also a map from container names to DSBAbstractContainer objects.
-            QMap<QString,DSBAbstractContainer> *containerMap = new QMap<QString,DSBAbstractContainer>();
+            // Build a map from species id's to internal objects representing those species.
+            //QMap<QString, DSBSpecies *> *speciesMap = new QMap<QString, DSBSpecies*>();
+            QMap<QString, DSBSpecies> speciesMap;
+
+            // Also a map from compartment names to DSBCompartment objects.
+            //QMap<QString, DSBCompartment *> *compMap = new QMap<QString, DSBCompartment *>();
+            QMap<QString, DSBCompartment> compMap;
+
             for (unsigned int i = 0; i < numSpecies; i++)
             {
-                // Get species information.
                 spec = los->get(i);
+                // Get species information.
                 id = spec->getId();
                 name = spec->getName();
 
                 // Construct internal representation.
-                //dunnart::DSBSpecies *dsbspec = new dunnart::DSBSpecies(spec);
-                DSBSpecies *dsbspec = new DSBSpecies(spec);
+                DSBSpecies dsbspec(spec);
 
                 // Save it in the species map.
-                speciesMap->insert(QString(id.c_str()), dsbspec);
-                // If it belongs to a new container, then add it to the container map.
-                QString conName = dsbspec->getCompartmentName();
-                if (!containerMap->contains(conName))
+                speciesMap.insert(QString(id.c_str()), dsbspec);
+                // If it belongs to a new compartment, then add that to the compartment map.
+                QString compName = dsbspec.getCompartmentName();
+                if (!compMap.contains(compName))
                 {
-                    DSBAbstractContainer *con = new DSBAbstractContainer(conName);
-                    containerMap->insert(conName,*con);
+                    DSBCompartment comp(compName);
+                    compMap.insert(compName, comp);
                 }
 
                 // Create shape.
-                QString *type = new QString("org.sbgn.pd.00UnspecifiedEPN");
-                ShapeObj *shape = factory->createShape(*type);
-
-                //FIXME
+                QString type("org.sbgn.pd.00UnspecifiedEPN");
+                ShapeObj *shape = factory->createShape(type);
+                // Give it a reference to the species it represents.
                 PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
-                //Why can't this be found at runtime?
                 epn->setSpecies(dsbspec);
 
                 // Set its properties.
                 // Size: leave as default.
-                //QSizeF *size = new QSizeF(70,50);
+                //QSizeF size(70,50);
                 // Position
                 x = x0 + sepUnits*u*(i%cols);
                 y = y0 + sepUnits*u*(i/cols);
-                QPointF *point = new QPointF(x,y);
-                //shape->setPosAndSize(*point, *size);
-                shape->setCentrePos(*point);
+                QPointF point(x,y);
+                //shape->setPosAndSize(point, size);
+                shape->setCentrePos(point);
                 // Label
-                QString *label = new QString(name.c_str());
-                shape->setLabel(*label);
+                QString label(name.c_str());
+                shape->setLabel(label);
                 // Add it to the canvas.
                 QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, shape);
                 canvas->currentUndoMacro()->addCommand(cmd);
@@ -182,28 +193,19 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             ListOfReactions *lor = model->getListOfReactions();
             unsigned int numReacs = lor->size();
             Reaction *reac;
-            QMap<QString,dunnart::DSBReaction> *reactionMap = new QMap<QString,dunnart::DSBReaction>();
+            QMap<QString, DSBReaction> reactionMap;
             for (unsigned int i = 0; i < numReacs; i++)
             {
                 reac = lor->get(i);
                 id = reac->getId();
-                dunnart::DSBReaction *dsbreac = new dunnart::DSBReaction(reac);
-                reactionMap->insert(QString(id.c_str()), *dsbreac);
-                dsbreac->doublyLink(speciesMap);
+                DSBReaction dsbreac(reac);
+                reactionMap.insert(QString(id.c_str()), dsbreac);
+                dsbreac.doublyLink(speciesMap);
             }
 
             return true;
         }
 
-        // TODO: If not using this method, then delete it:
-        static QString nodeToString(const QDomNode& node)
-        {
-            QString nodeString;
-            QTextStream nodeTextStream(&nodeString);
-            node.save(nodeTextStream, 4);
-
-            return nodeString;
-        }
 };
 
 

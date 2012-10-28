@@ -26,6 +26,9 @@
 #define DSBSPECIES_H
 
 #include <QString>
+#include <QList>
+
+#include "libdsbpe/dsbreaction.h"
 
 class Species;
 
@@ -38,12 +41,15 @@ public:
     DSBSpecies();
     DSBSpecies(Species *spec);
     QString getCompartmentName();
+    void addReactionEntered(DSBReaction& reac);
 
 private:
+    Species *m_sbmlSpecies;
     QString m_name;
     QString m_id;
-    QString m_compartment;
-
+    QString m_compartmentName;
+    QList<DSBReaction> m_reactionsEntered;
+    QList<DSBReaction> m_reactionsExited;
 };
 
 }

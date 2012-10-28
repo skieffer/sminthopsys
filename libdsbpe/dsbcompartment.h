@@ -22,30 +22,32 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#ifndef DSBCOMPARTMENT_H
+#define DSBCOMPARTMENT_H
+
 #include <QString>
 #include <QList>
 
-#include "libdsbpe/dsbabstractcontainer.h"
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 
 namespace dunnart {
 
-DSBAbstractContainer::DSBAbstractContainer(QString containerName)
-    : m_containerName(containerName)
+class DSBCompartment
 {
-    m_species = new QList<DSBSpecies>();
-    m_reactions = new QList<DSBReaction>();
-}
 
-void DSBAbstractContainer::addSpecies(DSBSpecies *spec)
-{
-    m_species->append(*spec);
-}
+public:
+    DSBCompartment(QString compartmentName);
+    void addSpecies(DSBSpecies& spec);
+    void addReaction(DSBReaction& reac);
 
-void DSBAbstractContainer::addReaction(DSBReaction *reac)
-{
-    m_reactions->append(*reac);
-}
+private:
+    QString m_compartmentName;
+    QList<DSBSpecies> m_species;
+    QList<DSBReaction> m_reactions;
+
+};
 
 }
+
+#endif // DSBCOMPARTMENT_H
