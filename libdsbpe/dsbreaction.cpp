@@ -23,6 +23,7 @@
 */
 
 #include "libdsbpe/dsbreaction.h"
+#include "libdsbpe/dsbspecies.h"
 
 #include "sbml/SBMLTypes.h"
 
@@ -30,20 +31,42 @@ namespace dunnart {
 
 DSBReaction::DSBReaction() {}
 
-DSBReaction::DSBReaction(Reaction *reac)
+DSBReaction::DSBReaction(Reaction *reac) :
+    m_sbmlReaction(reac)
 {
-    //m_sbmlReaction = reac;
     m_name = QString(reac->getName().c_str());
     m_id = QString(reac->getId().c_str());
-    m_compartment = QString(reac->getCompartment().c_str());
+    m_compartmentName = QString(reac->getCompartment().c_str());
 }
 
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
-void DSBReaction::doublyLink(QMap<QString, DSBSpecies *> *map)
+void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
 {
-    // TODO
+    ListOfSpeciesReferences *lsr;
+    SimpleSpeciesReference *ssr;
+    unsigned int N;
+    QString specId;
+    // "reactants", or inputs
+    lsr = m_sbmlReaction->getListOfReactants();
+    N = lsr->size();
+    for (unsigned int i = 0; i < N; i++)
+    {
+        ssr = lsr->get(i);
+        specId = QString(ssr->getSpecies().c_str());
+        if (!map.contains(specId))
+        {
+            // TODO: Report error. Reaction is referring to a species that
+            // was not declared in the SBML list of species.
+        }
+        else
+        {
+            DSBSpecies dsbspec = map.value(specId);
+            m_inputs.append(dsbspec);
+            dsbspec.addReactionEntered(*this);
+        }
+    }
 }
 
 }

@@ -26,12 +26,11 @@
 #define DSBREACTION_H
 
 #include <QString>
-#include <QMap>
 #include <QList>
+#include <QMap>
 
 //#include "libdsbpe/dsbspecies.h"
 
-//#include "sbml/SBMLTypes.h"
 class Reaction;
 
 namespace dunnart {
@@ -44,15 +43,16 @@ class DSBReaction
 public:
     DSBReaction();
     DSBReaction(Reaction *reac);
-    void doublyLink(QMap<QString,DSBSpecies *> *map);
+    void doublyLink(QMap<QString,DSBSpecies> map);
 
 private:
     Reaction *m_sbmlReaction;
     QString m_name;
     QString m_id;
-    QString m_compartment;
-    QList<DSBSpecies> *m_inputs;
-    QList<DSBSpecies> *m_outputs;
+    QString m_compartmentName;
+    QList<DSBSpecies> m_inputs;
+    QList<DSBSpecies> m_outputs;
+    QList<DSBSpecies> m_modifiers;
 
 };
 

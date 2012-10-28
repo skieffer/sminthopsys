@@ -11,10 +11,10 @@ include(../common_options.qmake)
 SOURCES += \
         dsbspecies.cpp \
 	dsbreaction.cpp \
-        dsbabstractcontainer.cpp
+        dsbcompartment.cpp
 
 HEADERS += \
         dsbspecies.h \
 	dsbreaction.h \
-        dsbabstractcontainer.h
+        dsbcompartment.h
 

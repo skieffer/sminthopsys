@@ -30,16 +30,22 @@ namespace dunnart {
 
 DSBSpecies::DSBSpecies() {}
 
-DSBSpecies::DSBSpecies(Species *spec)
+DSBSpecies::DSBSpecies(Species *spec) :
+    m_sbmlSpecies(spec)
 {
     m_name = QString(spec->getName().c_str());
     m_id = QString(spec->getId().c_str());
-    m_compartment = QString(spec->getCompartment().c_str());
+    m_compartmentName = QString(spec->getCompartment().c_str());
 }
 
 QString DSBSpecies::getCompartmentName()
 {
-    return m_compartment;
+    return m_compartmentName;
+}
+
+void DSBSpecies::addReactionEntered(DSBReaction& reac)
+{
+    m_reactionsEntered.append(reac);
 }
 
 }
