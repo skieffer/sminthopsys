@@ -42,6 +42,8 @@ public:
     DSBSpecies(Species *spec);
     QString getCompartmentName();
     void addReactionEntered(DSBReaction& reac);
+    void addReactionExited(DSBReaction& reac);
+    void addReactionModified(DSBReaction& reac);
 
 private:
     Species *m_sbmlSpecies;
@@ -50,6 +52,7 @@ private:
     QString m_compartmentName;
     QList<DSBReaction> m_reactionsEntered;
     QList<DSBReaction> m_reactionsExited;
+    QList<DSBReaction> m_reactionsModified;
 };
 
 }

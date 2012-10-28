@@ -48,6 +48,7 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
     SimpleSpeciesReference *ssr;
     unsigned int N;
     QString specId;
+
     // "reactants", or inputs
     lsr = m_sbmlReaction->getListOfReactants();
     N = lsr->size();
@@ -65,6 +66,46 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
             DSBSpecies dsbspec = map.value(specId);
             m_inputs.append(dsbspec);
             dsbspec.addReactionEntered(*this);
+        }
+    }
+
+    // "products", or outputs
+    lsr = m_sbmlReaction->getListOfProducts();
+    N = lsr->size();
+    for (unsigned int i = 0; i < N; i++)
+    {
+        ssr = lsr->get(i);
+        specId = QString(ssr->getSpecies().c_str());
+        if (!map.contains(specId))
+        {
+            // TODO: Report error. Reaction is referring to a species that
+            // was not declared in the SBML list of species.
+        }
+        else
+        {
+            DSBSpecies dsbspec = map.value(specId);
+            m_outputs.append(dsbspec);
+            dsbspec.addReactionExited(*this);
+        }
+    }
+
+    // modifiers (e.g. catalysts)
+    lsr = m_sbmlReaction->getListOfModifiers();
+    N = lsr->size();
+    for (unsigned int i = 0; i < N; i++)
+    {
+        ssr = lsr->get(i);
+        specId = QString(ssr->getSpecies().c_str());
+        if (!map.contains(specId))
+        {
+            // TODO: Report error. Reaction is referring to a species that
+            // was not declared in the SBML list of species.
+        }
+        else
+        {
+            DSBSpecies dsbspec = map.value(specId);
+            m_modifiers.append(dsbspec);
+            dsbspec.addReactionModified(*this);
         }
     }
 }

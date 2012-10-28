@@ -48,4 +48,14 @@ void DSBSpecies::addReactionEntered(DSBReaction& reac)
     m_reactionsEntered.append(reac);
 }
 
+void DSBSpecies::addReactionExited(DSBReaction& reac)
+{
+    m_reactionsExited.append(reac);
+}
+
+void DSBSpecies::addReactionModified(DSBReaction& reac)
+{
+    m_reactionsModified.append(reac);
+}
+
 }

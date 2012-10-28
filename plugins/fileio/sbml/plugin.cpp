@@ -138,11 +138,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             int x0 = 0, y0 = 0, x, y;
             PluginShapeFactory *factory = sharedPluginShapeFactory();
             // Build a map from species id's to internal objects representing those species.
-            //QMap<QString, DSBSpecies *> *speciesMap = new QMap<QString, DSBSpecies*>();
             QMap<QString, DSBSpecies> speciesMap;
 
             // Also a map from compartment names to DSBCompartment objects.
-            //QMap<QString, DSBCompartment *> *compMap = new QMap<QString, DSBCompartment *>();
             QMap<QString, DSBCompartment> compMap;
 
             for (unsigned int i = 0; i < numSpecies; i++)
