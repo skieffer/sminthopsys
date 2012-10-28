@@ -1,3 +1,4 @@
+QT += xml svg
 TEMPLATE = lib
 TARGET = dsbpe
 CONFIG += shared
