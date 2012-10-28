@@ -31,8 +31,12 @@
 #include "libdsbpe/dsbreaction.h"
 
 class Species;
+class PDEPN;
+//void PDEPN::setSelected(bool selected);
 
 namespace dunnart {
+
+class Canvas;
 
 class DSBSpecies
 {
@@ -44,8 +48,12 @@ public:
     void addReactionEntered(DSBReaction& reac);
     void addReactionExited(DSBReaction& reac);
     void addReactionModified(DSBReaction& reac);
+    void setCanvas(Canvas *canvas);
+    void addClone(PDEPN *epn);
+    bool createClone(int x, int y);
 
 private:
+    Canvas *m_canvas;
     Species *m_sbmlSpecies;
     QString m_name;
     QString m_id;
@@ -53,6 +61,7 @@ private:
     QList<DSBReaction> m_reactionsEntered;
     QList<DSBReaction> m_reactionsExited;
     QList<DSBReaction> m_reactionsModified;
+    QList<PDEPN *> m_clones;
 };
 
 }

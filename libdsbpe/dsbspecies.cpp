@@ -22,6 +22,7 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#include "libdunnartcanvas/canvas.h"
 #include "libdsbpe/dsbspecies.h"
 
 #include "sbml/SBMLTypes.h"
@@ -36,6 +37,11 @@ DSBSpecies::DSBSpecies(Species *spec) :
     m_name = QString(spec->getName().c_str());
     m_id = QString(spec->getId().c_str());
     m_compartmentName = QString(spec->getCompartment().c_str());
+}
+
+void DSBSpecies::setCanvas(Canvas *canvas)
+{
+    m_canvas = canvas;
 }
 
 QString DSBSpecies::getCompartmentName()
@@ -56,6 +62,37 @@ void DSBSpecies::addReactionExited(DSBReaction& reac)
 void DSBSpecies::addReactionModified(DSBReaction& reac)
 {
     m_reactionsModified.append(reac);
+}
+
+void DSBSpecies::addClone(PDEPN *epn)
+{
+    m_clones.append(epn);
+}
+
+bool DSBSpecies::createClone(int x, int y)
+{
+    // Make sure we have a canvas.
+    if (!m_canvas) { return false; }
+    // Make sure there is already at least one clone.
+    // (There always should be.)
+    if (m_clones.size() < 1) { return false; }
+
+    // TODO:
+    // Create a copy of the first clone in m_clones.
+    // Set the position of the new clone to the passed x,y.
+    // To make copy, imitate what Edit->Copy, Paste does.
+    // Or maybe just /use/ the canvas's copySelection and pasteSelection methods?
+    // Since we don't know which subclass of PDEPN we might have, it's hard to
+    // implement this manually.
+    // If we do use Copy-Paste, then afterward we still have to manually
+    // call the clone's setSpecies method, passing *this.
+
+    m_canvas->deselectAll();
+    PDEPN *epn = m_clones.at(0);
+    //epn->setSelected(true);
+
+    return true;
+
 }
 
 }

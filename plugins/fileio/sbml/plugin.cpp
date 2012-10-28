@@ -119,7 +119,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             if (errors > 0)
             {
                 errorMessage = tr("Error reading SBML.");
-                //TODO: Use doc.printErrors(stream=...) to write a description of
+                //TODO: Use doc->printErrors(stream=...) to write a description of
                 // the errors to a std::ostream object. Then append this to
                 // the errorMessage.
                 return false;
@@ -152,6 +152,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
                 // Construct internal representation.
                 DSBSpecies dsbspec(spec);
+                dsbspec.setCanvas(canvas);
 
                 // Save it in the species map.
                 speciesMap.insert(QString(id.c_str()), dsbspec);
@@ -166,9 +167,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 // Create shape.
                 QString type("org.sbgn.pd.00UnspecifiedEPN");
                 ShapeObj *shape = factory->createShape(type);
-                // Give it a reference to the species it represents.
+                // Let it hold the species it represents.
                 PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
                 epn->setSpecies(dsbspec);
+                // and give the species a pointer to the epn.
+                dsbspec.addClone(epn);
 
                 // Set its properties.
                 // Size: leave as default.
