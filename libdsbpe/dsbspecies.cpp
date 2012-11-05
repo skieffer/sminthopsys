@@ -49,17 +49,17 @@ QString DSBSpecies::getCompartmentName()
     return m_compartmentName;
 }
 
-void DSBSpecies::addReactionEntered(DSBReaction& reac)
+void DSBSpecies::addReactionEntered(DSBReaction *reac)
 {
     m_reactionsEntered.append(reac);
 }
 
-void DSBSpecies::addReactionExited(DSBReaction& reac)
+void DSBSpecies::addReactionExited(DSBReaction *reac)
 {
     m_reactionsExited.append(reac);
 }
 
-void DSBSpecies::addReactionModified(DSBReaction& reac)
+void DSBSpecies::addReactionModified(DSBReaction *reac)
 {
     m_reactionsModified.append(reac);
 }
