@@ -42,7 +42,7 @@ DSBReaction::DSBReaction(Reaction *reac) :
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
-void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
+void DSBReaction::doublyLink(QMap<QString, DSBSpecies> &map)
 {
     ListOfSpeciesReferences *lsr;
     SimpleSpeciesReference *ssr;
@@ -64,8 +64,8 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
         else
         {
             DSBSpecies dsbspec = map.value(specId);
-            m_inputs.append(dsbspec);
-            dsbspec.addReactionEntered(*this);
+            m_inputs.append(&dsbspec);
+            dsbspec.addReactionEntered(this);
         }
     }
 
@@ -84,8 +84,8 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
         else
         {
             DSBSpecies dsbspec = map.value(specId);
-            m_outputs.append(dsbspec);
-            dsbspec.addReactionExited(*this);
+            m_outputs.append(&dsbspec);
+            dsbspec.addReactionExited(this);
         }
     }
 
@@ -104,8 +104,8 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> map)
         else
         {
             DSBSpecies dsbspec = map.value(specId);
-            m_modifiers.append(dsbspec);
-            dsbspec.addReactionModified(*this);
+            m_modifiers.append(&dsbspec);
+            dsbspec.addReactionModified(this);
         }
     }
 }

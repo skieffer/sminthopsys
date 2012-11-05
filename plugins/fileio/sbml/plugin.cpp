@@ -151,27 +151,28 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 name = spec->getName();
 
                 // Construct internal representation.
-                DSBSpecies dsbspec(spec);
-                dsbspec.setCanvas(canvas);
+                DSBSpecies *dsbspec = new DSBSpecies(spec);
+                dsbspec->setCanvas(canvas);
 
                 // Save it in the species map.
-                speciesMap.insert(QString(id.c_str()), dsbspec);
+                speciesMap.insert(QString(id.c_str()), *dsbspec);
+
                 // If it belongs to a new compartment, then add that to the compartment map.
-                QString compName = dsbspec.getCompartmentName();
+                QString compName = dsbspec->getCompartmentName();
                 if (!compMap.contains(compName))
                 {
-                    DSBCompartment comp(compName);
-                    compMap.insert(compName, comp);
+                    DSBCompartment *comp = new DSBCompartment(compName);
+                    compMap.insert(compName, *comp);
                 }
 
                 // Create shape.
                 QString type("org.sbgn.pd.00UnspecifiedEPN");
                 ShapeObj *shape = factory->createShape(type);
-                // Let it hold the species it represents.
                 PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
+                // Give the epn a pointer to the species it represents.
                 epn->setSpecies(dsbspec);
                 // and give the species a pointer to the epn.
-                dsbspec.addClone(epn);
+                dsbspec->addClone(epn);
 
                 // Set its properties.
                 // Size: leave as default.
@@ -199,9 +200,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             {
                 reac = lor->get(i);
                 id = reac->getId();
-                DSBReaction dsbreac(reac);
-                reactionMap.insert(QString(id.c_str()), dsbreac);
-                dsbreac.doublyLink(speciesMap);
+                DSBReaction *dsbreac = new DSBReaction(reac);
+                reactionMap.insert(QString(id.c_str()), *dsbreac);
+                dsbreac->doublyLink(speciesMap);
             }
 
             return true;

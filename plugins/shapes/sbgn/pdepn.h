@@ -42,6 +42,8 @@
 
 using namespace dunnart;
 
+namespace dunnart {
+
 //enum Cloneable { IS_CLONEABLE, NOT_CLONEABLE };
 static const int GLYPH_PADDING = 5; // this is used as padding when drawing glyphs, to prevent auxiliary units and multimeric states from crossing outside the glyph bounding box
 
@@ -91,7 +93,7 @@ public:
     virtual QPainterPath clone_marker() const = 0; // creates the clone marker for this glyph: MUST be instantiated in the inheriting class
     bool isCloned();
     bool isMultimeric() { return false; } // an EPN is not multimeric
-    void setSpecies(DSBSpecies& spec);
+    void setSpecies(DSBSpecies *spec);
 
 protected:
     PDEPN(QString l, bool cb, QString cl, bool m);
@@ -101,7 +103,7 @@ protected:
     bool cloned;
     QString cloneLabel;
     bool multimer;
-    DSBSpecies m_species;
+    DSBSpecies *m_species;
 
 // QT
 #if 0
@@ -158,6 +160,8 @@ private:
   }
 #endif
 };
+
+}
 
 #endif //PDEPN_H
 // vim: filetype=cpp ts=4 sw=4 et tw=0 wm=0 cindent
