@@ -26,6 +26,8 @@
 #include <QString>
 #include <QList>
 
+#include <math.h>
+
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 
@@ -46,4 +48,25 @@ void DSBCompartment::addReaction(DSBReaction *reac)
     m_reactions.append(reac);
 }
 
+}
+
+QSizeF DSBCompartment::layout()
+{
+    return squareLayout();
+}
+
+QSizeF DSBCompartment::squareLayout()
+{
+    // TODO: Take account of the sizes of the species nodes.
+    // For now we simply assume they are the default size
+    // of 70x50.
+    int numSpecies = m_species.size();
+    int cols = ceil(sqrt(numSpecies)); // number of columns in array
+    int rows = ceil(numSpecies/cols);
+
+}
+
+void DSBCompartment::drawAt(QPointF p)
+{
+    // TODO
 }

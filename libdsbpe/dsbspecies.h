@@ -27,7 +27,10 @@
 
 #include <QString>
 #include <QList>
+#include <QSizeF>
+#include <QPointF>
 
+#include "dsblayoutcontainer.h"
 #include "libdsbpe/dsbreaction.h"
 #include "plugins/shapes/sbgn/pdepn.h"
 
@@ -39,7 +42,7 @@ class PDEPN;
 class Canvas;
 class DSBCompartment;
 
-class DSBSpecies
+class DSBSpecies : public DSBLayoutContainer
 {
 
 public:
@@ -56,6 +59,7 @@ public:
     bool createClone(int x, int y);
 
 private:
+    QPointF m_relpt;
     Canvas *m_canvas;
     Species *m_sbmlSpecies;
     QString m_name;

@@ -169,31 +169,6 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 comp.addSpecies(dsbspec);
                 // And give it a reference to its compartment.
                 dsbspec->setCompartment(&comp);
-
-                // Create shape.
-                QString type("org.sbgn.pd.00UnspecifiedEPN");
-                ShapeObj *shape = factory->createShape(type);
-                PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
-                // Give the epn a pointer to the species it represents.
-                epn->setSpecies(dsbspec);
-                // and give the species a pointer to the epn.
-                dsbspec->addClone(epn);
-
-                // Set its properties.
-                // Size: leave as default.
-                //QSizeF size(70,50);
-                // Position
-                x = x0 + sepUnits*u*(i%cols);
-                y = y0 + sepUnits*u*(i/cols);
-                QPointF point(x,y);
-                //shape->setPosAndSize(point, size);
-                shape->setCentrePos(point);
-                // Label
-                QString label(name.c_str());
-                shape->setLabel(label);
-                // Add it to the canvas.
-                QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, shape);
-                canvas->currentUndoMacro()->addCommand(cmd);
             }
 
             // Now get the reactions.
@@ -210,6 +185,26 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 dsbreac->doublyLink(speciesMap);
             }
 
+            // Do simple, square layout of each compartment, and
+            // lay them out side by side.
+            int pad = 100;
+            QList<DSBCompartment> comps = compMap.values();
+            int numComp = comps.size();
+            int *widths = new int[numComp];
+            for (int i = 0; i < numComp; i++)
+            {
+                DSBCompartment comp = comps.at(i);
+                QSizeF size = comp.squareLayout();
+                widths[i] = size.width();
+            }
+            int x = 0, y = 0;
+            for (int i = 0; i < numComp; i++)
+            {
+                DSBCompartment comp = comps.at(i);
+                comp.drawAt(QPointF(x,y));
+                x += widths[i] + pad;
+            }
+            delete[] widths;
             return true;
         }
 

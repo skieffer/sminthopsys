@@ -27,6 +27,8 @@
 
 #include <QString>
 #include <QList>
+#include <QSizeF>
+#include <QPointF>
 
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
@@ -41,6 +43,9 @@ public:
     DSBCompartment(QString compartmentName);
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
+    QSizeF layout();
+    QSizeF squareLayout();
+    void drawAt(QPointF p);
 
 private:
     QString m_compartmentName;
