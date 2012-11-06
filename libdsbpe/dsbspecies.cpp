@@ -24,6 +24,7 @@
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdsbpe/dsbspecies.h"
+#include "libdunnartcanvas/pluginshapefactory.h"
 
 #include "sbml/SBMLTypes.h"
 
@@ -72,6 +73,59 @@ void DSBSpecies::addReactionExited(DSBReaction *reac)
 void DSBSpecies::addReactionModified(DSBReaction *reac)
 {
     m_reactionsModified.append(reac);
+}
+
+QSizeF DSBSpecies::layout()
+{
+    // TODO: Figure out layout of label, and then base the size of
+    // the node on the result.
+    QSizeF size(70,50);
+    return size;
+}
+
+void DSBSpecies::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+/* This combines the functionality of the addClone and createClone
+   functions. It allows you to draw a first EPN, instead of cloning
+   an existing one.
+   TODO: Maybe addClone and createClone should be deleted?
+  */
+void DSBSpecies::drawRelTo(QPointF p)
+{
+    PluginShapeFactory *factory = sharedPluginShapeFactory();
+    QString type("org.sbgn.pd.00UnspecifiedEPN");
+    ShapeObj *shape = factory->createShape(type);
+    PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
+    // Give the epn a pointer to the species it represents.
+    epn->setSpecies(this);
+    // and give the species a pointer to the epn.
+    m_clones.append(epn);
+
+    // Set its properties.
+    // Size: leave as default.
+    //QSizeF size(70,50);
+    // Position
+    epn->setCentrePos(p);
+    // Label
+    epn->setLabel(m_name);
+
+    // Set clone markers, if there are more than one.
+    if (m_clones.size() > 1) {
+        for (int i = 0; i < m_clones.size(); i++)
+        {
+            m_clones.at(i)->set_is_cloned(true);
+        }
+    }
+
+    // Add it to the canvas.
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, epn);
+    canvas->currentUndoMacro()->addCommand(cmd);
+
+    // Return epn
+    return epn;
 }
 
 void DSBSpecies::addClone(PDEPN *epn)
