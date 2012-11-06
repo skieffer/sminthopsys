@@ -164,6 +164,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, *comp);
                 }
+                // Now add the species to its compartment.
+                DSBCompartment comp = compMap.value(compName);
+                comp.addSpecies(dsbspec);
+                // And give it a reference to its compartment.
+                dsbspec->setCompartment(&comp);
 
                 // Create shape.
                 QString type("org.sbgn.pd.00UnspecifiedEPN");

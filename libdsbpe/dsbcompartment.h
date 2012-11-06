@@ -37,14 +37,15 @@ class DSBCompartment
 {
 
 public:
+    DSBCompartment();
     DSBCompartment(QString compartmentName);
-    void addSpecies(DSBSpecies& spec);
-    void addReaction(DSBReaction& reac);
+    void addSpecies(DSBSpecies *spec);
+    void addReaction(DSBReaction *reac);
 
 private:
     QString m_compartmentName;
-    QList<DSBSpecies> m_species;
-    QList<DSBReaction> m_reactions;
+    QList<DSBSpecies *> m_species;
+    QList<DSBReaction *> m_reactions;
 
 };
 

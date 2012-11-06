@@ -108,7 +108,10 @@ DSBSpecies *PDEPN::getSpecies()
     return m_species;
 }
 
-
+void PDEPN::set_is_cloned(bool b)
+{
+    cloned = b;
+}
 
 
 

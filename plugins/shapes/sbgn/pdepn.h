@@ -95,6 +95,7 @@ public:
     bool isMultimeric() { return false; } // an EPN is not multimeric
     void setSpecies(DSBSpecies *spec);
     DSBSpecies *getSpecies();
+    void set_is_cloned(bool b);
 
 protected:
     PDEPN(QString l, bool cb, QString cl, bool m);
@@ -119,7 +120,6 @@ public:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
   SDL_Rect labelBoundingRect(void) const;
   int get_type(void)  {  return SHAPE_TYPE_PDEPN;  }
-  void set_is_cloned(bool b) { has_clone_marker = b; }
 
   // even though not every EPN can have a clone marker, this should be
   // the same for every class that uses it:

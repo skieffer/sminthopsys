@@ -37,6 +37,7 @@ namespace dunnart {
 
 class PDEPN;
 class Canvas;
+class DSBCompartment;
 
 class DSBSpecies
 {
@@ -49,6 +50,8 @@ public:
     void addReactionExited(DSBReaction *reac);
     void addReactionModified(DSBReaction *reac);
     void setCanvas(Canvas *canvas);
+    void setCompartment(DSBCompartment *comp);
+    DSBCompartment *getCompartment();
     void addClone(PDEPN *epn);
     bool createClone(int x, int y);
 
@@ -58,6 +61,7 @@ private:
     QString m_name;
     QString m_id;
     QString m_compartmentName;
+    DSBCompartment *m_compartment;
     QList<DSBReaction *> m_reactionsEntered;
     QList<DSBReaction *> m_reactionsExited;
     QList<DSBReaction *> m_reactionsModified;
