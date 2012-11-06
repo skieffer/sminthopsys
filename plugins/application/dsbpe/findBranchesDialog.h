@@ -9,6 +9,7 @@ class QLineEdit;
 namespace dunnart {
 
 class Canvas;
+class DSBSpecies;
 
 class FindBranchesDialog : public QDialog
 {
@@ -25,8 +26,9 @@ private:
     void getSelectedSpecies();
 
     Canvas *m_canvas;
-    QLineEdit *endpointEdit;
-    QString endpointIDString;
+    QLineEdit *m_endpointEdit;
+    QString m_endpointIDString;
+    DSBSpecies *m_endpointSpecies;
 
 };
 

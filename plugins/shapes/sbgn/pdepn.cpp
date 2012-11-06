@@ -103,7 +103,10 @@ void PDEPN::setSpecies(DSBSpecies *spec)
     m_species = spec;
 }
 
-
+DSBSpecies *PDEPN::getSpecies()
+{
+    return m_species;
+}
 
 
 
