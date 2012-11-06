@@ -44,6 +44,16 @@ void DSBSpecies::setCanvas(Canvas *canvas)
     m_canvas = canvas;
 }
 
+void DSBSpecies::setCompartment(DSBCompartment *comp)
+{
+    m_compartment = comp;
+}
+
+DSBCompartment *DSBSpecies::getCompartment()
+{
+    return m_compartment;
+}
+
 QString DSBSpecies::getCompartmentName()
 {
     return m_compartmentName;
@@ -77,7 +87,6 @@ bool DSBSpecies::createClone(int x, int y)
     // (There always should be.)
     if (m_clones.size() < 1) { return false; }
 
-    // TODO:
     // Create a copy of the first clone in m_clones.
     // Set the position of the new clone to the passed x,y.
     // To make copy, imitate what Edit->Copy, Paste does.
@@ -87,8 +96,8 @@ bool DSBSpecies::createClone(int x, int y)
     // If we do use Copy-Paste, then afterward we still have to manually
     // call the clone's setSpecies method, passing *this.
 
-    m_canvas->deselectAll();
     PDEPN *epn = m_clones.at(0);
+    m_canvas->deselectAll();
     epn->setSelected(true);
     m_canvas->copySelection();
     m_canvas->pasteSelection();
@@ -99,6 +108,12 @@ bool DSBSpecies::createClone(int x, int y)
     QPointF point(x,y);
     epn2->setCentrePos(point);
     m_clones.append(epn2);
+
+    // Make sure all clones have their clone markers on.
+    for (int i = 0; i < m_clones.size(); i++)
+    {
+        m_clones.at(i)->set_is_cloned(true);
+    }
 
     /*
     // Copy

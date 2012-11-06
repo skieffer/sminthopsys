@@ -36,12 +36,12 @@ DSBCompartment::DSBCompartment(QString compartmentName)
 {
 }
 
-void DSBCompartment::addSpecies(DSBSpecies& spec)
+void DSBCompartment::addSpecies(DSBSpecies *spec)
 {
     m_species.append(spec);
 }
 
-void DSBCompartment::addReaction(DSBReaction& reac)
+void DSBCompartment::addReaction(DSBReaction *reac)
 {
     m_reactions.append(reac);
 }
