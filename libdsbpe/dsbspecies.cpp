@@ -89,7 +89,59 @@ bool DSBSpecies::createClone(int x, int y)
 
     m_canvas->deselectAll();
     PDEPN *epn = m_clones.at(0);
-    //epn->setSelected(true);
+    epn->setSelected(true);
+    m_canvas->copySelection();
+    m_canvas->pasteSelection();
+    QList<CanvasItem *> selected_items = m_canvas->selectedItems();
+    CanvasItem *item = selected_items.at(0);
+    PDEPN *epn2 = dynamic_cast<PDEPN*>(item);
+    epn2->setSpecies(this);
+    QPointF point(x,y);
+    epn2->setCentrePos(point);
+    m_clones.append(epn2);
+
+    /*
+    // Copy
+    QDomDocument clipboard;
+    QDomElement svg = clipboard.createElement("svg");
+    clipboard.appendChild(svg);
+    newProp(svg, "xmlns", "http://www.w3.org/2000/svg");
+    newProp(svg, "xmlns:dunnart", x_dunnartURI);
+    QDomElement elem = epn->to_QDomElement(XMLSS_ALL, clipboard);
+    svg.appendChild(elem);
+
+    // Paste
+    QString dunnartNs = x_dunnartNs;
+    m_paste_id_map.clear();
+    m_paste_bad_constraint_ids.clear();
+
+    // Assign new clipboard IDs.
+    recursiveMapIDs(clipboard, dunnartNs, PASTE_UPDATEOBJIDS);
+
+    // Update IDs for connectors and relationships.
+    recursiveMapIDs(clipboard, dunnartNs, PASTE_UPDATEIDPROPS);
+
+    // Find bad distributions and separations.
+    recursiveMapIDs(clipboard, dunnartNs, PASTE_FINDBADDISTROS);
+
+    // Remove bad distributions and separations.
+    recursiveMapIDs(clipboard, dunnartNs, PASTE_REMOVEBADDISTROS);
+
+    qDebug() << clipboard.toString();
+    // Actually do the pasting, in correct order.
+    for (int pass = 0; pass < PASS_LAST; ++pass)
+    {
+        this->recursiveReadSVG(clipboard, dunnartNs, pass);
+    }
+    */
+
+    /*
+    PDEPN *epn2 = new PDEPN(*epn);
+    QPointF point(x,y);
+    epn2->setCentrePos(point);
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, epn2);
+    canvas->currentUndoMacro()->addCommand(cmd);
+    */
 
     return true;
 

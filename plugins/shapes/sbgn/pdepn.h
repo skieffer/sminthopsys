@@ -94,6 +94,7 @@ public:
     bool isCloned();
     bool isMultimeric() { return false; } // an EPN is not multimeric
     void setSpecies(DSBSpecies *spec);
+    DSBSpecies *getSpecies();
 
 protected:
     PDEPN(QString l, bool cb, QString cl, bool m);

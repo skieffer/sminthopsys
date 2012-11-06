@@ -33,6 +33,8 @@
 #include "libdunnartcanvas/canvasitem.h"
 #include "libdunnartcanvas/shape.h"
 
+#include "plugins/shapes/sbgn/pdepn.h"
+
 namespace dunnart {
 
 FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
@@ -44,7 +46,7 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     QLabel *endpointLabel = new QLabel(this);
     endpointLabel->setText(tr("Endpoint species:"));
 
-    endpointEdit = new QLineEdit(this);
+    m_endpointEdit = new QLineEdit(this);
 
     QComboBox *endpointCBox = new QComboBox(this);
     endpointCBox->addItem(tr("start"));
@@ -68,7 +70,7 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(endpointLabel, 0, 0);
-    layout->addWidget(endpointEdit,  0, 1);
+    layout->addWidget(m_endpointEdit,  0, 1);
     layout->addWidget(endpointCBox,  0, 2);
     layout->addWidget(layoutLabel,   1, 0);
     layout->addWidget(layoutCBox,    1, 1);
@@ -96,8 +98,6 @@ void FindBranchesDialog::canvasSelectionChanged()
 /* Consult the canvas selection, and check whether exactly one
    shape node is selected. If so, populate edit box with its name.
    Otherwise, put a message requesting selection of just one shape.
-
-   FIXME: We should be demanding not just shapes, but SBGN shapes.
  */
 void FindBranchesDialog::getSelectedSpecies()
 {
@@ -105,20 +105,22 @@ void FindBranchesDialog::getSelectedSpecies()
     int n = selection.size();
     if (n != 1)
     {
-        endpointEdit->setText(tr("not exactly one node selected"));
+        m_endpointEdit->setText(tr("not exactly one node selected"));
     }
     else // Exactly one object was selected.
     {
         CanvasItem *item = selection.first();
-        ShapeObj *shape = qobject_cast<ShapeObj *> (item);
-        if (shape)
+        //ShapeObj *shape = qobject_cast<ShapeObj *> (item);
+        PDEPN *epn = dynamic_cast<PDEPN *>(item);
+        if (epn)
         {
-            endpointEdit->setText(shape->getLabel());
-            endpointIDString = shape->idString();
+            m_endpointEdit->setText(epn->getLabel());
+            m_endpointIDString = epn->idString();
+            m_endpointSpecies = epn->getSpecies();
         }
         else
         {
-            endpointEdit->setText(tr("selection is not a node"));
+            m_endpointEdit->setText(tr("selection is not an EPN"));
         }
 
     }
@@ -130,6 +132,9 @@ void FindBranchesDialog::getSelectedSpecies()
 void FindBranchesDialog::findBranches()
 {
     // TODO: Find the branches!
+    //testing:
+    m_endpointSpecies->createClone(-100,-100);
+    //
     accept();
 }
 
