@@ -25,20 +25,17 @@
 #ifndef DSBCLONE_H
 #define DSBCLONE_H
 
-#include <QString>
 #include <QList>
 
-#include "dsblayoutcontainer.h"
-#include "plugins/shapes/sbgn/pdepn.h"
+#include "dsbreclayout.h"
 
 namespace dunnart {
 
 class PDEPN;
-class Canvas;
-class DSBCompartment;
+class DSBSpecies;
 class DSBReaction;
 
-class DSBClone : public DSBLayoutContainer
+class DSBClone : public DSBRecLayout
 {
 
 public:
@@ -46,11 +43,17 @@ public:
     void addReactionEntered(DSBReaction *reac);
     void addReactionExited(DSBReaction *reac);
     void addReactionModified(DSBReaction *reac);
+    void deleteShape();
+    void set_is_cloned(bool b);
+    void setReactionsEntered(QList<DSBReaction*> reacs);
+    void setReactionsExited(QList<DSBReaction*> reacs);
+    void setReactionsModified(QList<DSBReaction*> reacs);
 
 private:
     DSBSpecies *m_dsbspec;
     QPointF m_relpt;
-    PDEPN *m_shape;
+    QSizeF m_size;
+    PDEPN *m_epn;
     QList<DSBReaction *> m_reactionsEntered;
     QList<DSBReaction *> m_reactionsExited;
     QList<DSBReaction *> m_reactionsModified;

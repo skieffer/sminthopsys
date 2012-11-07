@@ -22,18 +22,18 @@
  * Author(s): Steven Kieffer <http://skieffer.info>
 */
 
-#ifndef DSBLAYOUTCONTAINER_H
-#define DSBLAYOUTCONTAINER_H
+#ifndef DSBRECLAYOUT_H
+#define DSBRECLAYOUT_H
 
 #include <QSizeF>
 #include <QPointF>
 
 namespace dunnart {
 
-//! Classes that implement this interface conform to a standard layout
+//! Classes that implement this interface conform to a recursive layout
 //! paradigm for objects that contain other objects, as detailed in the
 //! documentation for the methods below.
-class DSBLayoutContainer
+class DSBRecLayout
 {
 public:
 
@@ -45,7 +45,7 @@ public:
     //! to return the size of the present object.
     virtual QSizeF layout();
 
-    //! Each layout container object must have an established base point,
+    //! Each reclayout object must have an established base point,
     //! or origin for its local coordinate system. For a box, this might
     //! be the upper-left corner; for a disc it might be the center point.
     //! The "relpt" of the present object should be set by its parent
@@ -63,8 +63,15 @@ public:
     //! and asks each of its children to draw themselves
     //! rel-to the point q + p.
     virtual void drawRelTo(QPointF q);
+
+    //! Convenience method for drawing top-level container, relative to
+    //! the origin of the overall coordinate system.
+    void draw()
+    {
+        drawRelTo(QPointF(0,0));
+    }
 };
 
 }
 
-#endif
+#endif // DSBRECLAYOUT_H

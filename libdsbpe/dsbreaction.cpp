@@ -39,6 +39,21 @@ DSBReaction::DSBReaction(Reaction *reac) :
     m_compartmentName = QString(reac->getCompartment().c_str());
 }
 
+void DSBReaction::setCompartment(DSBCompartment *comp)
+{
+    m_compartment = comp;
+}
+
+DSBCompartment *DSBReaction::getCompartment()
+{
+    return m_compartment;
+}
+
+QString DSBReaction::getCompartmentName()
+{
+    return m_compartmentName;
+}
+
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */

@@ -24,6 +24,10 @@
 
 #include "dsbclone.h"
 
+#include "libdunnartcanvas/canvas.h"
+#include "libdunnartcanvas/pluginshapefactory.h"
+#include "plugins/shapes/sbgn/pdepn.h"
+
 namespace dunnart {
 
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
@@ -45,9 +49,50 @@ void DSBClone::addReactionModified(DSBReaction *reac)
     m_reactionsModified.append(reac);
 }
 
+void DSBClone::setReactionsEntered(QList<DSBReaction *> reacs)
+{
+    while (!m_reactionsEntered.isEmpty()) { m_reactionsEntered.removeFirst(); }
+    for (int i = 0; i < reacs.size(); i++) {
+        m_reactionsEntered.append(reacs.at(i));
+    }
+}
+
+void DSBClone::setReactionsExited(QList<DSBReaction *> reacs)
+{
+    while (!m_reactionsExited.isEmpty()) { m_reactionsExited.removeFirst(); }
+    for (int i = 0; i < reacs.size(); i++) {
+        m_reactionsExited.append(reacs.at(i));
+    }
+}
+
+void DSBClone::setReactionsModified(QList<DSBReaction *> reacs)
+{
+    while (!m_reactionsModified.isEmpty()) { m_reactionsModified.removeFirst(); }
+    for (int i = 0; i < reacs.size(); i++) {
+        m_reactionsModified.append(reacs.at(i));
+    }
+}
+
+void DSBClone::deleteShape()
+{
+    Canvas *canvas = m_dsbspec->canvas();
+    canvas->deselectAll();
+    m_epn->setSelected();
+    canvas->deleteSelection();
+}
+
+void DSBClone::set_is_cloned(bool b)
+{
+    m_epn->set_is_cloned(b);
+}
+
 QSizeF DSBClone::layout()
 {
-    // TODO
+    // TODO: Figure out layout of label, and then base the size of
+    // the node on the result.
+    // For now:
+    QSizeF size(70,50);
+    return size;
 }
 
 void DSBClone::setRelPt(QPointF p)
@@ -57,7 +102,23 @@ void DSBClone::setRelPt(QPointF p)
 
 void DSBClone::drawRelTo(QPointF q)
 {
-    // TODO
+    PluginShapeFactory *factory = sharedPluginShapeFactory();
+    QString type("org.sbgn.pd.00UnspecifiedEPN");
+    ShapeObj *shape = factory->createShape(type);
+    m_epn = dynamic_cast<PDEPN*>  (shape);
+    // Give the epn a pointer to the species it represents.
+    m_epn->setSpecies(m_dsbspec);
+    // Set its properties.
+    // Size
+    m_epn->setSize(m_size);
+    // Position
+    QPointF r = p + q;
+    m_epn->setCentrePos(r);
+    // Label
+    m_epn->setLabel(m_dsbspec->getName());
+    // Add it to the canvas.
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_dsbspec->canvas(), m_epn);
+    m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
 }
 
 }

@@ -27,15 +27,16 @@
 
 #include <QString>
 #include <QList>
-#include <QSizeF>
-#include <QPointF>
 
-#include "libdsbpe/dsbspecies.h"
-#include "libdsbpe/dsbreaction.h"
+#include "dsbreclayout.h"
 
 namespace dunnart {
 
-class DSBCompartment
+class DSBSpecies;
+class DSBReaction;
+class DSBClone;
+
+class DSBCompartment : DSBRecLayout
 {
 
 public:
@@ -43,14 +44,16 @@ public:
     DSBCompartment(QString compartmentName);
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
-    QSizeF layout();
     QSizeF squareLayout();
-    void drawAt(QPointF p);
 
 private:
     QString m_compartmentName;
+    QPointF m_relpt;
+    QSizeF m_size;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;
+
+    QList<DSBClone*> getAllClones();
 
 };
 
