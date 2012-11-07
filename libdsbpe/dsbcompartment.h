@@ -52,6 +52,7 @@ private:
     QSizeF m_size;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;
+    bool m_show_reactions = false;
 
     QList<DSBClone*> getAllClones();
 

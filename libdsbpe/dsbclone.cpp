@@ -112,7 +112,7 @@ void DSBClone::drawRelTo(QPointF q)
     // Size
     m_epn->setSize(m_size);
     // Position
-    QPointF r = p + q;
+    QPointF r = m_relpt + q;
     m_epn->setCentrePos(r);
     // Label
     m_epn->setLabel(m_dsbspec->getName());

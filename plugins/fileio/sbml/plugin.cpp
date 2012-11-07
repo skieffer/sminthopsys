@@ -50,6 +50,7 @@
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbcompartment.h"
+#include "libdsbpe/dsbcell.h"
 
 #include "plugins/shapes/sbgn/pdepn.h"
 
@@ -119,7 +120,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             if (errors > 0)
             {
                 errorMessage = tr("Error reading SBML.");
-                //TODO: Use doc->printErrors(stream=...) to write a description of
+                // TODO: Use doc->printErrors(stream=...) to write a description of
                 // the errors to a std::ostream object. Then append this to
                 // the errorMessage.
                 return false;
@@ -140,11 +141,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             for (unsigned int i = 0; i < numSpecies; i++)
             {
                 spec = los->get(i);
-                // Get species information.
                 id = spec->getId();
-                //name = spec->getName();
-
-                // Construct internal representation.
                 DSBSpecies *dsbspec = new DSBSpecies(spec);
                 dsbspec->setCanvas(canvas);
 
@@ -169,13 +166,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             ListOfReactions *lor = model->getListOfReactions();
             unsigned int numReacs = lor->size();
             Reaction *reac;
-            //QMap<QString, DSBReaction> reactionMap;
             for (unsigned int i = 0; i < numReacs; i++)
             {
                 reac = lor->get(i);
                 id = reac->getId();
                 DSBReaction *dsbreac = new DSBReaction(reac);
-                //reactionMap.insert(QString(id.c_str()), *dsbreac);
                 dsbreac->doublyLink(speciesMap);
 
                 // If it belongs to a new compartment, then add that to the compartment map.
@@ -195,7 +190,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             // Do simple, square layout of each compartment, and
             // lay them out side by side.
 
-            // TODO
+            DSBCell cell;
+            cell.setCompartments( compMap.values() );
+            cell.rowLayout();
+            cell.setRelPt(QPointF(0,0));
+            cell.draw();
 
             return true;
         }
