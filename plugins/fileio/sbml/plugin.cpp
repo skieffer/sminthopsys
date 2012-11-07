@@ -189,7 +189,6 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
             // Do simple, square layout of each compartment, and
             // lay them out side by side.
-
             DSBCell cell;
             cell.setCompartments( compMap.values() );
             cell.rowLayout();
