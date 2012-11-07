@@ -130,13 +130,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             unsigned int numSpecies = los->size();
             Species *spec;
             std::string id;
-            std::string name;
-            // Will layout in a square array.
-            int cols = ceil(sqrt(numSpecies)); // number of columns in array
-            int u = 50; // unit of separation
-            int sepUnits = 2; // separation between adjacent nodes, in units u
-            int x0 = 0, y0 = 0, x, y;
-            PluginShapeFactory *factory = sharedPluginShapeFactory();
+
             // Build a map from species id's to internal objects representing those species.
             QMap<QString, DSBSpecies> speciesMap;
 
@@ -148,7 +142,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 spec = los->get(i);
                 // Get species information.
                 id = spec->getId();
-                name = spec->getName();
+                //name = spec->getName();
 
                 // Construct internal representation.
                 DSBSpecies *dsbspec = new DSBSpecies(spec);
@@ -175,14 +169,27 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             ListOfReactions *lor = model->getListOfReactions();
             unsigned int numReacs = lor->size();
             Reaction *reac;
-            QMap<QString, DSBReaction> reactionMap;
+            //QMap<QString, DSBReaction> reactionMap;
             for (unsigned int i = 0; i < numReacs; i++)
             {
                 reac = lor->get(i);
                 id = reac->getId();
                 DSBReaction *dsbreac = new DSBReaction(reac);
-                reactionMap.insert(QString(id.c_str()), *dsbreac);
+                //reactionMap.insert(QString(id.c_str()), *dsbreac);
                 dsbreac->doublyLink(speciesMap);
+
+                // If it belongs to a new compartment, then add that to the compartment map.
+                QString compName = dsbreac->getCompartmentName();
+                if (!compMap.contains(compName))
+                {
+                    DSBCompartment *comp = new DSBCompartment(compName);
+                    compMap.insert(compName, *comp);
+                }
+                // Now add the reaction to its compartment.
+                DSBCompartment comp = compMap.value(compName);
+                comp.addReaction(dsbreac);
+                // And give it a reference to its compartment.
+                dsbreac->setCompartment(&comp);
             }
 
             // Do simple, square layout of each compartment, and

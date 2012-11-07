@@ -30,6 +30,7 @@
 
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
+#include "libdsbpe/dsbclone.h"
 
 namespace dunnart {
 
@@ -48,25 +49,62 @@ void DSBCompartment::addReaction(DSBReaction *reac)
     m_reactions.append(reac);
 }
 
+QList<DSBClone*> DSBCompartment::getAllClones()
+{
+    QList<DSBClone*> clones;
+    for (int i = 0; i < m_species.size(); i++)
+    {
+        DSBSpecies *spec = m_species.at(i);
+        clones.append(spec->getClones());
+    }
+    return clones;
 }
 
 QSizeF DSBCompartment::layout()
 {
+    // TODO: Implement more layout methods.
     return squareLayout();
 }
 
 QSizeF DSBCompartment::squareLayout()
 {
-    // TODO: Take account of the sizes of the species nodes.
+    // Set cloning.
+    for (int i = 0; i < m_species.size(); i++)
+    {
+        m_species.at(i)->setTrivialCloning();
+    }
+    QList<DSBClone*> clones = getAllClones();
+    // TODO: Take account of the sizes of the EPN nodes.
     // For now we simply assume they are the default size
     // of 70x50.
-    int numSpecies = m_species.size();
-    int cols = ceil(sqrt(numSpecies)); // number of columns in array
-    int rows = ceil(numSpecies/cols);
-
+    int numClones = clones.size();
+    int cols = ceil(sqrt(numClones)); // number of columns in array
+    int rows = ceil(numClones/cols);
+    int u = 50; // unit of separation
+    int sepUnits = 2; // separation between adjacent nodes, in units u
+    int x0 = 0, y0 = 0, x, y, col, row;
+    for (int i = 0; i < numClones; i++)
+    {
+        col = i%cols;
+        row = i/cols;
+        x = x0 + col*sepUnits*u;
+        y = y0 + row*sepUnits*u;
+        clones.at(i)->setRelPt(QPointF(x,y));
+    }
+    int width = cols*sepUnits*u + 70;
+    int height = rows*sepUnits*u + 50;
+    m_size = QSizeF(width,height);
+    return m_size;
 }
 
-void DSBCompartment::drawAt(QPointF p)
+void DSBCompartment::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+void DSBCompartment::drawRelTo(QPointF q)
 {
     // TODO
+}
+
 }

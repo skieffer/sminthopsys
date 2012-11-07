@@ -22,9 +22,10 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#include "dsbspecies.h"
+#include "dsbclone.h"
+
 #include "libdunnartcanvas/canvas.h"
-#include "libdsbpe/dsbspecies.h"
-#include "libdunnartcanvas/pluginshapefactory.h"
 
 #include "sbml/SBMLTypes.h"
 
@@ -45,6 +46,11 @@ void DSBSpecies::setCanvas(Canvas *canvas)
     m_canvas = canvas;
 }
 
+Canvas *DSBSpecies::canvas()
+{
+    return m_canvas;
+}
+
 void DSBSpecies::setCompartment(DSBCompartment *comp)
 {
     m_compartment = comp;
@@ -58,6 +64,11 @@ DSBCompartment *DSBSpecies::getCompartment()
 QString DSBSpecies::getCompartmentName()
 {
     return m_compartmentName;
+}
+
+QString DSBSpecies::getName()
+{
+    return m_name;
 }
 
 void DSBSpecies::addReactionEntered(DSBReaction *reac)
@@ -75,62 +86,77 @@ void DSBSpecies::addReactionModified(DSBReaction *reac)
     m_reactionsModified.append(reac);
 }
 
-QSizeF DSBSpecies::layout()
+QList<DSBClone*> DSBSpecies::getClones()
 {
-    // TODO: Figure out layout of label, and then base the size of
-    // the node on the result.
-    QSizeF size(70,50);
-    return size;
+    return m_clones;
 }
 
-void DSBSpecies::setRelPt(QPointF p)
+void DSBSpecies::deleteClones()
 {
-    m_relpt = p;
+    for (int i = 0; i < m_clones.size(); i++)
+    {
+        m_clones.at(i)->deleteShape();
+    }
+    while (!m_clones.isEmpty())
+    {
+        DSBClone *cl = m_clones.at(0);
+        m_clones.removeFirst();
+        delete cl;
+    }
 }
 
-/* This combines the functionality of the addClone and createClone
-   functions. It allows you to draw a first EPN, instead of cloning
-   an existing one.
-   TODO: Maybe addClone and createClone should be deleted?
-  */
-void DSBSpecies::drawRelTo(QPointF p)
+void DSBSpecies::setTrivialCloning()
 {
-    PluginShapeFactory *factory = sharedPluginShapeFactory();
-    QString type("org.sbgn.pd.00UnspecifiedEPN");
-    ShapeObj *shape = factory->createShape(type);
-    PDEPN *epn = dynamic_cast<PDEPN*>  (shape);
-    // Give the epn a pointer to the species it represents.
-    epn->setSpecies(this);
-    // and give the species a pointer to the epn.
-    m_clones.append(epn);
+    deleteClones();
+    DSBClone *cl = new DSBClone(this);
+    cl->setReactionsEntered(m_reactionsEntered);
+    cl->setReactionsExited(m_reactionsExited);
+    cl->setReactionsModified(m_reactionsModified);
+    m_clones.append(cl);
+    setCloneMarkers();
+}
 
-    // Set its properties.
-    // Size: leave as default.
-    //QSizeF size(70,50);
-    // Position
-    epn->setCentrePos(p);
-    // Label
-    epn->setLabel(m_name);
+void DSBSpecies::setDiscreteCloning()
+{
+    deleteClones();
 
-    // Set clone markers, if there are more than one.
-    if (m_clones.size() > 1) {
+    for (int i = 0; i < m_reactionsEntered.size(); i++)
+    {
+        DSBClone *cl = new DSBClone(this);
+        cl->addReactionEntered(m_reactionsEntered.at(i));
+        m_clones.append(cl);
+    }
+
+    for (int i = 0; i < m_reactionsExited.size(); i++)
+    {
+        DSBClone *cl = new DSBClone(this);
+        cl->addReactionExited(m_reactionsExited.at(i));
+        m_clones.append(cl);
+    }
+
+    for (int i = 0; i < m_reactionsModified.size(); i++)
+    {
+        DSBClone *cl = new DSBClone(this);
+        cl->addReactionModified(m_reactionsModified.at(i));
+        m_clones.append(cl);
+    }
+
+    setCloneMarkers();
+}
+
+void DSBSpecies::setCloneMarkers()
+{
+    if (m_clones.size() > 1)
+    {
         for (int i = 0; i < m_clones.size(); i++)
         {
             m_clones.at(i)->set_is_cloned(true);
         }
     }
-
-    // Add it to the canvas.
-    QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, epn);
-    canvas->currentUndoMacro()->addCommand(cmd);
-
-    // Return epn
-    return epn;
-}
-
-void DSBSpecies::addClone(PDEPN *epn)
-{
-    m_clones.append(epn);
+    else if (m_clones.size() == 1)
+    {
+        m_clones.at(0)->set_is_cloned(false);
+    }
 }
 
 bool DSBSpecies::createClone(int x, int y)
@@ -140,15 +166,6 @@ bool DSBSpecies::createClone(int x, int y)
     // Make sure there is already at least one clone.
     // (There always should be.)
     if (m_clones.size() < 1) { return false; }
-
-    // Create a copy of the first clone in m_clones.
-    // Set the position of the new clone to the passed x,y.
-    // To make copy, imitate what Edit->Copy, Paste does.
-    // Or maybe just /use/ the canvas's copySelection and pasteSelection methods?
-    // Since we don't know which subclass of PDEPN we might have, it's hard to
-    // implement this manually.
-    // If we do use Copy-Paste, then afterward we still have to manually
-    // call the clone's setSpecies method, passing *this.
 
     PDEPN *epn = m_clones.at(0);
     m_canvas->deselectAll();
@@ -163,54 +180,7 @@ bool DSBSpecies::createClone(int x, int y)
     epn2->setCentrePos(point);
     m_clones.append(epn2);
 
-    // Make sure all clones have their clone markers on.
-    for (int i = 0; i < m_clones.size(); i++)
-    {
-        m_clones.at(i)->set_is_cloned(true);
-    }
 
-    /*
-    // Copy
-    QDomDocument clipboard;
-    QDomElement svg = clipboard.createElement("svg");
-    clipboard.appendChild(svg);
-    newProp(svg, "xmlns", "http://www.w3.org/2000/svg");
-    newProp(svg, "xmlns:dunnart", x_dunnartURI);
-    QDomElement elem = epn->to_QDomElement(XMLSS_ALL, clipboard);
-    svg.appendChild(elem);
-
-    // Paste
-    QString dunnartNs = x_dunnartNs;
-    m_paste_id_map.clear();
-    m_paste_bad_constraint_ids.clear();
-
-    // Assign new clipboard IDs.
-    recursiveMapIDs(clipboard, dunnartNs, PASTE_UPDATEOBJIDS);
-
-    // Update IDs for connectors and relationships.
-    recursiveMapIDs(clipboard, dunnartNs, PASTE_UPDATEIDPROPS);
-
-    // Find bad distributions and separations.
-    recursiveMapIDs(clipboard, dunnartNs, PASTE_FINDBADDISTROS);
-
-    // Remove bad distributions and separations.
-    recursiveMapIDs(clipboard, dunnartNs, PASTE_REMOVEBADDISTROS);
-
-    qDebug() << clipboard.toString();
-    // Actually do the pasting, in correct order.
-    for (int pass = 0; pass < PASS_LAST; ++pass)
-    {
-        this->recursiveReadSVG(clipboard, dunnartNs, pass);
-    }
-    */
-
-    /*
-    PDEPN *epn2 = new PDEPN(*epn);
-    QPointF point(x,y);
-    epn2->setCentrePos(point);
-    QUndoCommand *cmd = new CmdCanvasSceneAddItem(canvas, epn2);
-    canvas->currentUndoMacro()->addCommand(cmd);
-    */
 
     return true;
 

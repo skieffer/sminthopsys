@@ -34,6 +34,7 @@ class Reaction;
 namespace dunnart {
 
 class DSBSpecies;
+class DSBCompartment;
 
 class DSBReaction
 {
@@ -41,13 +42,17 @@ class DSBReaction
 public:
     DSBReaction();
     DSBReaction(Reaction *reac);
+    QString getCompartmentName();
     void doublyLink(QMap<QString,DSBSpecies> &map);
+    void setCompartment(DSBCompartment *comp);
+    DSBCompartment *getCompartment();
 
 private:
     Reaction *m_sbmlReaction;
     QString m_name;
     QString m_id;
     QString m_compartmentName;
+    DSBCompartment *m_compartment;
     QList<DSBSpecies *> m_inputs;
     QList<DSBSpecies *> m_outputs;
     QList<DSBSpecies *> m_modifiers;

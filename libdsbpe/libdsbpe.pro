@@ -16,7 +16,7 @@ SOURCES += \
         dsbclone.cpp
 
 HEADERS += \
-        dsblayoutcontainer.h \
+        dsbreclayout.h \
         dsbspecies.h \
 	dsbreaction.h \
         dsbcompartment.h \
