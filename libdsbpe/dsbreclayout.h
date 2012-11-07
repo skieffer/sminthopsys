@@ -43,7 +43,7 @@ public:
     //! them should be assigned a location within the present object,
     //! using their setRelPt method. Finally, it should now be possible
     //! to return the size of the present object.
-    virtual QSizeF layout();
+    virtual QSizeF layout() = 0;
 
     //! Each reclayout object must have an established base point,
     //! or origin for its local coordinate system. For a box, this might
@@ -51,7 +51,7 @@ public:
     //! The "relpt" of the present object should be set by its parent
     //! container, to give its location relative to the origin of that
     //! parent container.
-    virtual void setRelPt(QPointF p);
+    virtual void setRelPt(QPointF p) = 0;
 
     //! After the layout phase, the drawing phase can begin. Typically,
     //! the top-level container will be asked to draw itself relative to
@@ -62,7 +62,7 @@ public:
     //! draws itself with its own base point at q + p, and then
     //! and asks each of its children to draw themselves
     //! rel-to the point q + p.
-    virtual void drawRelTo(QPointF q);
+    virtual void drawRelTo(QPointF q) = 0;
 
     //! Convenience method for drawing top-level container, relative to
     //! the origin of the overall coordinate system.
