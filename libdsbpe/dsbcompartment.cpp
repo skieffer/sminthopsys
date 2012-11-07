@@ -23,6 +23,7 @@
 */
 #include "libdsbpe/dsbcompartment.h"
 
+#include <QtGui>
 #include <QString>
 #include <QList>
 
@@ -68,21 +69,30 @@ QSizeF DSBCompartment::layout()
 
 QSizeF DSBCompartment::squareLayout()
 {
-    // Set cloning.
+    // Set all clonings to trivial.
     for (int i = 0; i < m_species.size(); i++)
     {
         m_species.at(i)->setTrivialCloning();
     }
+
     QList<DSBClone*> clones = getAllClones();
     // TODO: Take account of the sizes of the EPN nodes.
     // For now we simply assume they are the default size
     // of 70x50.
     int numClones = clones.size();
+    // If there are no clones, then it is an empty compartment.
+    // We return a default "small" size.
+    if (numClones == 0)
+    {
+        m_size = QSizeF(100,100);
+        return m_size;
+    }
     int cols = ceil(sqrt(numClones)); // number of columns in array
     int rows = ceil(numClones/cols);
     int u = 50; // unit of separation
     int sepUnits = 2; // separation between adjacent nodes, in units u
     int x0 = 0, y0 = 0, x, y, col, row;
+
     for (int i = 0; i < numClones; i++)
     {
         col = i%cols;
@@ -95,6 +105,7 @@ QSizeF DSBCompartment::squareLayout()
     int height = rows*sepUnits*u + 50;
     // Set reactions to be undisplayed.
     m_show_reactions = false;
+
     m_size = QSizeF(width,height);
     return m_size;
 }
