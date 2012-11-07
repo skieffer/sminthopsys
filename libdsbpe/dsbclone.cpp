@@ -83,7 +83,7 @@ void DSBClone::deleteShape()
 
 void DSBClone::set_is_cloned(bool b)
 {
-    m_epn->set_is_cloned(b);
+    m_is_cloned = b;
 }
 
 QSizeF DSBClone::layout()
@@ -91,8 +91,8 @@ QSizeF DSBClone::layout()
     // TODO: Figure out layout of label, and then base the size of
     // the node on the result.
     // For now:
-    QSizeF size(70,50);
-    return size;
+    m_size = QSizeF(70,50);
+    return m_size;
 }
 
 void DSBClone::setRelPt(QPointF p)
@@ -109,6 +109,8 @@ void DSBClone::drawRelTo(QPointF q)
     // Give the epn a pointer to the species it represents.
     m_epn->setSpecies(m_dsbspec);
     // Set its properties.
+    // Clone marker state
+    m_epn->set_is_cloned(m_is_cloned);
     // Size
     m_epn->setSize(m_size);
     // Position

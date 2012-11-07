@@ -74,8 +74,9 @@ QSizeF DSBCompartment::squareLayout()
     {
         m_species.at(i)->setTrivialCloning();
     }
-
+    // Get the clones.
     QList<DSBClone*> clones = getAllClones();
+
     // TODO: Take account of the sizes of the EPN nodes.
     // For now we simply assume they are the default size
     // of 70x50.
@@ -87,12 +88,19 @@ QSizeF DSBCompartment::squareLayout()
         m_size = QSizeF(100,100);
         return m_size;
     }
+    // Call the clones' layout methods, even though for now
+    // we are not using the sizes that they return.
+    // (We need them to initialize their own sizes.)
+    for (int i = 0; i < numClones; i++)
+    {
+        clones.at(i)->layout();
+    }
+
     int cols = ceil(sqrt(numClones)); // number of columns in array
     int rows = ceil(numClones/cols);
     int u = 50; // unit of separation
     int sepUnits = 2; // separation between adjacent nodes, in units u
     int x0 = 0, y0 = 0, x, y, col, row;
-
     for (int i = 0; i < numClones; i++)
     {
         col = i%cols;
@@ -105,7 +113,6 @@ QSizeF DSBCompartment::squareLayout()
     int height = rows*sepUnits*u + 50;
     // Set reactions to be undisplayed.
     m_show_reactions = false;
-
     m_size = QSizeF(width,height);
     return m_size;
 }

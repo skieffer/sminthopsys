@@ -57,6 +57,7 @@ private:
     QPointF m_relpt;
     QSizeF m_size;
     PDEPN *m_epn;
+    bool m_is_cloned;
     QList<DSBReaction *> m_reactionsEntered;
     QList<DSBReaction *> m_reactionsExited;
     QList<DSBReaction *> m_reactionsModified;

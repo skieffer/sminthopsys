@@ -152,6 +152,11 @@ class Canvas : public QGraphicsScene
             LayeredLayout = 2
         };
 
+        // FIXME
+        // for debugging; delete when done
+        QString getClipboard();
+        //
+
         bool loadGmlDiagram(const QFileInfo& fileInfo);
         void loadSVGRootNodeAttributes(const QDomElement& svgRoot);
         void startLayoutUpdateTimer(void);
