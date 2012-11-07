@@ -194,24 +194,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
             // Do simple, square layout of each compartment, and
             // lay them out side by side.
-            int pad = 100;
-            QList<DSBCompartment> comps = compMap.values();
-            int numComp = comps.size();
-            int *widths = new int[numComp];
-            for (int i = 0; i < numComp; i++)
-            {
-                DSBCompartment comp = comps.at(i);
-                QSizeF size = comp.squareLayout();
-                widths[i] = size.width();
-            }
-            int x = 0, y = 0;
-            for (int i = 0; i < numComp; i++)
-            {
-                DSBCompartment comp = comps.at(i);
-                comp.drawAt(QPointF(x,y));
-                x += widths[i] + pad;
-            }
-            delete[] widths;
+
+            // TODO
+
             return true;
         }
 

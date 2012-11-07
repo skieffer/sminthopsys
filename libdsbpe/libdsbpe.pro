@@ -13,11 +13,13 @@ SOURCES += \
         dsbspecies.cpp \
 	dsbreaction.cpp \
         dsbcompartment.cpp \
-        dsbclone.cpp
+        dsbclone.cpp \
+        dsbcell.cpp
 
 HEADERS += \
         dsbreclayout.h \
         dsbspecies.h \
 	dsbreaction.h \
         dsbcompartment.h \
-        dsbclone.h
+        dsbclone.h \
+        dsbcell.h
