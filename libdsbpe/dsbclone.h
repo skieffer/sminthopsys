@@ -48,6 +48,9 @@ public:
     void setReactionsEntered(QList<DSBReaction*> reacs);
     void setReactionsExited(QList<DSBReaction*> reacs);
     void setReactionsModified(QList<DSBReaction*> reacs);
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
 
 private:
     DSBSpecies *m_dsbspec;

@@ -136,7 +136,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             QMap<QString, DSBSpecies> speciesMap;
 
             // Also a map from compartment names to DSBCompartment objects.
-            QMap<QString, DSBCompartment> compMap;
+            QMap<QString, DSBCompartment*> compMap;
 
             for (unsigned int i = 0; i < numSpecies; i++)
             {
@@ -153,13 +153,13 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 if (!compMap.contains(compName))
                 {
                     DSBCompartment *comp = new DSBCompartment(compName);
-                    compMap.insert(compName, *comp);
+                    compMap.insert(compName, comp);
                 }
                 // Now add the species to its compartment.
-                DSBCompartment comp = compMap.value(compName);
-                comp.addSpecies(dsbspec);
+                DSBCompartment *comp = compMap.value(compName);
+                comp->addSpecies(dsbspec);
                 // And give it a reference to its compartment.
-                dsbspec->setCompartment(&comp);
+                dsbspec->setCompartment(comp);
             }
 
             // Now get the reactions.
@@ -178,13 +178,13 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 if (!compMap.contains(compName))
                 {
                     DSBCompartment *comp = new DSBCompartment(compName);
-                    compMap.insert(compName, *comp);
+                    compMap.insert(compName, comp);
                 }
                 // Now add the reaction to its compartment.
-                DSBCompartment comp = compMap.value(compName);
-                comp.addReaction(dsbreac);
+                DSBCompartment *comp = compMap.value(compName);
+                comp->addReaction(dsbreac);
                 // And give it a reference to its compartment.
-                dsbreac->setCompartment(&comp);
+                dsbreac->setCompartment(comp);
             }
 
             // Do simple, square layout of each compartment, and

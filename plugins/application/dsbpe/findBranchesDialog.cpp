@@ -132,8 +132,6 @@ void FindBranchesDialog::getSelectedSpecies()
 void FindBranchesDialog::findBranches()
 {
     // TODO: Find the branches!
-    //testing:
-    m_endpointSpecies->createClone(-100,-100);
     //
     accept();
 }

@@ -36,7 +36,7 @@ class DSBSpecies;
 class DSBReaction;
 class DSBClone;
 
-class DSBCompartment : DSBRecLayout
+class DSBCompartment : public DSBRecLayout
 {
 
 public:
@@ -45,6 +45,9 @@ public:
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
     QSizeF squareLayout();
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
 
 private:
     QString m_compartmentName;
@@ -52,7 +55,7 @@ private:
     QSizeF m_size;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;
-    bool m_show_reactions = false;
+    bool m_show_reactions;
 
     QList<DSBClone*> getAllClones();
 

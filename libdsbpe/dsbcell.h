@@ -33,7 +33,7 @@ namespace dunnart {
 
 class DSBCompartment;
 
-class DSBCell : DSBRecLayout
+class DSBCell : public DSBRecLayout
 {
 
 public:
@@ -41,6 +41,9 @@ public:
     void addCompartment(DSBCompartment *comp);
     void setCompartments(QList<DSBCompartment*> comps);
     QSizeF rowLayout();
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
 
 private:
     QList<DSBCompartment*> m_compartments;
