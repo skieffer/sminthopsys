@@ -77,7 +77,7 @@ void DSBClone::deleteShape()
 {
     Canvas *canvas = m_dsbspec->canvas();
     canvas->deselectAll();
-    m_epn->setSelected();
+    m_epn->setSelected(true);
     canvas->deleteSelection();
 }
 

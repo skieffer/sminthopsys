@@ -159,31 +159,4 @@ void DSBSpecies::setCloneMarkers()
     }
 }
 
-bool DSBSpecies::createClone(int x, int y)
-{
-    // Make sure we have a canvas.
-    if (!m_canvas) { return false; }
-    // Make sure there is already at least one clone.
-    // (There always should be.)
-    if (m_clones.size() < 1) { return false; }
-
-    PDEPN *epn = m_clones.at(0);
-    m_canvas->deselectAll();
-    epn->setSelected(true);
-    m_canvas->copySelection();
-    m_canvas->pasteSelection();
-    QList<CanvasItem *> selected_items = m_canvas->selectedItems();
-    CanvasItem *item = selected_items.at(0);
-    PDEPN *epn2 = dynamic_cast<PDEPN*>(item);
-    epn2->setSpecies(this);
-    QPointF point(x,y);
-    epn2->setCentrePos(point);
-    m_clones.append(epn2);
-
-
-
-    return true;
-
-}
-
 }
