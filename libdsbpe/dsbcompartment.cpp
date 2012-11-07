@@ -93,6 +93,8 @@ QSizeF DSBCompartment::squareLayout()
     }
     int width = cols*sepUnits*u + 70;
     int height = rows*sepUnits*u + 50;
+    // Set reactions to be undisplayed.
+    m_show_reactions = false;
     m_size = QSizeF(width,height);
     return m_size;
 }
@@ -104,7 +106,23 @@ void DSBCompartment::setRelPt(QPointF p)
 
 void DSBCompartment::drawRelTo(QPointF q)
 {
-    // TODO
+    QPointF r = m_relpt + q;
+    // Compartment boundary
+    //   (TODO)
+
+    // Reactions:
+    if (m_show_reactions)
+    {
+        // TODO
+    }
+
+    // Clones:
+    QList<DSBClone*> clones = getAllClones();
+    for (int i = 0; i < clones.size(); i++)
+    {
+        DSBClone *cl = clones.at(i);
+        cl->drawRelTo(r);
+    }
 }
 
 }
