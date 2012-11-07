@@ -1579,6 +1579,14 @@ void Canvas::copySelection(void)
     emit clipboardContentsChanged();
 }
 
+// FIXME
+// for debugging; delete when done
+QString Canvas::getClipboard()
+{
+    return m_clipboard;
+}
+
+//
 
 void Canvas::pasteSelection(void)
 {
