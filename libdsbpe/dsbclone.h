@@ -51,10 +51,13 @@ public:
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
 
 private:
     DSBSpecies *m_dsbspec;
     QPointF m_relpt;
+    QPointF m_basept;
     QSizeF m_size;
     PDEPN *m_epn;
     bool m_is_cloned;

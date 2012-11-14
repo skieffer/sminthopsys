@@ -102,6 +102,18 @@ void DSBClone::setRelPt(QPointF p)
 
 void DSBClone::drawRelTo(QPointF q)
 {
+    QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBClone::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBClone::drawAt(QPointF r)
+{
+    m_basept = r;
     PluginShapeFactory *factory = sharedPluginShapeFactory();
     QString type("org.sbgn.pd.00UnspecifiedEPN");
     ShapeObj *shape = factory->createShape(type);
@@ -114,8 +126,7 @@ void DSBClone::drawRelTo(QPointF q)
     // Size
     m_epn->setSize(m_size);
     // Position
-    QPointF r = m_relpt + q;
-    m_epn->setCentrePos(r);
+    m_epn->setCentrePos(m_basept);
     // Label
     m_epn->setLabel(m_dsbspec->getName());
     // Add it to the canvas.

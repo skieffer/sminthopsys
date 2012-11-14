@@ -64,6 +64,12 @@ public:
     //! rel-to the point q + p.
     virtual void drawRelTo(QPointF q) = 0;
 
+    //! Ignore own rel-pt, and simply draw with base point at r.
+    virtual void drawAt(QPointF r) = 0;
+
+    //! Draw again, with base point at same place as last time.
+    virtual void redraw() = 0;
+
     //! Convenience method for drawing top-level container, relative to
     //! the origin of the overall coordinate system.
     void draw()
