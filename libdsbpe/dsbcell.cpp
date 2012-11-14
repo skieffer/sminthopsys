@@ -87,10 +87,23 @@ void DSBCell::setRelPt(QPointF p)
 void DSBCell::drawRelTo(QPointF q)
 {
     QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBCell::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBCell::drawAt(QPointF r)
+{
+    m_basept = r;
     for (int i = 0; i < m_compartments.size(); i++)
     {
-        m_compartments.at(i)->drawRelTo(r);
+        m_compartments.at(i)->drawRelTo(m_basept);
     }
 }
+
+
 
 }

@@ -191,6 +191,17 @@ void DSBCompartment::setRelPt(QPointF p)
 void DSBCompartment::drawRelTo(QPointF q)
 {
     QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBCompartment::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBCompartment::drawAt(QPointF r)
+{
+    m_basept = r;
     // Compartment boundary
     //   (TODO)
 
@@ -205,7 +216,7 @@ void DSBCompartment::drawRelTo(QPointF q)
     for (int i = 0; i < clones.size(); i++)
     {
         DSBClone *cl = clones.at(i);
-        cl->drawRelTo(r);
+        cl->drawRelTo(m_basept);
     }
 }
 

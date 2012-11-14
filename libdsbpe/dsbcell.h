@@ -44,10 +44,13 @@ public:
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
 
 private:
     QList<DSBCompartment*> m_compartments;
     QPointF m_relpt;
+    QPointF m_basept;
     QSizeF m_size;
 };
 

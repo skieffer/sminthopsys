@@ -50,12 +50,15 @@ public:
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
     QString getName();
     void setCell(DSBCell *cell);
 
 private:
     QString m_compartmentName;
     QPointF m_relpt;
+    QPointF m_basept;
     QSizeF m_size;
     DSBCell *m_cell;
     QList<DSBSpecies *> m_species;
