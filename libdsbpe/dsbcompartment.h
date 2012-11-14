@@ -48,6 +48,7 @@ public:
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
+    QString getName();
 
 private:
     QString m_compartmentName;

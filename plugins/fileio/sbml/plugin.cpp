@@ -133,7 +133,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             std::string id;
 
             // Build a map from species id's to internal objects representing those species.
-            QMap<QString, DSBSpecies> speciesMap;
+            QMap<QString, DSBSpecies*> speciesMap;
 
             // Also a map from compartment names to DSBCompartment objects.
             QMap<QString, DSBCompartment*> compMap;
@@ -146,13 +146,12 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 dsbspec->setCanvas(canvas);
 
                 // Save it in the species map.
-                speciesMap.insert(QString(id.c_str()), *dsbspec);
+                speciesMap.insert(QString(id.c_str()), dsbspec);
 
                 // If it belongs to a new compartment, then add that to the compartment map.
                 QString compName = dsbspec->getCompartmentName();
                 if (!compMap.contains(compName))
                 {
-                    qDebug() << "Compartment: " << compName;
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
                 }
@@ -190,11 +189,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
             // Do simple, square layout of each compartment, and
             // lay them out side by side.
-            DSBCell cell;
-            cell.setCompartments( compMap.values() );
-            cell.rowLayout();
-            cell.setRelPt(QPointF(0,0));
-            cell.draw();
+            DSBCell *cell = new DSBCell();
+            cell->setCompartments( compMap.values() );
+            cell->rowLayout();
+            cell->setRelPt(QPointF(0,0));
+            cell->draw();
             return true;
         }
 

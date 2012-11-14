@@ -50,6 +50,11 @@ void DSBCompartment::addReaction(DSBReaction *reac)
     m_reactions.append(reac);
 }
 
+QString DSBCompartment::getName()
+{
+    return m_compartmentName;
+}
+
 QList<DSBClone*> DSBCompartment::getAllClones()
 {
     QList<DSBClone*> clones;

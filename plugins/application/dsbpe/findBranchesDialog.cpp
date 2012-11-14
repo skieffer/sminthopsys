@@ -35,6 +35,8 @@
 #include "libdunnartcanvas/shape.h"
 
 #include "plugins/shapes/sbgn/pdepn.h"
+#include "libdsbpe/dsbspecies.h"
+#include "libdsbpe/dsbcompartment.h"
 
 namespace dunnart {
 
@@ -135,7 +137,13 @@ void FindBranchesDialog::findBranches()
     // TODO: Find the branches!
     //
     // random testing:
-    LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
+    //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
+    //
+    if (m_endpointSpecies)
+    {
+        DSBCompartment *comp = m_endpointSpecies->getCompartment();
+        qDebug() << comp->getName();
+    }
     //
     accept();
 }
