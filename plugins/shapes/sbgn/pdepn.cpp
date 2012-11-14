@@ -98,14 +98,14 @@ PDEPN::PDEPN(QString l, bool cb, QString cl, bool m) : ShapeObj("sbgn.NucleicAci
 // This function overrides the function defined in the Glyph class, to return true, because by definition this class is cloneable :-)
 bool PDEPN::isCloned() { return cloned; }
 
-void PDEPN::setSpecies(DSBSpecies *spec)
+void PDEPN::setClone(DSBClone *clone)
 {
-    m_species = spec;
+    m_clone = clone;
 }
 
-DSBSpecies *PDEPN::getSpecies()
+DSBClone *PDEPN::getClone()
 {
-    return m_species;
+    return m_clone;
 }
 
 void PDEPN::set_is_cloned(bool b)

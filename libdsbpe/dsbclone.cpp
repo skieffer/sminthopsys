@@ -23,6 +23,7 @@
 */
 
 #include "dsbclone.h"
+#include "dsbspecies.h"
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/pluginshapefactory.h"
@@ -81,6 +82,11 @@ void DSBClone::deleteShape()
     canvas->deleteSelection();
 }
 
+DSBSpecies *DSBClone::getSpecies()
+{
+    return m_dsbspec;
+}
+
 void DSBClone::set_is_cloned(bool b)
 {
     m_is_cloned = b;
@@ -119,7 +125,7 @@ void DSBClone::drawAt(QPointF r)
     ShapeObj *shape = factory->createShape(type);
     m_epn = dynamic_cast<PDEPN*>  (shape);
     // Give the epn a pointer to the species it represents.
-    m_epn->setSpecies(m_dsbspec);
+    m_epn->setClone(this);
     // Set its properties.
     // Clone marker state
     m_epn->set_is_cloned(m_is_cloned);

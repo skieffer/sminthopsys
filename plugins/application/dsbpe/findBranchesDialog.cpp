@@ -35,6 +35,7 @@
 #include "libdunnartcanvas/shape.h"
 
 #include "plugins/shapes/sbgn/pdepn.h"
+#include "libdsbpe/dsbclone.h"
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbcompartment.h"
 
@@ -72,19 +73,19 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(endpointLabel, 0, 0);
-    layout->addWidget(m_endpointEdit,  0, 1);
-    layout->addWidget(endpointCBox,  0, 2);
-    layout->addWidget(layoutLabel,   1, 0);
-    layout->addWidget(layoutCBox,    1, 1);
-    layout->addWidget(cancelButton,    2, 0);
-    layout->addWidget(findButton,    2, 1);
+    layout->addWidget(endpointLabel,  0, 0);
+    layout->addWidget(m_endpointEdit, 0, 1);
+    layout->addWidget(endpointCBox,   0, 2);
+    layout->addWidget(layoutLabel,    1, 0);
+    layout->addWidget(layoutCBox,     1, 1);
+    layout->addWidget(cancelButton,   2, 0);
+    layout->addWidget(findButton,     2, 1);
     setLayout(layout);
 
     setWindowTitle(tr("Find Branches"));
 
     // Populate endpoint box.
-    getSelectedSpecies();
+    getSelectedClone();
 
     // Watch change of selection.
     connect(m_canvas, SIGNAL(selectionChanged()),
@@ -95,14 +96,14 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
  */
 void FindBranchesDialog::canvasSelectionChanged()
 {
-    getSelectedSpecies();
+    getSelectedClone();
 }
 
 /* Consult the canvas selection, and check whether exactly one
    shape node is selected. If so, populate edit box with its name.
    Otherwise, put a message requesting selection of just one shape.
  */
-void FindBranchesDialog::getSelectedSpecies()
+void FindBranchesDialog::getSelectedClone()
 {
     CanvasItemList selection = m_canvas->selectedItems();
     int n = selection.size();
@@ -119,7 +120,7 @@ void FindBranchesDialog::getSelectedSpecies()
         {
             m_endpointEdit->setText(epn->getLabel());
             m_endpointIDString = epn->idString();
-            m_endpointSpecies = epn->getSpecies();
+            m_endpointClone = epn->getClone();
         }
         else
         {
@@ -139,12 +140,13 @@ void FindBranchesDialog::findBranches()
     // random testing:
     //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
     //
-    if (m_endpointSpecies)
+    if (m_endpointClone)
     {
-        DSBCompartment *comp = m_endpointSpecies->getCompartment();
-        qDebug() << comp->getName();
-        comp->squareLayout2();
-        comp->draw();
+        DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
+        //qDebug() << comp->getName();
+        //comp->squareLayout2();
+        comp->longestBranchLayout(m_endpointClone);
+        comp->redraw();
     }
     //
     accept();

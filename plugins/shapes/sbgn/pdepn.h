@@ -38,11 +38,11 @@
 #include <QObject> // need this class for the QOBJECT macro, which is needed for type checking
 #include <QPainter> // this is actually included in the coreclasses.cpp file, but needed here because of order of inclusion
 
-#include "libdsbpe/dsbspecies.h"
-
 using namespace dunnart;
 
 namespace dunnart {
+
+class DSBClone;
 
 //enum Cloneable { IS_CLONEABLE, NOT_CLONEABLE };
 static const int GLYPH_PADDING = 5; // this is used as padding when drawing glyphs, to prevent auxiliary units and multimeric states from crossing outside the glyph bounding box
@@ -93,8 +93,8 @@ public:
     virtual QPainterPath clone_marker() const = 0; // creates the clone marker for this glyph: MUST be instantiated in the inheriting class
     bool isCloned();
     bool isMultimeric() { return false; } // an EPN is not multimeric
-    void setSpecies(DSBSpecies *spec);
-    DSBSpecies *getSpecies();
+    void setClone(DSBClone *clone);
+    DSBClone *getClone();
     void set_is_cloned(bool b);
 
 protected:
@@ -105,7 +105,7 @@ protected:
     bool cloned;
     QString cloneLabel;
     bool multimer;
-    DSBSpecies *m_species;
+    DSBClone *m_clone;
 
 // QT
 #if 0

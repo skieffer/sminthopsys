@@ -38,6 +38,13 @@ namespace dunnart {
 DSBCompartment::DSBCompartment(QString compartmentName)
     : m_compartmentName(compartmentName)
 {
+    m_default_blacklist <<
+                           "ATP" <<
+                           "ADP" <<
+                           "NADH" <<
+                           "NAD+" <<
+                           "NADPH" <<
+                           "NADP+";
 }
 
 void DSBCompartment::addSpecies(DSBSpecies *spec)
@@ -134,11 +141,77 @@ QSizeF DSBCompartment::squareLayout()
   */
 QSizeF DSBCompartment::squareLayout2()
 {
-    // Set all clonings to trivial.
+    // Set all clonings to discrete.
     for (int i = 0; i < m_species.size(); i++)
     {
         m_species.at(i)->setDiscreteCloning();
     }
+    // Get the clones.
+    QList<DSBClone*> clones = getAllClones();
+
+    // TODO: Take account of the sizes of the EPN nodes.
+    // For now we simply assume they are the default size
+    // of 70x50.
+    int numClones = clones.size();
+    // If there are no clones, then it is an empty compartment.
+    // We return a default "small" size.
+    if (numClones == 0)
+    {
+        m_size = QSizeF(100,100);
+        return m_size;
+    }
+    // Call the clones' layout methods, even though for now
+    // we are not using the sizes that they return. This serves
+    // to get them to initialize their own sizes, which are needed
+    // when we ask them to draw themselves.
+    for (int i = 0; i < numClones; i++)
+    {
+        clones.at(i)->layout();
+    }
+
+    int cols = ceil(sqrt(numClones)); // number of columns in array
+    int rows = ceil(numClones/cols);
+    int u = 50; // unit of separation
+    int sepUnits = 2; // separation between adjacent nodes, in units u
+    int x0 = 0, y0 = 0, x, y, col, row;
+    for (int i = 0; i < numClones; i++)
+    {
+        col = i%cols;
+        row = i/cols;
+        x = x0 + col*sepUnits*u;
+        y = y0 + row*sepUnits*u;
+        clones.at(i)->setRelPt(QPointF(x,y));
+    }
+    int width = cols*sepUnits*u + 70;
+    int height = rows*sepUnits*u + 50;
+    // Set reactions to be undisplayed.
+    m_show_reactions = false;
+    m_size = QSizeF(width,height);
+    return m_size;
+}
+
+QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt)
+{
+    return longestBranchLayout(endpt, m_default_blacklist);
+}
+
+QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> blacklist)
+{
+    // Set discrete clonings for all blacklisted species.
+    for (int i = 0; i < m_species.size(); i++)
+    {
+        DSBSpecies *spec = m_species.at(i);
+        QString name = spec->getName();
+        if (blacklist.contains(name))
+        {
+            qDebug() << "found blacklisted species: " << name;
+            spec->setDiscreteCloning();
+        }
+    }
+
+    // For now, the rest is just a square layout.
+    // TODO -- write the correct method
+
     // Get the clones.
     QList<DSBClone*> clones = getAllClones();
 
