@@ -35,6 +35,7 @@ namespace dunnart {
 class DSBSpecies;
 class DSBReaction;
 class DSBClone;
+class DSBCell;
 
 class DSBCompartment : public DSBRecLayout
 {
@@ -45,15 +46,18 @@ public:
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
     QSizeF squareLayout();
+    QSizeF squareLayout2();
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
     QString getName();
+    void setCell(DSBCell *cell);
 
 private:
     QString m_compartmentName;
     QPointF m_relpt;
     QSizeF m_size;
+    DSBCell *m_cell;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;
     bool m_show_reactions;

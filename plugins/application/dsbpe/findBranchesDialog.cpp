@@ -143,6 +143,8 @@ void FindBranchesDialog::findBranches()
     {
         DSBCompartment *comp = m_endpointSpecies->getCompartment();
         qDebug() << comp->getName();
+        comp->squareLayout2();
+        comp->draw();
     }
     //
     accept();

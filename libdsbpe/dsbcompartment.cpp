@@ -55,6 +55,11 @@ QString DSBCompartment::getName()
     return m_compartmentName;
 }
 
+void DSBCompartment::setCell(DSBCell *cell)
+{
+    m_cell = cell;
+}
+
 QList<DSBClone*> DSBCompartment::getAllClones()
 {
     QList<DSBClone*> clones;
@@ -78,6 +83,61 @@ QSizeF DSBCompartment::squareLayout()
     for (int i = 0; i < m_species.size(); i++)
     {
         m_species.at(i)->setTrivialCloning();
+    }
+    // Get the clones.
+    QList<DSBClone*> clones = getAllClones();
+
+    // TODO: Take account of the sizes of the EPN nodes.
+    // For now we simply assume they are the default size
+    // of 70x50.
+    int numClones = clones.size();
+    // If there are no clones, then it is an empty compartment.
+    // We return a default "small" size.
+    if (numClones == 0)
+    {
+        m_size = QSizeF(100,100);
+        return m_size;
+    }
+    // Call the clones' layout methods, even though for now
+    // we are not using the sizes that they return. This serves
+    // to get them to initialize their own sizes, which are needed
+    // when we ask them to draw themselves.
+    for (int i = 0; i < numClones; i++)
+    {
+        clones.at(i)->layout();
+    }
+
+    int cols = ceil(sqrt(numClones)); // number of columns in array
+    int rows = ceil(numClones/cols);
+    int u = 50; // unit of separation
+    int sepUnits = 2; // separation between adjacent nodes, in units u
+    int x0 = 0, y0 = 0, x, y, col, row;
+    for (int i = 0; i < numClones; i++)
+    {
+        col = i%cols;
+        row = i/cols;
+        x = x0 + col*sepUnits*u;
+        y = y0 + row*sepUnits*u;
+        clones.at(i)->setRelPt(QPointF(x,y));
+    }
+    int width = cols*sepUnits*u + 70;
+    int height = rows*sepUnits*u + 50;
+    // Set reactions to be undisplayed.
+    m_show_reactions = false;
+    m_size = QSizeF(width,height);
+    return m_size;
+}
+
+/* Just a method with which to switch to discrete cloning,
+  while still in square layout. For debugging purposes.
+  Delete when done.
+  */
+QSizeF DSBCompartment::squareLayout2()
+{
+    // Set all clonings to trivial.
+    for (int i = 0; i < m_species.size(); i++)
+    {
+        m_species.at(i)->setDiscreteCloning();
     }
     // Get the clones.
     QList<DSBClone*> clones = getAllClones();
