@@ -46,6 +46,7 @@ public:
     void doublyLink(QMap<QString,DSBSpecies> &map);
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
+    QString getReactionId();
 
 private:
     Reaction *m_sbmlReaction;

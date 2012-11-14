@@ -26,6 +26,7 @@
 
 //diag:
 #include <iostream>
+#include "libdunnartcanvas/templates.h"
 //
 
 #include "findBranchesDialog.h"
@@ -132,6 +133,9 @@ void FindBranchesDialog::getSelectedSpecies()
 void FindBranchesDialog::findBranches()
 {
     // TODO: Find the branches!
+    //
+    // random testing:
+    LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
     //
     accept();
 }

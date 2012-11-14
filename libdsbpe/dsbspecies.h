@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <QList>
+#include <QMap>
 
 class Species;
 
@@ -36,6 +37,13 @@ class Canvas;
 class DSBCompartment;
 class DSBReaction;
 class DSBClone;
+
+struct DSBCloneAssignment
+{
+    QList<DSBClone*> reactants;
+    QList<DSBClone*> products;
+    QList<DSBClone*> modifiers;
+};
 
 class DSBSpecies
 {
@@ -52,10 +60,10 @@ public:
     Canvas *canvas();
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
-    void deleteClones();
     void setTrivialCloning();
     void setDiscreteCloning();
     QList<DSBClone*> getClones();
+    DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
 
 private:
     Canvas *m_canvas;
@@ -68,7 +76,9 @@ private:
     QList<DSBReaction *> m_reactionsExited;
     QList<DSBReaction *> m_reactionsModified;
     QList<DSBClone *> m_clones;
+    QMap<QString, DSBCloneAssignment*> m_cloneAssignmentsByReactionId;
 
+    void deleteClonesAndAssignments();
     void setCloneMarkers();
 };
 

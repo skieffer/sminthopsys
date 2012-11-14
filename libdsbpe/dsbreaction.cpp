@@ -54,6 +54,11 @@ QString DSBReaction::getCompartmentName()
     return m_compartmentName;
 }
 
+QString DSBReaction::getReactionId()
+{
+    return m_id;
+}
+
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
