@@ -47,6 +47,8 @@ public:
     void addReaction(DSBReaction *reac);
     QSizeF squareLayout();
     QSizeF squareLayout2();
+    QSizeF longestBranchLayout(DSBClone *endpt);
+    QSizeF longestBranchLayout(DSBClone *endpt, QList<QString> blacklist);
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
@@ -54,6 +56,8 @@ public:
     void redraw();
     QString getName();
     void setCell(DSBCell *cell);
+
+    QList<QString> m_default_blacklist;
 
 private:
     QString m_compartmentName;

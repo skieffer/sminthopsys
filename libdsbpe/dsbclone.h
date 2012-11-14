@@ -45,6 +45,7 @@ public:
     void addReactionModified(DSBReaction *reac);
     void deleteShape();
     void set_is_cloned(bool b);
+    DSBSpecies *getSpecies();
     void setReactionsEntered(QList<DSBReaction*> reacs);
     void setReactionsExited(QList<DSBReaction*> reacs);
     void setReactionsModified(QList<DSBReaction*> reacs);
