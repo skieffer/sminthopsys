@@ -34,11 +34,17 @@ DSBCell::DSBCell() {}
 void DSBCell::addCompartment(DSBCompartment *comp)
 {
     m_compartments.append(comp);
+    comp->setCell(this);
 }
 
 void DSBCell::setCompartments(QList<DSBCompartment *> comps)
 {
-    m_compartments = comps;
+    m_compartments.clear();
+    for (int i = 0; i < comps.size(); i++)
+    {
+        DSBCompartment *comp = comps.at(i);
+        addCompartment(comp);
+    }
 }
 
 QSizeF DSBCell::layout()
