@@ -22,6 +22,8 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#include <QtGui>
+
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbspecies.h"
 
@@ -62,7 +64,7 @@ QString DSBReaction::getReactionId()
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
-void DSBReaction::doublyLink(QMap<QString, DSBSpecies> &map)
+void DSBReaction::doublyLink(QMap<QString, DSBSpecies*> map)
 {
     ListOfSpeciesReferences *lsr;
     SimpleSpeciesReference *ssr;
@@ -80,12 +82,13 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> &map)
         {
             // TODO: Report error. Reaction is referring to a species that
             // was not declared in the SBML list of species.
+            qDebug() << "map does not contain species id " << specId;
         }
         else
         {
-            DSBSpecies dsbspec = map.value(specId);
-            m_inputs.append(&dsbspec);
-            dsbspec.addReactionEntered(this);
+            DSBSpecies *dsbspec = map.value(specId);
+            m_inputs.append(dsbspec);
+            dsbspec->addReactionEntered(this);
         }
     }
 
@@ -100,12 +103,13 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> &map)
         {
             // TODO: Report error. Reaction is referring to a species that
             // was not declared in the SBML list of species.
+            qDebug() << "map does not contain species id " << specId;
         }
         else
         {
-            DSBSpecies dsbspec = map.value(specId);
-            m_outputs.append(&dsbspec);
-            dsbspec.addReactionExited(this);
+            DSBSpecies *dsbspec = map.value(specId);
+            m_outputs.append(dsbspec);
+            dsbspec->addReactionExited(this);
         }
     }
 
@@ -120,12 +124,13 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies> &map)
         {
             // TODO: Report error. Reaction is referring to a species that
             // was not declared in the SBML list of species.
+            qDebug() << "map does not contain species id " << specId;
         }
         else
         {
-            DSBSpecies dsbspec = map.value(specId);
-            m_modifiers.append(&dsbspec);
-            dsbspec.addReactionModified(this);
+            DSBSpecies *dsbspec = map.value(specId);
+            m_modifiers.append(dsbspec);
+            dsbspec->addReactionModified(this);
         }
     }
 }

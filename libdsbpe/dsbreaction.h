@@ -43,7 +43,7 @@ public:
     DSBReaction();
     DSBReaction(Reaction *reac);
     QString getCompartmentName();
-    void doublyLink(QMap<QString,DSBSpecies> &map);
+    void doublyLink(QMap<QString,DSBSpecies*> map);
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
     QString getReactionId();
