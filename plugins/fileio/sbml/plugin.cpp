@@ -152,6 +152,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 QString compName = dsbspec->getCompartmentName();
                 if (!compMap.contains(compName))
                 {
+                    qDebug() << "Compartment: " << compName;
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
                 }

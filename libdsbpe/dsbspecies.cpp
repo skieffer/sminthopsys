@@ -25,6 +25,7 @@
 #include <QtGui>
 
 #include "dsbspecies.h"
+#include "dsbreaction.h"
 #include "dsbclone.h"
 
 #include "libdunnartcanvas/canvas.h"
@@ -93,54 +94,143 @@ QList<DSBClone*> DSBSpecies::getClones()
     return m_clones;
 }
 
-void DSBSpecies::deleteClones()
+/* This map must be maintained by all methods that change the
+   cloning.
+
+   It associates with each reaction (ID) a list of clones of the present
+   species which have been assigned to participate in that reaction, as
+   reactant, product, or modifier.
+
+   (SBGN PD diagrams do sometimes feature multiple clones of one
+    and the same species playing one and the same role in a reaction,
+    be it as reactant or product (or maybe even modifier?).)
+  */
+DSBCloneAssignment *DSBSpecies::getCloneAssignmentByReactionId(QString rid)
 {
+    return m_cloneAssignmentsByReactionId.value(rid);
+}
+
+void DSBSpecies::deleteClonesAndAssignments()
+{
+    // Delete shapes from the canvas.
     for (int i = 0; i < m_clones.size(); i++)
     {
         m_clones.at(i)->deleteShape();
     }
+    // Clear the clone assignment map, and delete the DSBCloneAssignment
+    // structs themselves.
+    QList<QString> reacIds = m_cloneAssignmentsByReactionId.keys();
+    for (int i = 0; i < reacIds.size(); i++)
+    {
+        QString id = reacIds.at(i);
+        DSBCloneAssignment *ca = m_cloneAssignmentsByReactionId.value(id);
+        m_cloneAssignmentsByReactionId.remove(id);
+        delete ca;
+    }
+    // Clear the list of clones, and delete the DSBClone objects themselves.
     while (!m_clones.isEmpty())
     {
-        DSBClone *cl = m_clones.at(0);
-        m_clones.removeFirst();
+        DSBClone *cl = m_clones.takeFirst(); // removes it from the list
         delete cl;
     }
 }
 
+/* The trivial cloning is that in which there is precisely one clone
+   of this species, participating in all reactions in which this
+   species participates.
+  */
 void DSBSpecies::setTrivialCloning()
 {
-    deleteClones();
+    // Delete old clones.
+    deleteClonesAndAssignments();
+
+    // Create new clone.
     DSBClone *cl = new DSBClone(this);
-    cl->setReactionsEntered(m_reactionsEntered);
-    cl->setReactionsExited(m_reactionsExited);
-    cl->setReactionsModified(m_reactionsModified);
     m_clones.append(cl);
+
+    // Set it as the sole clone assigned to each reaction.
+    for (int i = 0; i < m_reactionsEntered.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsEntered.at(i);
+        cl->addReactionEntered(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->reactants.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
+    }
+
+    for (int i = 0; i < m_reactionsExited.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsExited.at(i);
+        cl->addReactionExited(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->products.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
+    }
+
+    for (int i = 0; i < m_reactionsModified.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsModified.at(i);
+        cl->addReactionModified(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->modifiers.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
+    }
+
     setCloneMarkers();
 }
 
+/* The discrete cloning (named after "the discrete topology") is that
+   in which there is one clone for each role played by the species.
+  */
 void DSBSpecies::setDiscreteCloning()
 {
-    deleteClones();
+    // Delete old clones.
+    deleteClonesAndAssignments();
 
+    // Create a new clone for each role played by this species.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
     {
         DSBClone *cl = new DSBClone(this);
-        cl->addReactionEntered(m_reactionsEntered.at(i));
         m_clones.append(cl);
+        DSBReaction *reac = m_reactionsEntered.at(i);
+        cl->addReactionEntered(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->reactants.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
     }
 
     for (int i = 0; i < m_reactionsExited.size(); i++)
     {
         DSBClone *cl = new DSBClone(this);
-        cl->addReactionExited(m_reactionsExited.at(i));
         m_clones.append(cl);
+        DSBReaction *reac = m_reactionsExited.at(i);
+        cl->addReactionExited(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->products.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
     }
 
     for (int i = 0; i < m_reactionsModified.size(); i++)
     {
         DSBClone *cl = new DSBClone(this);
-        cl->addReactionModified(m_reactionsModified.at(i));
         m_clones.append(cl);
+        DSBReaction *reac = m_reactionsModified.at(i);
+        cl->addReactionModified(reac);
+        QString rid = reac->getReactionId();
+        DSBCloneAssignment *ca =
+                m_cloneAssignmentsByReactionId.value( rid, new DSBCloneAssignment() );
+        ca->modifiers.append(cl);
+        m_cloneAssignmentsByReactionId.insert(rid,ca);
     }
 
     setCloneMarkers();

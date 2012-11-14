@@ -89,8 +89,9 @@ QSizeF DSBCompartment::squareLayout()
         return m_size;
     }
     // Call the clones' layout methods, even though for now
-    // we are not using the sizes that they return.
-    // (We need them to initialize their own sizes.)
+    // we are not using the sizes that they return. This serves
+    // to get them to initialize their own sizes, which are needed
+    // when we ask them to draw themselves.
     for (int i = 0; i < numClones; i++)
     {
         clones.at(i)->layout();
