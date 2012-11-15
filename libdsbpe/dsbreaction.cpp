@@ -220,7 +220,6 @@ QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
 
 QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> &seen, DSBNode *last)
 {
-    qDebug() << m_id << " entering findBranchesRec~~~~~~~~~~~~~~~~~~~~~";
     seen.append(m_id); // Mark self as seen.
 
     QList<DSBBranch*> branches; // Prepare return value.
@@ -229,8 +228,6 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> &seen, DSBNode *la
     // Then only consider flowing out on opposite side.
     DSBClone *clone = dynamic_cast<DSBClone*>(last);
     QList<DSBClone*> opp = getOpposedClones(clone);
-
-    qDebug() << "got " << opp.size() << " opposed clones";
 
     for (int i = 0; i < opp.size(); i++)
     {
@@ -241,8 +238,6 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> &seen, DSBNode *la
 
         // Consider whether this clone has already been seen or not.
         QString cid = cl->getCloneId();
-
-        qDebug() << "  considering clone: " << cid;
 
         if (seen.contains(cid))
         {

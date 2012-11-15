@@ -49,8 +49,6 @@ DSBBranch *DSBNode::findMergeTarget(QList<DSBBranch *> branches)
     // Find a longest linear branch and longest cycle.
     int lin = 0; DSBBranch *linB = 0;
     int cyc = 0; DSBBranch *cycB = 0;
-    qDebug() << "num lin branches: " << linearBranches.size();
-    qDebug() << "num cycles: " << cycles.size();
     for (int i = 0; i < linearBranches.size(); i++)
     {
         DSBBranch *b = linearBranches.at(i);
@@ -70,14 +68,8 @@ DSBBranch *DSBNode::findMergeTarget(QList<DSBBranch *> branches)
         }
     }
     DSBBranch *mergeTarget;
-    if (linB) {
-        qDebug() << "merging with linear branch at " << linB;
-        mergeTarget = linB;
-    }
-    else {
-        qDebug() << "merging with cycle at " << cycB;
-        mergeTarget = cycB;
-    }
+    if (linB) { mergeTarget = linB; }
+    else { mergeTarget = cycB; }
     return mergeTarget;
 }
 
