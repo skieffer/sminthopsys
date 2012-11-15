@@ -73,27 +73,23 @@ bool DSBReaction::isReversible()
   */
 bool DSBReaction::isIntercompartmental()
 {
-    qDebug() << "checking intercompartmentality for " << m_id;
     QSet<QString> comps;
     for (int i = 0; i < m_inputs.size(); i++)
     {
         DSBSpecies *spec = m_inputs.at(i);
         QString comp =spec->getCompartmentName();
-        qDebug() << "  -has species in compartment: " << comp;
         comps.insert(comp);
     }
     for (int i = 0; i < m_outputs.size(); i++)
     {
         DSBSpecies *spec = m_outputs.at(i);
         QString comp =spec->getCompartmentName();
-        qDebug() << "  -has species in compartment: " << comp;
         comps.insert(comp);
     }
     for (int i = 0; i < m_modifiers.size(); i++)
     {
         DSBSpecies *spec = m_modifiers.at(i);
         QString comp =spec->getCompartmentName();
-        qDebug() << "  -has species in compartment: " << comp;
         comps.insert(comp);
     }
     return (comps.size() > 1);
@@ -204,13 +200,8 @@ QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
     // First determine which side, or sides, the clone is on.
     DSBSpecies *spec = clone->getSpecies();
     DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
-    bool isMod = cla->modifiers.contains(clone);
     bool isProd = cla->products.contains(clone);
     bool isReac = cla->reactants.contains(clone);
-
-    qDebug() << "isMod: " << isMod;
-    qDebug() << "isProd: " << isProd;
-    qDebug() << "isReac: " << isReac;
 
     // If it is a product and not a reactant, then the reactants are opposed.
     if (isProd && !isReac)
@@ -220,16 +211,14 @@ QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
     // If it is a reactant and not a product, then the products are opposed.
     else if (isReac && !isProd)
     {
-        qDebug() << "it is a reactant and not a product";
         opp = getOutputClones();
-        qDebug() << "opp has " << opp.size() << " elements";
     }
     // Otherwise we cannot call anything opposed.
 
     return opp;
 }
 
-QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> seen, DSBNode *last)
+QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> &seen, DSBNode *last)
 {
     qDebug() << m_id << " entering findBranchesRec~~~~~~~~~~~~~~~~~~~~~";
     seen.append(m_id); // Mark self as seen.
@@ -246,6 +235,10 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> seen, DSBNode *las
     for (int i = 0; i < opp.size(); i++)
     {
         DSBClone *cl = opp.at(i);
+
+        // Do not turn around and go backwards.
+        if (cl == last) {continue;}
+
         // Consider whether this clone has already been seen or not.
         QString cid = cl->getCloneId();
 

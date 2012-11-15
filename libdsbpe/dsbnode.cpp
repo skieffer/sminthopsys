@@ -33,6 +33,54 @@ namespace dunnart {
 
 bool DSBNode::s_followTransporters = false;
 
+DSBBranch *DSBNode::findMergeTarget(QList<DSBBranch *> branches)
+{
+    // Will find longest linear branch, or, failing that, longest cycle.
+
+    // Separate branches into linear and cycles.
+    QList<DSBBranch*> linearBranches;
+    QList<DSBBranch*> cycles;
+    for (int i = 0; i < branches.size(); i++)
+    {
+        DSBBranch *b = branches.at(i);
+        if (b->cycle) { cycles.append(b); }
+        else { linearBranches.append(b); }
+    }
+    // Find a longest linear branch and longest cycle.
+    int lin = 0; DSBBranch *linB = 0;
+    int cyc = 0; DSBBranch *cycB = 0;
+    qDebug() << "num lin branches: " << linearBranches.size();
+    qDebug() << "num cycles: " << cycles.size();
+    for (int i = 0; i < linearBranches.size(); i++)
+    {
+        DSBBranch *b = linearBranches.at(i);
+        if (b->nodes.size() > lin)
+        {
+            lin = b->nodes.size();
+            linB = b;
+        }
+    }
+    for (int i = 0; i < cycles.size(); i++)
+    {
+        DSBBranch *b = cycles.at(i);
+        if (b->nodes.size() > cyc)
+        {
+            cyc = b->nodes.size();
+            cycB = b;
+        }
+    }
+    DSBBranch *mergeTarget;
+    if (linB) {
+        qDebug() << "merging with linear branch at " << linB;
+        mergeTarget = linB;
+    }
+    else {
+        qDebug() << "merging with cycle at " << cycB;
+        mergeTarget = cycB;
+    }
+    return mergeTarget;
+}
+
 QList<DSBBranch*> DSBNode::mergeSelfWithBranches(QList<DSBBranch*> branches)
 {
     // Were there no branches?
@@ -48,53 +96,15 @@ QList<DSBBranch*> DSBNode::mergeSelfWithBranches(QList<DSBBranch*> branches)
     {
         // Then must merge self with the one branch.
         branches.first()->nodes.prepend(this);
+        // And set self as parent.
+        branches.first()->parent = this;
     }
     else
     {
         // Otherwise there were two or more branches.
-        // Will merge with longest linear branch, or, failing that, longest cycle.
-        // Separate branches into linear and cycles.
-        QList<DSBBranch*> linearBranches;
-        QList<DSBBranch*> cycles;
-        for (int i = 0; i < branches.size(); i++)
-        {
-            DSBBranch *b = branches.at(i);
-            if (b->cycle) { cycles.append(b); }
-            else { linearBranches.append(b); }
-        }
-        // Find a longest linear branch and longest cycle.
-        int lin = 0; DSBBranch *linB = 0;
-        int cyc = 0; DSBBranch *cycB = 0;
-        qDebug() << "num lin branches: " << linearBranches.size();
-        qDebug() << "num cycles: " << cycles.size();
-        for (int i = 0; i < linearBranches.size(); i++)
-        {
-            DSBBranch *b = linearBranches.at(i);
-            if (b->nodes.size() > lin)
-            {
-                lin = b->nodes.size();
-                linB = b;
-            }
-        }
-        for (int i = 0; i < cycles.size(); i++)
-        {
-            DSBBranch *b = cycles.at(i);
-            if (b->nodes.size() > cyc)
-            {
-                cyc = b->nodes.size();
-                cycB = b;
-            }
-        }
-        DSBBranch *mergeTarget;
-        if (linB) {
-            qDebug() << "merging with linear branch at " << linB;
-            mergeTarget = linB;
-        }
-        else {
-            qDebug() << "merging with cycle at " << cycB;
-            mergeTarget = cycB;
-        }
-        // Finally, merge.
+        // Choose merge target.
+        DSBBranch *mergeTarget = findMergeTarget(branches);
+        // Merge.
         mergeTarget->nodes.prepend(this);
         // And set self as parent of that branch.
         mergeTarget->parent = this;
@@ -112,6 +122,12 @@ QList<DSBBranch*> DSBNode::mergeSelfWithBranches(QList<DSBBranch*> branches)
 QString DSBBranch::toString()
 {
     QString s;
+    if (cycle)
+    {
+        s += "\nCycle:------------------------------------------\n";
+    } else {
+        s += "\nBranch:-----------------------------------------\n";
+    }
     if (parent)
     {
         s += "( ";
