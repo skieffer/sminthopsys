@@ -32,6 +32,7 @@
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbclone.h"
+#include "libdsbpe/dsbnode.h"
 
 namespace dunnart {
 
@@ -198,16 +199,21 @@ QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt)
 QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> blacklist)
 {
     // Set discrete clonings for all blacklisted species.
+    // The exception is that if the selected endpoint clone is of a
+    // blacklisted species, then we do not change its cloning.
+    QString endptSpecName = endpt->getSpecies()->getName();
     for (int i = 0; i < m_species.size(); i++)
     {
         DSBSpecies *spec = m_species.at(i);
         QString name = spec->getName();
-        if (blacklist.contains(name))
+        if (blacklist.contains(name) && name != endptSpecName)
         {
-            qDebug() << "found blacklisted species: " << name;
             spec->setDiscreteCloning();
         }
     }
+
+    // Find branches.
+    QList<DSBBranch> branches = endpt->findBranches();
 
     // For now, the rest is just a square layout.
     // TODO -- write the correct method

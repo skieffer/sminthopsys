@@ -22,53 +22,38 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#ifndef DSBREACTION_H
-#define DSBREACTION_H
+#ifndef DSBNODE_H
+#define DSBNODE_H
 
-#include <QString>
 #include <QList>
-#include <QMap>
-
-#include "dsbnode.h"
-
-class Reaction;
+#include <QString>
 
 namespace dunnart {
 
-class DSBSpecies;
-class DSBCompartment;
-class DSBClone;
+struct DSBBranch;
 
-class DSBReaction : public DSBNode
+class DSBNode
 {
-
 public:
-    DSBReaction();
-    DSBReaction(Reaction *reac);
-    QString getCompartmentName();
-    void doublyLink(QMap<QString,DSBSpecies*> map);
-    void setCompartment(DSBCompartment *comp);
-    DSBCompartment *getCompartment();
-    QString getReactionId();
-    bool isIntercompartmental();
-    bool isReversible();
-    QList<DSBBranch> findBranchesRec(QList<QString> seen, DSBNode *last);
+    virtual QList<DSBBranch> findBranchesRec(QList<QString> seen, DSBNode *last = 0) = 0;
 
-private:
-    Reaction *m_sbmlReaction;
-    QString m_name;
-    QString m_id;
-    QString m_compartmentName;
-    bool m_reversible;
-    DSBCompartment *m_compartment;
-    QList<DSBSpecies *> m_inputs;
-    QList<DSBSpecies *> m_outputs;
-    QList<DSBSpecies *> m_modifiers;
+    QList<DSBBranch> findBranches()
+    {
+        QList<QString> seen;
+        return findBranchesRec(seen);
+    }
 
-    QList<DSBClone *> getOpposedClones(DSBClone* clone);
+    QList<DSBBranch> mergeSelfWithBranches(QList<DSBBranch> branches);
 
+    static bool s_followTransporters;
+};
+
+struct DSBBranch
+{
+    bool cycle;
+    QList<DSBNode*> nodes;
 };
 
 }
 
-#endif // DSBREACTION_H
+#endif // DSBNODE_H

@@ -26,6 +26,7 @@
 
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbspecies.h"
+#include "libdsbpe/dsbclone.h"
 
 #include "sbml/SBMLTypes.h"
 
@@ -39,6 +40,7 @@ DSBReaction::DSBReaction(Reaction *reac) :
     m_name = QString(reac->getName().c_str());
     m_id = QString(reac->getId().c_str());
     m_compartmentName = QString(reac->getCompartment().c_str());
+    m_reversible = reac->isSetReversible();
 }
 
 void DSBReaction::setCompartment(DSBCompartment *comp)
@@ -59,6 +61,36 @@ QString DSBReaction::getCompartmentName()
 QString DSBReaction::getReactionId()
 {
     return m_id;
+}
+
+bool DSBReaction::isReversible()
+{
+    return m_reversible;
+}
+
+/* Check whether this reaction spans multiple compartments.
+  */
+bool DSBReaction::isIntercompartmental()
+{
+    for (int i = 0; i < m_inputs.size(); i++)
+    {
+        DSBSpecies *spec = m_inputs.at(i);
+        QString comp =spec->getCompartmentName();
+        if (comp != m_compartmentName) { return true; }
+    }
+    for (int i = 0; i < m_outputs.size(); i++)
+    {
+        DSBSpecies *spec = m_outputs.at(i);
+        QString comp =spec->getCompartmentName();
+        if (comp != m_compartmentName) { return true; }
+    }
+    for (int i = 0; i < m_modifiers.size(); i++)
+    {
+        DSBSpecies *spec = m_modifiers.at(i);
+        QString comp =spec->getCompartmentName();
+        if (comp != m_compartmentName) { return true; }
+    }
+    return false;
 }
 
 /* Give this reaction links to all species involved in it,
@@ -135,4 +167,90 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies*> map)
     }
 }
 
+QList<DSBClone *> DSBReaction::getOpposedClones(DSBClone *clone)
+{
+    QList<DSBClone*> opp; // Prepare return value.
+
+    // First determine which side, or sides, the clone is on.
+    DSBSpecies *spec = clone->getSpecies();
+    DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+    bool isMod = cla->modifiers.contains(clone);
+    bool isProd = cla->products.contains(clone);
+    bool isReac = cla->reactants.contains(clone);
+
+    // If it is a product and not a reactant, then the reactants are opposed.
+    if (isProd && !isReac)
+    {
+        opp = cla->reactants;
+    }
+    // If it is a reactant and not a product, then the products are opposed.
+    else if (isReac && !isProd)
+    {
+        opp = cla->products;
+    }
+    // Otherwise we cannot call anything opposed.
+
+    return opp;
 }
+
+QList<DSBBranch> DSBReaction::findBranchesRec(QList<QString> seen, DSBNode *last)
+{
+    seen.append(m_id); // Mark self as seen.
+
+    QList<DSBBranch> branches; // Prepare return value.
+
+    // Check which side of this reaction the last node 'last' lies on.
+    // Then only consider flowing out on opposite side.
+    DSBClone *clone = dynamic_cast<DSBClone*>(last);
+    QList<DSBClone*> opp = getOpposedClones(clone);
+
+    for (int i = 0; i < opp.size(); i++)
+    {
+        DSBClone *cl = opp.at(i);
+        // Consider whether this clone has already been seen or not.
+        QString cid = cl->getCloneId();
+        if (seen.contains(cid))
+        {
+            // Clone has already been seen, so we have found a cycle.
+            DSBBranch b;
+            b.nodes.append(cl);
+            b.cycle = true;
+            branches.append(b);
+        }
+        else
+        {
+            // No cycle. Recurse.
+            QList<DSBBranch> bb = cl->findBranchesRec(seen, this);
+            branches.append(bb);
+        }
+    }
+
+    return mergeSelfWithBranches(branches);
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
