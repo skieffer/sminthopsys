@@ -23,6 +23,7 @@
 */
 
 #include <QtGui>
+#include <QSet>
 
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbspecies.h"
@@ -72,25 +73,30 @@ bool DSBReaction::isReversible()
   */
 bool DSBReaction::isIntercompartmental()
 {
+    qDebug() << "checking intercompartmentality for " << m_id;
+    QSet<QString> comps;
     for (int i = 0; i < m_inputs.size(); i++)
     {
         DSBSpecies *spec = m_inputs.at(i);
         QString comp =spec->getCompartmentName();
-        if (comp != m_compartmentName) { return true; }
+        qDebug() << "  -has species in compartment: " << comp;
+        comps.insert(comp);
     }
     for (int i = 0; i < m_outputs.size(); i++)
     {
         DSBSpecies *spec = m_outputs.at(i);
         QString comp =spec->getCompartmentName();
-        if (comp != m_compartmentName) { return true; }
+        qDebug() << "  -has species in compartment: " << comp;
+        comps.insert(comp);
     }
     for (int i = 0; i < m_modifiers.size(); i++)
     {
         DSBSpecies *spec = m_modifiers.at(i);
         QString comp =spec->getCompartmentName();
-        if (comp != m_compartmentName) { return true; }
+        qDebug() << "  -has species in compartment: " << comp;
+        comps.insert(comp);
     }
-    return false;
+    return (comps.size() > 1);
 }
 
 /* Give this reaction links to all species involved in it,
@@ -167,7 +173,31 @@ void DSBReaction::doublyLink(QMap<QString, DSBSpecies*> map)
     }
 }
 
-QList<DSBClone *> DSBReaction::getOpposedClones(DSBClone *clone)
+QList<DSBClone*> DSBReaction::getInputClones()
+{
+    QList<DSBClone*> clones;
+    for (int i = 0; i < m_inputs.size(); i++)
+    {
+        DSBSpecies *spec = m_inputs.at(i);
+        DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+        clones.append(cla->reactants);
+    }
+    return clones;
+}
+
+QList<DSBClone*> DSBReaction::getOutputClones()
+{
+    QList<DSBClone*> clones;
+    for (int i = 0; i < m_outputs.size(); i++)
+    {
+        DSBSpecies *spec = m_outputs.at(i);
+        DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+        clones.append(cla->products);
+    }
+    return clones;
+}
+
+QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
 {
     QList<DSBClone*> opp; // Prepare return value.
 
@@ -178,49 +208,61 @@ QList<DSBClone *> DSBReaction::getOpposedClones(DSBClone *clone)
     bool isProd = cla->products.contains(clone);
     bool isReac = cla->reactants.contains(clone);
 
+    qDebug() << "isMod: " << isMod;
+    qDebug() << "isProd: " << isProd;
+    qDebug() << "isReac: " << isReac;
+
     // If it is a product and not a reactant, then the reactants are opposed.
     if (isProd && !isReac)
     {
-        opp = cla->reactants;
+        opp = getInputClones();
     }
     // If it is a reactant and not a product, then the products are opposed.
     else if (isReac && !isProd)
     {
-        opp = cla->products;
+        qDebug() << "it is a reactant and not a product";
+        opp = getOutputClones();
+        qDebug() << "opp has " << opp.size() << " elements";
     }
     // Otherwise we cannot call anything opposed.
 
     return opp;
 }
 
-QList<DSBBranch> DSBReaction::findBranchesRec(QList<QString> seen, DSBNode *last)
+QList<DSBBranch*> DSBReaction::findBranchesRec(QList<QString> seen, DSBNode *last)
 {
+    qDebug() << m_id << " entering findBranchesRec~~~~~~~~~~~~~~~~~~~~~";
     seen.append(m_id); // Mark self as seen.
 
-    QList<DSBBranch> branches; // Prepare return value.
+    QList<DSBBranch*> branches; // Prepare return value.
 
     // Check which side of this reaction the last node 'last' lies on.
     // Then only consider flowing out on opposite side.
     DSBClone *clone = dynamic_cast<DSBClone*>(last);
     QList<DSBClone*> opp = getOpposedClones(clone);
 
+    qDebug() << "got " << opp.size() << " opposed clones";
+
     for (int i = 0; i < opp.size(); i++)
     {
         DSBClone *cl = opp.at(i);
         // Consider whether this clone has already been seen or not.
         QString cid = cl->getCloneId();
+
+        qDebug() << "  considering clone: " << cid;
+
         if (seen.contains(cid))
         {
             // Clone has already been seen, so we have found a cycle.
-            DSBBranch b;
-            b.nodes.append(cl);
-            b.cycle = true;
+            DSBBranch *b = new DSBBranch;
+            b->nodes.append(cl);
+            b->cycle = true;
             branches.append(b);
         }
         else
         {
             // No cycle. Recurse.
-            QList<DSBBranch> bb = cl->findBranchesRec(seen, this);
+            QList<DSBBranch*> bb = cl->findBranchesRec(seen, this);
             branches.append(bb);
         }
     }

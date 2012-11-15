@@ -58,7 +58,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
-    QList<DSBBranch> findBranchesRec(QList<QString> seen, DSBNode *last);
+    QList<DSBBranch*> findBranchesRec(QList<QString> seen, DSBNode *last);
 
 private:
     QString m_cloneId;
