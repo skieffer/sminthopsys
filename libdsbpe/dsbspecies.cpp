@@ -34,9 +34,10 @@
 
 namespace dunnart {
 
-DSBSpecies::DSBSpecies() {}
+DSBSpecies::DSBSpecies() : m_nextCloneId(0) {}
 
 DSBSpecies::DSBSpecies(Species *spec) :
+    m_nextCloneId(0),
     m_sbmlSpecies(spec)
 {
     m_name = QString(spec->getName().c_str());
@@ -72,6 +73,11 @@ QString DSBSpecies::getCompartmentName()
 QString DSBSpecies::getName()
 {
     return m_name;
+}
+
+QString DSBSpecies::getId()
+{
+    return m_id;
 }
 
 void DSBSpecies::addReactionEntered(DSBReaction *reac)
@@ -133,6 +139,21 @@ void DSBSpecies::deleteClonesAndAssignments()
         DSBClone *cl = m_clones.takeFirst(); // removes it from the list
         delete cl;
     }
+    // Reset nextCloneId to 0.
+    m_nextCloneId = 0;
+}
+
+/*  Allocate a new DSBClone object, cloning this species,
+    give it the next available clone id, add it to the
+    list of clones, and return a pointer to it.
+  */
+DSBClone *DSBSpecies::makeNewClone()
+{
+    int idNum = m_nextCloneId++;
+    DSBClone *cl = new DSBClone(this);
+    cl->setCloneNum(idNum);
+    m_clones.append(cl);
+    return cl;
 }
 
 /* The trivial cloning is that in which there is precisely one clone
@@ -145,8 +166,9 @@ void DSBSpecies::setTrivialCloning()
     deleteClonesAndAssignments();
 
     // Create new clone.
-    DSBClone *cl = new DSBClone(this);
-    m_clones.append(cl);
+    //DSBClone *cl = new DSBClone(this);
+    //m_clones.append(cl);
+    DSBClone *cl = makeNewClone();
 
     // Set it as the sole clone assigned to each reaction.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
@@ -196,8 +218,9 @@ void DSBSpecies::setDiscreteCloning()
     // Create a new clone for each role played by this species.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
     {
-        DSBClone *cl = new DSBClone(this);
-        m_clones.append(cl);
+        //DSBClone *cl = new DSBClone(this);
+        //m_clones.append(cl);
+        DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsEntered.at(i);
         cl->addReactionEntered(reac);
         QString rid = reac->getReactionId();
@@ -209,8 +232,9 @@ void DSBSpecies::setDiscreteCloning()
 
     for (int i = 0; i < m_reactionsExited.size(); i++)
     {
-        DSBClone *cl = new DSBClone(this);
-        m_clones.append(cl);
+        //DSBClone *cl = new DSBClone(this);
+        //m_clones.append(cl);
+        DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsExited.at(i);
         cl->addReactionExited(reac);
         QString rid = reac->getReactionId();
@@ -222,8 +246,9 @@ void DSBSpecies::setDiscreteCloning()
 
     for (int i = 0; i < m_reactionsModified.size(); i++)
     {
-        DSBClone *cl = new DSBClone(this);
-        m_clones.append(cl);
+        //DSBClone *cl = new DSBClone(this);
+        //m_clones.append(cl);
+        DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsModified.at(i);
         cl->addReactionModified(reac);
         QString rid = reac->getReactionId();

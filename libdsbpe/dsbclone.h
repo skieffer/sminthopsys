@@ -26,8 +26,10 @@
 #define DSBCLONE_H
 
 #include <QList>
+#include <QString>
 
 #include "dsbreclayout.h"
+#include "dsbnode.h"
 
 namespace dunnart {
 
@@ -35,11 +37,13 @@ class PDEPN;
 class DSBSpecies;
 class DSBReaction;
 
-class DSBClone : public DSBRecLayout
+class DSBClone : public DSBRecLayout, public DSBNode
 {
 
 public:
     DSBClone(DSBSpecies *dsbspec);
+    void setCloneNum(int num);
+    QString getCloneId();
     void addReactionEntered(DSBReaction *reac);
     void addReactionExited(DSBReaction *reac);
     void addReactionModified(DSBReaction *reac);
@@ -54,8 +58,10 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QList<DSBBranch> findBranchesRec(QList<QString> seen, DSBNode *last);
 
 private:
+    QString m_cloneId;
     DSBSpecies *m_dsbspec;
     QPointF m_relpt;
     QPointF m_basept;
@@ -65,6 +71,8 @@ private:
     QList<DSBReaction *> m_reactionsEntered;
     QList<DSBReaction *> m_reactionsExited;
     QList<DSBReaction *> m_reactionsModified;
+
+    QList<DSBReaction *> computeEnterableReactions();
 };
 
 }

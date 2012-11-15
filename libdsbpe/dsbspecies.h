@@ -52,6 +52,7 @@ public:
     DSBSpecies();
     DSBSpecies(Species *spec);
     QString getName();
+    QString getId();
     QString getCompartmentName();
     void addReactionEntered(DSBReaction *reac);
     void addReactionExited(DSBReaction *reac);
@@ -66,6 +67,7 @@ public:
     DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
 
 private:
+    int m_nextCloneId;
     Canvas *m_canvas;
     Species *m_sbmlSpecies;
     QString m_name;
@@ -80,6 +82,7 @@ private:
 
     void deleteClonesAndAssignments();
     void setCloneMarkers();
+    DSBClone *makeNewClone();
 };
 
 }

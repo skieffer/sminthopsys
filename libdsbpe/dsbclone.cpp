@@ -22,8 +22,11 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#include <QtGui>
+
 #include "dsbclone.h"
 #include "dsbspecies.h"
+#include "dsbreaction.h"
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/pluginshapefactory.h"
@@ -34,6 +37,18 @@ namespace dunnart {
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
     m_dsbspec(dsbspec)
 {}
+
+void DSBClone::setCloneNum(int num)
+{
+    QString snum = QString::number(num);
+    QString specId = m_dsbspec->getId();
+    m_cloneId = specId + "_clone" + snum;
+}
+
+QString DSBClone::getCloneId()
+{
+    return m_cloneId;
+}
 
 void DSBClone::addReactionEntered(DSBReaction *reac)
 {
@@ -140,4 +155,85 @@ void DSBClone::drawAt(QPointF r)
     m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
 }
 
+/* Both reactions entered, and reversible reactions exited, are
+  enterable. Compute list of all those.
+  */
+QList<DSBReaction*> DSBClone::computeEnterableReactions()
+{
+    QList<DSBReaction*> enterable;
+    // Get reactions entered.
+    for (int i = 0; i < m_reactionsEntered.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsEntered.at(i);
+        enterable.append(reac);
+    }
+    // Examine reactions exited.
+    for (int i = 0; i < m_reactionsExited.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsExited.at(i);
+        // We can only use it if it is reversible.
+        if (reac->isReversible()) { enterable.append(reac); }
+    }
+    return enterable;
 }
+
+QList<DSBBranch> DSBClone::findBranchesRec(QList<QString> seen, DSBNode *last)
+{
+    seen.append(m_cloneId); // Mark self as seen.
+
+    QList<DSBBranch> branches; // Prepare return value.
+
+    // Now consider all enterable reactions.
+    QList<DSBReaction*> enterable = computeEnterableReactions();
+    for (int i = 0; i < enterable.size(); i++)
+    {
+        DSBReaction *reac = enterable.at(i);
+
+        // Do not turn around and go backwards.
+        if (reac == last) {continue;}
+
+        // Are we avoiding transporter processes?
+        if (!DSBNode::s_followTransporters && reac->isIntercompartmental()) {continue;}
+
+        // Consider whether this reaction has already been seen or not.
+        QString rid = reac->getReactionId();
+        if (seen.contains(rid))
+        {
+            // Reaction has already been seen, so we have found a cycle.
+            DSBBranch b;
+            b.nodes.append(reac);
+            b.cycle = true;
+            branches.append(b);
+        }
+        else
+        {
+            // No cycle. Recurse.
+            QList<DSBBranch> bb = reac->findBranchesRec(seen, this);
+            branches.append(bb);
+        }
+    }
+    return mergeSelfWithBranches(branches);
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
