@@ -35,20 +35,23 @@ struct DSBBranch;
 class DSBNode
 {
 public:
-    virtual QList<DSBBranch*> findBranchesRec(QList<QString> &seen, DSBNode *last = 0) = 0;
+    virtual QList<DSBBranch*> findBranchesRec(
+            QList<QString> &seen, QList<QString> blacklist, DSBNode *last = 0) = 0;
 
-    QList<DSBBranch*> findBranches()
+    QList<DSBBranch*> findBranches(QList<QString> blacklist)
     {
         QList<QString> seen;
-        return findBranchesRec(seen);
+        return findBranchesRec(seen, blacklist);
     }
 
-    QList<DSBBranch*> mergeSelfWithBranches(QList<DSBBranch*> branches);
+    QList<DSBBranch*> mergeSelfWithBranches(
+            QList<DSBBranch*> branches, QList<QString> blacklist);
 
     static bool s_followTransporters;
 
 private:
-    DSBBranch *findMergeTarget(QList<DSBBranch*> branches);
+    DSBBranch *findMergeTarget(
+            QList<DSBBranch*> branches, QList<QString> blacklist);
 };
 
 struct DSBBranch
