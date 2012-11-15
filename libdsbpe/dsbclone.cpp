@@ -23,6 +23,7 @@
 */
 
 #include <QtGui>
+#include <QSet>
 
 #include "dsbclone.h"
 #include "dsbspecies.h"
@@ -160,24 +161,24 @@ void DSBClone::drawAt(QPointF r)
   */
 QList<DSBReaction*> DSBClone::computeEnterableReactions()
 {
-    QList<DSBReaction*> enterable;
+    QSet<DSBReaction*> enterable;
     // Get reactions entered.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
     {
         DSBReaction *reac = m_reactionsEntered.at(i);
-        enterable.append(reac);
+        enterable.insert(reac);
     }
     // Examine reactions exited.
     for (int i = 0; i < m_reactionsExited.size(); i++)
     {
         DSBReaction *reac = m_reactionsExited.at(i);
         // We can only use it if it is reversible.
-        if (reac->isReversible()) { enterable.append(reac); }
+        if (reac->isReversible()) { enterable.insert(reac); }
     }
-    return enterable;
+    return QList<DSBReaction*>::fromSet(enterable);
 }
 
-QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> seen, DSBNode *last)
+QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> &seen, DSBNode *last)
 {
     qDebug() << m_cloneId << " entering findBranchesRec-------------------";
     seen.append(m_cloneId); // Mark self as seen.
@@ -196,7 +197,6 @@ QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> seen, DSBNode *last)
 
         // Are we avoiding transporter processes?
         if (!DSBNode::s_followTransporters && reac->isIntercompartmental()) {
-            qDebug() << "  reaction is intercompartmental";
             continue;
         }
 
