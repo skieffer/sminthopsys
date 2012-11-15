@@ -24,6 +24,8 @@
 
 #include <QtGui>
 
+#include <assert.h>
+
 #include "dsbnode.h"
 #include "dsbclone.h"
 #include "dsbspecies.h"
@@ -33,19 +35,80 @@ namespace dunnart {
 
 bool DSBNode::s_followTransporters = false;
 
-DSBBranch *DSBNode::findMergeTarget(QList<DSBBranch *> branches)
+DSBBranch *DSBNode::findMergeTarget(
+        QList<DSBBranch *> branches, QList<QString> blacklist)
 {
     // Will find longest linear branch, or, failing that, longest cycle.
 
-    // Separate branches into linear and cycles.
+    // Separate branches into linear and cycles, and determine the length
+    // of the longest linear branch, the the length of the longest cycle.
     QList<DSBBranch*> linearBranches;
     QList<DSBBranch*> cycles;
+    int linL = 0, cycL = 0;
     for (int i = 0; i < branches.size(); i++)
     {
         DSBBranch *b = branches.at(i);
-        if (b->cycle) { cycles.append(b); }
-        else { linearBranches.append(b); }
+        if (b->cycle) {
+            cycles.append(b);
+            int s = b->nodes.size();
+            cycL = (s > cycL ? s : cycL);
+        }
+        else {
+            linearBranches.append(b);
+            int s = b->nodes.size();
+            linL = (s > linL ? s : linL);
+        }
     }
+    QList<DSBBranch*> opts = linL > 0 ? linearBranches : cycles;
+    int maxL = linL > 0 ? linL : cycL;
+    // Now will chose from among all branches of length maxL in list opts.
+    // We will prefer a branch that does not begin with a blacklisted species.
+
+    // Grab first branches of maxL length whose lead nodes
+    // a) are not on blacklist
+    // b) are on blacklist (in case there is none of the former kind)
+    // Note that a reaction node always counts as "not on blacklist".
+    DSBBranch *white = 0;
+    DSBBranch *black = 0;
+    for (int i = 0; i < opts.size(); i++)
+    {
+        DSBBranch *b = opts.at(i);
+        if (b->nodes.size() == maxL)
+        {
+            DSBNode *n = b->nodes.first();
+            DSBClone *cl = dynamic_cast<DSBClone*>(n);
+            DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+            if (reac)
+            {
+                white = b;
+                break;
+            }
+            else if (cl)
+            {
+                QString name = cl->getSpecies()->getName();
+                if (blacklist.contains(name) && black == 0)
+                {
+                    black = b;
+                }
+                else
+                {
+                    white = b;
+                    break;
+                }
+            }
+            else
+            {
+                qDebug() << "ERROR: DSBNode in findMergeTarget which is neither Clone nor Reaction.";
+            }
+        }
+    }
+    assert( !(white==0 && black==0) ); // Must have been at least one branch.
+    DSBBranch *mergeTarget;
+    if (white) { mergeTarget = white; }
+    else { mergeTarget = black; }
+    return mergeTarget;
+
+    /*
     // Find a longest linear branch and longest cycle.
     int lin = 0; DSBBranch *linB = 0;
     int cyc = 0; DSBBranch *cycB = 0;
@@ -71,9 +134,11 @@ DSBBranch *DSBNode::findMergeTarget(QList<DSBBranch *> branches)
     if (linB) { mergeTarget = linB; }
     else { mergeTarget = cycB; }
     return mergeTarget;
+    */
 }
 
-QList<DSBBranch*> DSBNode::mergeSelfWithBranches(QList<DSBBranch*> branches)
+QList<DSBBranch*> DSBNode::mergeSelfWithBranches(
+        QList<DSBBranch*> branches, QList<QString> blacklist)
 {
     // Were there no branches?
     if (branches.isEmpty())
@@ -95,7 +160,7 @@ QList<DSBBranch*> DSBNode::mergeSelfWithBranches(QList<DSBBranch*> branches)
     {
         // Otherwise there were two or more branches.
         // Choose merge target.
-        DSBBranch *mergeTarget = findMergeTarget(branches);
+        DSBBranch *mergeTarget = findMergeTarget(branches, blacklist);
         // Merge.
         mergeTarget->nodes.prepend(this);
         // And set self as parent of that branch.

@@ -178,7 +178,8 @@ QList<DSBReaction*> DSBClone::computeEnterableReactions()
     return QList<DSBReaction*>::fromSet(enterable);
 }
 
-QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> &seen, DSBNode *last)
+QList<DSBBranch*> DSBClone::findBranchesRec(
+        QList<QString> &seen, QList<QString> blacklist, DSBNode *last)
 {
     seen.append(m_cloneId); // Mark self as seen.
 
@@ -211,11 +212,11 @@ QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> &seen, DSBNode *last)
         else
         {
             // No cycle. Recurse.
-            QList<DSBBranch*> bb = reac->findBranchesRec(seen, this);
+            QList<DSBBranch*> bb = reac->findBranchesRec(seen, blacklist, this);
             branches.append(bb);
         }
     }
-    return mergeSelfWithBranches(branches);
+    return mergeSelfWithBranches(branches, blacklist);
 }
 
 }

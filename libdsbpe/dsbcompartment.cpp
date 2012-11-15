@@ -45,7 +45,15 @@ DSBCompartment::DSBCompartment(QString compartmentName)
                            "NADH" <<
                            "NAD+" <<
                            "NADPH" <<
-                           "NADP+";
+                           "NADP+" <<
+                           "AMP" <<
+                           "L-glutamate" <<
+                           "2-oxoglutarate" <<
+                           "CoA" <<
+                           "acetyl-CoA" <<
+                           "CO2" <<
+                           "P" <<
+                           "PP";
 }
 
 void DSBCompartment::addSpecies(DSBSpecies *spec)
@@ -213,7 +221,7 @@ QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> black
     }
 
     // Find branches.
-    QList<DSBBranch*> branches = endpt->findBranches();
+    QList<DSBBranch*> branches = endpt->findBranches(blacklist);
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }

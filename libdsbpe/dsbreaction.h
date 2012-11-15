@@ -52,7 +52,8 @@ public:
     QString getReactionId();
     bool isIntercompartmental();
     bool isReversible();
-    QList<DSBBranch*> findBranchesRec(QList<QString> &seen, DSBNode *last);
+    QList<DSBBranch*> findBranchesRec(
+            QList<QString> &seen, QList<QString> blacklist, DSBNode *last);
 
 private:
     Reaction *m_sbmlReaction;
