@@ -177,38 +177,45 @@ QList<DSBReaction*> DSBClone::computeEnterableReactions()
     return enterable;
 }
 
-QList<DSBBranch> DSBClone::findBranchesRec(QList<QString> seen, DSBNode *last)
+QList<DSBBranch*> DSBClone::findBranchesRec(QList<QString> seen, DSBNode *last)
 {
+    qDebug() << m_cloneId << " entering findBranchesRec-------------------";
     seen.append(m_cloneId); // Mark self as seen.
 
-    QList<DSBBranch> branches; // Prepare return value.
+    QList<DSBBranch*> branches; // Prepare return value.
 
     // Now consider all enterable reactions.
     QList<DSBReaction*> enterable = computeEnterableReactions();
     for (int i = 0; i < enterable.size(); i++)
     {
         DSBReaction *reac = enterable.at(i);
+        qDebug() << "  considering reaction: " << reac->getReactionId();
 
         // Do not turn around and go backwards.
         if (reac == last) {continue;}
 
         // Are we avoiding transporter processes?
-        if (!DSBNode::s_followTransporters && reac->isIntercompartmental()) {continue;}
+        if (!DSBNode::s_followTransporters && reac->isIntercompartmental()) {
+            qDebug() << "  reaction is intercompartmental";
+            continue;
+        }
 
         // Consider whether this reaction has already been seen or not.
         QString rid = reac->getReactionId();
         if (seen.contains(rid))
         {
             // Reaction has already been seen, so we have found a cycle.
-            DSBBranch b;
-            b.nodes.append(reac);
-            b.cycle = true;
+            qDebug() << "  reaction has been seen before";
+            DSBBranch *b = new DSBBranch;
+            b->nodes.append(reac);
+            b->cycle = true;
             branches.append(b);
         }
         else
         {
             // No cycle. Recurse.
-            QList<DSBBranch> bb = reac->findBranchesRec(seen, this);
+            qDebug() << "  reaction has NOT been seen before";
+            QList<DSBBranch*> bb = reac->findBranchesRec(seen, this);
             branches.append(bb);
         }
     }

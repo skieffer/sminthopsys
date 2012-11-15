@@ -213,7 +213,19 @@ QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> black
     }
 
     // Find branches.
-    QList<DSBBranch> branches = endpt->findBranches();
+    qDebug() << "flag 1 =================";
+    QList<DSBBranch*> branches = endpt->findBranches();
+    for (int i = 0; i < branches.size(); i++) {
+        DSBBranch *b = branches.at(i);
+        if (b->cycle)
+        {
+            qDebug() << "\nCycle:------------------------------------------";
+        } else {
+            qDebug() << "\nBranch:------------------------------------------";
+        }
+        qDebug() << branches.at(i)->toString();
+    }
+    qDebug() << "flag 2 =================";
 
     // For now, the rest is just a square layout.
     // TODO -- write the correct method
