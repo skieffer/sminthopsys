@@ -27,6 +27,7 @@
 
 #include <QList>
 #include <QString>
+#include <QSizeF>
 
 namespace dunnart {
 
@@ -36,7 +37,7 @@ class DSBNode
 {
 public:
     virtual QList<DSBBranch*> findBranchesRec(
-            QList<QString> &seen, QList<QString> blacklist,
+            QList<QString>& seen, QList<QString> blacklist,
             bool forward, DSBNode *last = 0) = 0;
 
     QList<DSBBranch*> findBranches(QList<QString> blacklist, bool forward)
@@ -48,11 +49,14 @@ public:
     QList<DSBBranch*> mergeSelfWithBranches(
             QList<DSBBranch*> branches, QList<QString> blacklist);
 
+    void setBranchHeadNumber(int n);
+
     static bool s_followTransporters;
 
 private:
     DSBBranch *findMergeTarget(
             QList<DSBBranch*> branches, QList<QString> blacklist);
+    int m_branchHeadNumber;
 };
 
 struct DSBBranch
@@ -62,6 +66,7 @@ struct DSBBranch
     DSBNode *parent;
     QString toString();
     DSBBranch() : cycle(false), parent(0) {}
+
 };
 
 }

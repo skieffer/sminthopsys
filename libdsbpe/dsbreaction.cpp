@@ -228,7 +228,7 @@ QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
 }
 
 QList<DSBBranch*> DSBReaction::findBranchesRec(
-        QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last)
+        QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last)
 {
     seen.append(m_id); // Mark self as seen.
 

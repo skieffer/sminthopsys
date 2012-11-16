@@ -201,7 +201,7 @@ QList<DSBReaction*> DSBClone::computeExitableReactions()
 }
 
 QList<DSBBranch*> DSBClone::findBranchesRec(
-        QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last)
+        QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last)
 {
     seen.append(m_cloneId); // Mark self as seen.
 

@@ -28,6 +28,7 @@
 #include <QList>
 
 #include <math.h>
+#include <assert.h>
 
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
@@ -199,6 +200,26 @@ QSizeF DSBCompartment::squareLayout2()
     return m_size;
 }
 
+/* Let p1, p2, ..., pn be the parent nodes of the passed branches
+  b1, b2, ..., bn. We construct the map with pi --> bi for each i.
+  Then for any node n, map.count(n) will say how many branches have
+  node n as parent, and map.values(n) will return the list of them.
+  */
+QMap<DSBNode*, DSBBranch*> DSBCompartment::countBranchPoints(QList<DSBBranch *> branches)
+{
+    QMap<DSBNode*, DSBBranch*> map;
+    for (int i = 0; i < branches.size(); i++)
+    {
+        DSBBranch *b = branches.at(i);
+        DSBNode *p = b->parent;
+        if (p)
+        {
+            map.insert(p,b);
+        }
+    }
+    return map;
+}
+
 QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, bool forward)
 {
     return longestBranchLayout(endpt, forward, m_default_blacklist);
@@ -226,24 +247,28 @@ QSizeF DSBCompartment::longestBranchLayout(
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }
-
-    // For now, the rest is just a square layout.
-    // TODO -- write the correct method
+    // Throw away length-1 branches, and find branch starting
+    // with selected endpt clone.
+    QList<DSBBranch*> otherBranches;
+    DSBBranch *mainBranch = 0;
+    for (int i = 0; i < branches.size(); i++)
+    {
+        DSBBranch *b = branches.at(i);
+        DSBNode *n = b->nodes.first();
+        if (n == endpt) { mainBranch = b; }
+        else if (b->nodes.size() > 1) { otherBranches.append(b); }
+    }
+    assert(mainBranch!=0);
+    qDebug() << "\nMain branch: " << mainBranch->toString();
+    qDebug() << "\nOther branches: ";
+    for (int i = 0; i < otherBranches.size(); i++) {
+        qDebug() << otherBranches.at(i)->toString();
+    }
 
     // Get the clones.
     QList<DSBClone*> clones = getAllClones();
-
-    // TODO: Take account of the sizes of the EPN nodes.
-    // For now we simply assume they are the default size
-    // of 70x50.
     int numClones = clones.size();
-    // If there are no clones, then it is an empty compartment.
-    // We return a default "small" size.
-    if (numClones == 0)
-    {
-        m_size = QSizeF(100,100);
-        return m_size;
-    }
+
     // Call the clones' layout methods, even though for now
     // we are not using the sizes that they return. This serves
     // to get them to initialize their own sizes, which are needed
@@ -252,6 +277,31 @@ QSizeF DSBCompartment::longestBranchLayout(
     {
         clones.at(i)->layout();
     }
+
+    // Count branch points in otherBranches.
+    QMap<DSBNode*, DSBBranch*> bpCounts = countBranchPoints(otherBranches);
+    // Get list of nodes that occur as branch points.
+    QList<DSBNode*> branchPts = bpCounts.uniqueKeys();
+    // Tell them their "branch head number", i.e. the number of branches
+    // of which they are the head node.
+    for (int i = 0; i < branchPts.size(); i++)
+    {
+        DSBNode *n = branchPts.at(i);
+        n->setBranchHeadNumber( bpCounts.count(n) );
+    }
+
+    // TODO: Take account of the sizes of the EPN nodes.
+    // For now we simply assume they are the default size
+    // of 70x50.
+
+    // If there are no clones, then it is an empty compartment.
+    // We return a default "small" size.
+    if (numClones == 0)
+    {
+        m_size = QSizeF(100,100);
+        return m_size;
+    }
+
 
     int cols = ceil(sqrt(numClones)); // number of columns in array
     int rows = ceil(numClones/cols);
