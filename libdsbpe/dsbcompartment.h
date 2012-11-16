@@ -27,6 +27,7 @@
 
 #include <QString>
 #include <QList>
+#include <QMap>
 
 #include "dsbreclayout.h"
 
@@ -36,6 +37,8 @@ class DSBSpecies;
 class DSBReaction;
 class DSBClone;
 class DSBCell;
+class DSBNode;
+class DSBBranch;
 
 class DSBCompartment : public DSBRecLayout
 {
@@ -56,6 +59,7 @@ public:
     void redraw();
     QString getName();
     void setCell(DSBCell *cell);
+    QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
 
     QList<QString> m_default_blacklist;
 

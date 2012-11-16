@@ -35,6 +35,11 @@ namespace dunnart {
 
 bool DSBNode::s_followTransporters = false;
 
+void DSBNode::setBranchHeadNumber(int n)
+{
+    m_branchHeadNumber = n;
+}
+
 DSBBranch *DSBNode::findMergeTarget(
         QList<DSBBranch *> branches, QList<QString> blacklist)
 {
