@@ -10,6 +10,7 @@ include(../common_options.qmake)
 
 # Input
 SOURCES += \
+        dsbpathway.cpp \
         dsbnode.cpp \
         dsbspecies.cpp \
 	dsbreaction.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
         dsbcell.cpp
 
 HEADERS += \
+        dsbpathway.h \
         dsbnode.h \
         dsbreclayout.h \
         dsbspecies.h \
