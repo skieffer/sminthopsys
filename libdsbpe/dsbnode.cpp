@@ -165,11 +165,18 @@ QList<DSBBranch*> DSBNode::mergeSelfWithBranches(
         mergeTarget->nodes.prepend(this);
         // And set self as parent of that branch.
         mergeTarget->parent = this;
-        // And set self as parent of all branches that do not already have one.
+        // And set self as parent of all branches that do not already have one,
+        // or do have one but it is the same as their first node.
         for (int i = 0; i < branches.size(); i++)
         {
             DSBBranch *b = branches.at(i);
             if (!b->parent) { b->parent = this; }
+            else
+            {
+                DSBNode *p = b->parent;
+                DSBNode *f = b->nodes.first();
+                if (p == f) { b->parent = this; }
+            }
         }
     }
 
@@ -212,7 +219,7 @@ QString DSBBranch::toString()
         }
         else if (reac)
         {
-            s += " --[ ]--> ";
+            s += " --[ " + reac->getReactionId() + " ]--> ";
         }
     }
     return s;
