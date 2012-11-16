@@ -135,11 +135,7 @@ void FindBranchesDialog::getSelectedClone()
   */
 void FindBranchesDialog::findBranches()
 {
-    // TODO: Find the branches!
-    //
-    // random testing:
-    //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
-    //
+    // If an endpoint has been selected, then go ahead.
     if (m_endpointClone)
     {
         // Get the compartment in which the endpoint clone lives.
@@ -153,7 +149,12 @@ void FindBranchesDialog::findBranches()
         comp->longestBranchLayout(m_endpointClone, forward);
         comp->redraw();
     }
+    // random testing:
+    //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
     //
+    //
+
+    // Finally, "accept" the click on the dialog's OK button.
     accept();
 }
 
