@@ -52,18 +52,18 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
 
     m_endpointEdit = new QLineEdit(this);
 
-    QComboBox *endpointCBox = new QComboBox(this);
-    endpointCBox->addItem(tr("start"));
-    endpointCBox->addItem(tr("finish"));
+    m_endpointCBox = new QComboBox(this);
+    m_endpointCBox->addItem(tr("start"));
+    m_endpointCBox->addItem(tr("finish"));
 
     QLabel *layoutLabel = new QLabel(this);
     layoutLabel->setText(tr("Layout:"));
 
-    QComboBox *layoutCBox = new QComboBox(this);
-    layoutCBox->addItem(tr("Vertical"));
-    layoutCBox->addItem(tr("Horizontal"));
-    layoutCBox->addItem(tr("Clockwise"));
-    layoutCBox->addItem(tr("Counterclockwise"));
+    m_layoutCBox = new QComboBox(this);
+    m_layoutCBox->addItem(tr("Vertical"));
+    m_layoutCBox->addItem(tr("Horizontal"));
+    m_layoutCBox->addItem(tr("Clockwise"));
+    m_layoutCBox->addItem(tr("Counterclockwise"));
 
     QPushButton *findButton = new QPushButton(tr("Find"),this);
     findButton->setDefault(true);
@@ -75,9 +75,9 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(endpointLabel,  0, 0);
     layout->addWidget(m_endpointEdit, 0, 1);
-    layout->addWidget(endpointCBox,   0, 2);
+    layout->addWidget(m_endpointCBox,   0, 2);
     layout->addWidget(layoutLabel,    1, 0);
-    layout->addWidget(layoutCBox,     1, 1);
+    layout->addWidget(m_layoutCBox,     1, 1);
     layout->addWidget(cancelButton,   2, 0);
     layout->addWidget(findButton,     2, 1);
     setLayout(layout);
@@ -142,10 +142,15 @@ void FindBranchesDialog::findBranches()
     //
     if (m_endpointClone)
     {
+        // Get the compartment in which the endpoint clone lives.
         DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
-        //qDebug() << comp->getName();
-        //comp->squareLayout2();
-        comp->longestBranchLayout(m_endpointClone);
+
+        // Determine whether we're searching forward, or backward.
+        int whichEnd = m_endpointCBox->currentIndex();
+        bool forward = (whichEnd == 0);
+
+        // Ask the compartment to switch to a "longest branch layout", and redraw.
+        comp->longestBranchLayout(m_endpointClone, forward);
         comp->redraw();
     }
     //

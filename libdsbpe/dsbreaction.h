@@ -54,7 +54,7 @@ public:
     bool isIntercompartmental();
     bool isReversible();
     QList<DSBBranch*> findBranchesRec(
-            QList<QString> &seen, QList<QString> blacklist, DSBNode *last);
+            QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last);
 
 private:
     Reaction *m_sbmlReaction;

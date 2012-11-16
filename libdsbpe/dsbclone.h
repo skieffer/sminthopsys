@@ -59,7 +59,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QList<DSBBranch*> findBranchesRec(
-            QList<QString> &seen, QList<QString> blacklist, DSBNode *last);
+            QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last);
 
 private:
     QString m_cloneId;
@@ -74,6 +74,7 @@ private:
     QList<DSBReaction *> m_reactionsModified;
 
     QList<DSBReaction *> computeEnterableReactions();
+    QList<DSBReaction *> computeExitableReactions();
 };
 
 }

@@ -228,7 +228,7 @@ QList<DSBClone*> DSBReaction::getOpposedClones(DSBClone *clone)
 }
 
 QList<DSBBranch*> DSBReaction::findBranchesRec(
-        QList<QString> &seen, QList<QString> blacklist, DSBNode *last)
+        QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last)
 {
     seen.append(m_id); // Mark self as seen.
 
@@ -260,7 +260,7 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(
         else
         {
             // No cycle. Recurse.
-            QList<DSBBranch*> bb = cl->findBranchesRec(seen, blacklist, this);
+            QList<DSBBranch*> bb = cl->findBranchesRec(seen, blacklist, forward, this);
             branches.append(bb);
         }
     }
