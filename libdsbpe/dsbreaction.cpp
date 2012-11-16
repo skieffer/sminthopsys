@@ -41,7 +41,11 @@ DSBReaction::DSBReaction(Reaction *reac) :
     m_name = QString(reac->getName().c_str());
     m_id = QString(reac->getId().c_str());
     m_compartmentName = QString(reac->getCompartment().c_str());
-    m_reversible = reac->isSetReversible();
+    m_reversible = false; // Default to not reversible.
+    if (reac->isSetReversible()) // If reversibility has been stated,
+    {
+        m_reversible = reac->getReversible(); // then accept the stated value.
+    }
 }
 
 void DSBReaction::setCompartment(DSBCompartment *comp)
@@ -57,6 +61,11 @@ DSBCompartment *DSBReaction::getCompartment()
 QString DSBReaction::getCompartmentName()
 {
     return m_compartmentName;
+}
+
+QString DSBReaction::getName()
+{
+    return m_name;
 }
 
 QString DSBReaction::getReactionId()

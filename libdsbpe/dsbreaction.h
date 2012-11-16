@@ -50,6 +50,7 @@ public:
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
     QString getReactionId();
+    QString getName();
     bool isIntercompartmental();
     bool isReversible();
     QList<DSBBranch*> findBranchesRec(
