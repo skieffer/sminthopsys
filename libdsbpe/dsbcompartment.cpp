@@ -199,12 +199,13 @@ QSizeF DSBCompartment::squareLayout2()
     return m_size;
 }
 
-QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt)
+QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, bool forward)
 {
-    return longestBranchLayout(endpt, m_default_blacklist);
+    return longestBranchLayout(endpt, forward, m_default_blacklist);
 }
 
-QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> blacklist)
+QSizeF DSBCompartment::longestBranchLayout(
+        DSBClone *endpt, bool forward, QList<QString> blacklist)
 {
     // Set discrete clonings for all blacklisted species.
     // The exception is that if the selected endpoint clone is of a
@@ -221,7 +222,7 @@ QSizeF DSBCompartment::longestBranchLayout(DSBClone *endpt, QList<QString> black
     }
 
     // Find branches.
-    QList<DSBBranch*> branches = endpt->findBranches(blacklist);
+    QList<DSBBranch*> branches = endpt->findBranches(blacklist, forward);
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }

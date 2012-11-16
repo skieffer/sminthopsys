@@ -178,18 +178,41 @@ QList<DSBReaction*> DSBClone::computeEnterableReactions()
     return QList<DSBReaction*>::fromSet(enterable);
 }
 
+/* Both reactions exited, and reversible reactions entered, are
+  exitable. Compute list of all those.
+  */
+QList<DSBReaction*> DSBClone::computeExitableReactions()
+{
+    QSet<DSBReaction*> exitable;
+    // Get reactions exited.
+    for (int i = 0; i < m_reactionsExited.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsExited.at(i);
+        exitable.insert(reac);
+    }
+    // Examine reactions entered.
+    for (int i = 0; i < m_reactionsEntered.size(); i++)
+    {
+        DSBReaction *reac = m_reactionsEntered.at(i);
+        // We can only use it if it is reversible.
+        if (reac->isReversible()) { exitable.insert(reac); }
+    }
+    return QList<DSBReaction*>::fromSet(exitable);
+}
+
 QList<DSBBranch*> DSBClone::findBranchesRec(
-        QList<QString> &seen, QList<QString> blacklist, DSBNode *last)
+        QList<QString> &seen, QList<QString> blacklist, bool forward, DSBNode *last)
 {
     seen.append(m_cloneId); // Mark self as seen.
 
     QList<DSBBranch*> branches; // Prepare return value.
 
-    // Now consider all enterable reactions.
-    QList<DSBReaction*> enterable = computeEnterableReactions();
-    for (int i = 0; i < enterable.size(); i++)
+    // Now consider all usable reactions.
+    QList<DSBReaction*> usable =
+            forward ? computeEnterableReactions() : computeExitableReactions();
+    for (int i = 0; i < usable.size(); i++)
     {
-        DSBReaction *reac = enterable.at(i);
+        DSBReaction *reac = usable.at(i);
 
         // Do not turn around and go backwards.
         if (reac == last) {continue;}
@@ -212,7 +235,7 @@ QList<DSBBranch*> DSBClone::findBranchesRec(
         else
         {
             // No cycle. Recurse.
-            QList<DSBBranch*> bb = reac->findBranchesRec(seen, blacklist, this);
+            QList<DSBBranch*> bb = reac->findBranchesRec(seen, blacklist, forward, this);
             branches.append(bb);
         }
     }

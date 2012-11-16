@@ -47,8 +47,8 @@ public:
     void addReaction(DSBReaction *reac);
     QSizeF squareLayout();
     QSizeF squareLayout2();
-    QSizeF longestBranchLayout(DSBClone *endpt);
-    QSizeF longestBranchLayout(DSBClone *endpt, QList<QString> blacklist);
+    QSizeF longestBranchLayout(DSBClone *endpt, bool forward);
+    QSizeF longestBranchLayout(DSBClone *endpt, bool forward, QList<QString> blacklist);
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);

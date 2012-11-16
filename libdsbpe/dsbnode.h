@@ -36,12 +36,13 @@ class DSBNode
 {
 public:
     virtual QList<DSBBranch*> findBranchesRec(
-            QList<QString> &seen, QList<QString> blacklist, DSBNode *last = 0) = 0;
+            QList<QString> &seen, QList<QString> blacklist,
+            bool forward, DSBNode *last = 0) = 0;
 
-    QList<DSBBranch*> findBranches(QList<QString> blacklist)
+    QList<DSBBranch*> findBranches(QList<QString> blacklist, bool forward)
     {
         QList<QString> seen;
-        return findBranchesRec(seen, blacklist);
+        return findBranchesRec(seen, blacklist, forward);
     }
 
     QList<DSBBranch*> mergeSelfWithBranches(

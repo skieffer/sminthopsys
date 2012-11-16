@@ -5,6 +5,7 @@
 #include <QDialog>
 
 class QLineEdit;
+class QComboBox;
 
 namespace dunnart {
 
@@ -27,6 +28,8 @@ private:
 
     Canvas *m_canvas;
     QLineEdit *m_endpointEdit;
+    QComboBox *m_endpointCBox;
+    QComboBox *m_layoutCBox;
     QString m_endpointIDString;
     DSBClone *m_endpointClone;
 
