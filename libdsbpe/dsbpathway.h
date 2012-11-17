@@ -35,12 +35,15 @@ namespace dunnart {
 class DSBBranch;
 class DSBFork;
 class DSBNode;
+class DSBClone;
 
 class DSBPathway : public DSBRecLayout
 {
 public:
     // Constructors
     DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
+    // Get and set
+    DSBFork *getFork(DSBClone *cl);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
