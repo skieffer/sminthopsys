@@ -76,6 +76,10 @@ public:
     {
         drawRelTo(QPointF(0,0));
     }
+
+    //! Retrieve the size, after layout has been called.
+    virtual QSizeF getSize() = 0;
+
 };
 
 }

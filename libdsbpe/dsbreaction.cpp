@@ -287,7 +287,13 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(
 QSizeF DSBReaction::layout()
 {
     // TODO
-    return QSizeF(10,10);
+    m_size = QSizeF(10,10);
+    return m_size;
+}
+
+QSizeF DSBReaction::getSize()
+{
+    return m_size;
 }
 
 void DSBReaction::setRelPt(QPointF p)

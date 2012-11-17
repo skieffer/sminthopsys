@@ -63,6 +63,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QSizeF getSize();
     // other
     void doublyLink(QMap<QString,DSBSpecies*> map);
     QList<DSBBranch*> findBranchesRec(

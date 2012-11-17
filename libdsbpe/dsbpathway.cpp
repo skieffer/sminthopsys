@@ -189,7 +189,13 @@ QMap<DSBNode*, DSBBranch*> DSBPathway::countBranchPoints(QList<DSBBranch *> bran
 QSizeF DSBPathway::layout()
 {
     // TODO
-    return QSizeF(10,10);
+    m_size = QSizeF(10,10);
+    return m_size;
+}
+
+QSizeF DSBPathway::getSize()
+{
+    return m_size;
 }
 
 void DSBPathway::setRelPt(QPointF p)

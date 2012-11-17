@@ -96,6 +96,11 @@ QSizeF DSBCompartment::layout()
     return squareLayout();
 }
 
+QSizeF DSBCompartment::getSize()
+{
+    return m_size;
+}
+
 QSizeF DSBCompartment::squareLayout()
 {
     // Set all clonings to trivial.

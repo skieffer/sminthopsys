@@ -47,6 +47,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QSizeF getSize();
     // Other
     QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
     void setFirstBranch(DSBBranch *branch);

@@ -61,6 +61,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QSizeF getSize();
     // Misc get and set
     QString getName();
     void setCell(DSBCell *cell);
