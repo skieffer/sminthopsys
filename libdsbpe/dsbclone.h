@@ -36,6 +36,7 @@ namespace dunnart {
 class PDEPN;
 class DSBSpecies;
 class DSBReaction;
+class DSBBranch;
 
 class DSBClone : public DSBRecLayout, public DSBNode
 {

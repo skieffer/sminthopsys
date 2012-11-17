@@ -30,10 +30,11 @@
 #include <math.h>
 #include <assert.h>
 
-#include "libdsbpe/dsbspecies.h"
-#include "libdsbpe/dsbreaction.h"
-#include "libdsbpe/dsbclone.h"
-#include "libdsbpe/dsbnode.h"
+#include "dsbspecies.h"
+#include "dsbreaction.h"
+#include "dsbclone.h"
+#include "dsbnode.h"
+#include "dsbbranch.h"
 
 namespace dunnart {
 
@@ -223,7 +224,8 @@ QSizeF DSBCompartment::longestBranchLayout(
     }
 
     // Find branches.
-    QList<DSBBranch*> branches = endpt->findBranches(blacklist, forward);
+    bool extended = true;
+    QList<DSBBranch*> branches = endpt->findBranches(blacklist, forward, extended);
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }

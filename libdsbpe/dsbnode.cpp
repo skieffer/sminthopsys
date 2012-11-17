@@ -30,6 +30,7 @@
 #include "dsbclone.h"
 #include "dsbspecies.h"
 #include "dsbreaction.h"
+#include "dsbbranch.h"
 
 namespace dunnart {
 
@@ -38,6 +39,25 @@ bool DSBNode::s_followTransporters = false;
 void DSBNode::setBranchHeadNumber(int n)
 {
     m_branchHeadNumber = n;
+}
+
+QList<DSBBranch*> DSBNode::findBranches(
+        QList<QString> blacklist, bool forward, bool extended)
+{
+    QList<QString> seen;
+    QList<DSBBranch*> branches = findBranchesRec(seen, blacklist, forward);
+    if (extended)
+    {
+        // Throw away branches of length 1.
+        QList<DSBBranch*> keep;
+        for (int i = 0; i < branches.size(); i++)
+        {
+            DSBBranch *b = branches.at(i);
+            if (b->nodes.size() > 1) { keep.append(b); }
+        }
+        branches = keep;
+    }
+    return branches;
 }
 
 DSBBranch *DSBNode::findMergeTarget(
@@ -186,48 +206,6 @@ QList<DSBBranch*> DSBNode::mergeSelfWithBranches(
     }
 
     return branches;
-}
-
-QString DSBBranch::toString()
-{
-    QString s;
-    if (cycle)
-    {
-        s += "\nCycle:------------------------------------------\n";
-    } else {
-        s += "\nBranch:-----------------------------------------\n";
-    }
-    if (parent)
-    {
-        s += "( ";
-        DSBClone *cl = dynamic_cast<DSBClone*>(parent);
-        DSBReaction *reac = dynamic_cast<DSBReaction*>(parent);
-        if (cl)
-        {
-            s += cl->getSpecies()->getName();
-            s += "-"+cl->getCloneId();
-        }
-        else if (reac)
-        {
-            s += reac->getReactionId();
-        }
-        s += " ) ";
-    }
-    for (int j = 0; j < nodes.size(); j++)
-    {
-        DSBClone *cl = dynamic_cast<DSBClone*>(nodes.at(j));
-        DSBReaction *reac = dynamic_cast<DSBReaction*>(nodes.at(j));
-        if (cl)
-        {
-            s += cl->getSpecies()->getName();
-            s += "-"+cl->getCloneId();
-        }
-        else if (reac)
-        {
-            s += " --[ " + reac->getReactionId() + " ]--> ";
-        }
-    }
-    return s;
 }
 
 }

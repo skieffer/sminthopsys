@@ -28,6 +28,7 @@
 
 #include "dsbpathway.h"
 #include "dsbnode.h"
+#include "dsbbranch.h"
 
 namespace dunnart {
 
