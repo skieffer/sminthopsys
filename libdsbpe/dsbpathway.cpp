@@ -29,35 +29,121 @@
 #include "dsbpathway.h"
 #include "dsbnode.h"
 #include "dsbbranch.h"
+#include "dsbclone.h"
+#include "dsbreaction.h"
+#include "dsbfork.h"
 
 namespace dunnart {
 
-DSBPathway::DSBPathway(DSBBranch *primaryBranch, QList<DSBBranch *> secondaryBranches)
+void DSBPathway::setFirstBranch(DSBBranch *branch)
 {
-    m_headNode = primaryBranch->nodes.first();
-    //...
+    m_branches.clear();
+    m_allNodes.clear();
+    m_branchMembership.clear();
+    m_forkMembership.clear();
+
+    m_branches.append(branch);
+    addBranchNodes(branch);
+
+    m_headNode = branch->nodes.first();
 }
 
-DSBPathway::DSBPathway(DSBNode *endpt, QList<DSBBranch *> branches)
+void DSBPathway::addBranchNodes(DSBBranch *branch)
 {
-    // Throw away length-1 branches, and find branch starting
-    // with selected endpt clone.
+    for (int i = 0; i < branch->nodes.size(); i++)
+    {
+        DSBNode *n = branch->nodes.at(i);
+        m_allNodes.append(n);
+        m_branchMembership.insertMulti(n,branch);
+    }
+}
+
+void DSBPathway::addBranch(DSBBranch *branch)
+{
+    // Find parent node.
+    DSBNode *parent = branch->parent;
+    if (!m_allNodes.contains(parent))
+    {
+        // TODO: report error: could not find node in pathway
+        return;
+    }
+    // No node should belong to more than one branch.
+    // Can we also be sure that every node belongs to at least one branch?
+    // For now we proceed as if we can.
+
+    // If parent is a reaction, simply add the branch to it.
+    DSBReaction *reac = dynamic_cast<DSBReaction*>(parent);
+    if (reac)
+    {
+        DSBNode *first = branch->nodes.first();
+        DSBClone *cl = dynamic_cast<DSBClone*>(first);
+        assert(cl);
+        reac->addOutputBranchHead(cl);
+        return;
+    }
+
+    // Otherwise parent is a clone.
+    //DSBClone *cl = dynamic_cast<DSBClone*>(first);
+    //assert(cl);
+    // Get existing fork, or create one.
+    DSBFork *fork = 0;
+    if (m_forkMembership.contains(parent))
+    {
+        fork = m_forkMembership.value(parent);
+    }
+    else
+    {
+        DSBClone *cl = dynamic_cast<DSBClone*>(parent);
+        fork = new DSBFork(cl);
+        // Get branch with parent in it.
+        DSBBranch *main = m_branchMembership.value(cl);
+        // Get predecessor and successor in branch, if any.
+        DSBNode *n = main->getPredecessor(cl);
+        if (n) {
+            DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+            fork->addUpstream(reac);
+        }
+        n = main->getSuccessor(cl);
+        if (n) {
+            DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+            fork->addDownstream(reac);
+        }
+        // Register fork.
+        m_forkMembership.insert(cl,fork);
+    }
+    // Add branch head as downstream member of fork.
+    assert(fork);
+    DSBNode *n = branch->nodes.first();
+    DSBReaction *downstr = dynamic_cast<DSBReaction*>(n);
+    fork->addDownstream(downstr);
+
+    // Add new branch to list.
+    m_branches.append(branch);
+    addBranchNodes(branch);
+}
+
+DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches)
+{
+    // Find branch starting with selected endpt clone.
     QList<DSBBranch*> otherBranches;
     DSBBranch *mainBranch = 0;
     for (int i = 0; i < branches.size(); i++)
     {
         DSBBranch *b = branches.at(i);
         DSBNode *n = b->nodes.first();
-        if (n == endpt) { mainBranch = b; }
-        else if (b->nodes.size() > 1) { otherBranches.append(b); }
+        if (n == head) { mainBranch = b; }
+        else { otherBranches.append(b); }
     }
     assert(mainBranch!=0);
+    /*
     qDebug() << "\nMain branch: " << mainBranch->toString();
     qDebug() << "\nOther branches: ";
     for (int i = 0; i < otherBranches.size(); i++) {
         qDebug() << otherBranches.at(i)->toString();
     }
+    */
 
+    /*
     // Count branch points in otherBranches.
     QMap<DSBNode*, DSBBranch*> bpCounts = countBranchPoints(otherBranches);
     // Get list of nodes that occur as branch points.
@@ -68,6 +154,14 @@ DSBPathway::DSBPathway(DSBNode *endpt, QList<DSBBranch *> branches)
     {
         DSBNode *n = branchPts.at(i);
         n->setBranchHeadNumber( bpCounts.count(n) );
+    }
+    */
+
+    setFirstBranch(mainBranch);
+    for (int i = 0; i < otherBranches.size(); i++)
+    {
+        DSBBranch *b = otherBranches.at(i);
+        addBranch(b);
     }
 
 }
@@ -86,7 +180,7 @@ QMap<DSBNode*, DSBBranch*> DSBPathway::countBranchPoints(QList<DSBBranch *> bran
         DSBNode *p = b->parent;
         if (p)
         {
-            map.insert(p,b);
+            map.insertMulti(p,b);
         }
     }
     return map;
@@ -95,6 +189,7 @@ QMap<DSBNode*, DSBBranch*> DSBPathway::countBranchPoints(QList<DSBBranch *> bran
 QSizeF DSBPathway::layout()
 {
     // TODO
+    return QSizeF(10,10);
 }
 
 void DSBPathway::setRelPt(QPointF p)

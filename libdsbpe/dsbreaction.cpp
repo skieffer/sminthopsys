@@ -74,6 +74,21 @@ QString DSBReaction::getReactionId()
     return m_id;
 }
 
+void DSBReaction::addInputBranchHead(DSBClone *head)
+{
+    m_inputBranchHeads.append(head);
+}
+
+void DSBReaction::addOutputBranchHead(DSBClone *head)
+{
+    m_outputBranchHeads.append(head);
+}
+
+void DSBReaction::addSatellite(DSBClone *sat)
+{
+    m_satellites.append(sat);
+}
+
 bool DSBReaction::isReversible()
 {
     return m_reversible;
@@ -267,6 +282,34 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(
     }
 
     return mergeSelfWithBranches(branches, blacklist);
+}
+
+QSizeF DSBReaction::layout()
+{
+    // TODO
+    return QSizeF(10,10);
+}
+
+void DSBReaction::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+void DSBReaction::drawRelTo(QPointF q)
+{
+    QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBReaction::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBReaction::drawAt(QPointF r)
+{
+    m_basept = r;
+    // TODO
 }
 
 }

@@ -33,14 +33,14 @@
 namespace dunnart {
 
 class DSBBranch;
+class DSBFork;
 class DSBNode;
 
 class DSBPathway : public DSBRecLayout
 {
 public:
     // Constructors
-    DSBPathway(DSBNode *endpt, QList<DSBBranch*> branches);
-    DSBPathway(DSBBranch *primaryBranch, QList<DSBBranch*> secondaryBranches);
+    DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -49,12 +49,20 @@ public:
     void redraw();
     // Other
     QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
+    void setFirstBranch(DSBBranch *branch);
+    void addBranch(DSBBranch *branch);
 
 private:
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
     DSBNode *m_headNode;
+    QList<DSBBranch*> m_branches;
+    QList<DSBNode*> m_allNodes;
+    QMap<DSBNode*, DSBBranch*> m_branchMembership;
+    QMap<DSBNode*, DSBFork*> m_forkMembership;
+
+    void addBranchNodes(DSBBranch *branch);
 };
 
 }

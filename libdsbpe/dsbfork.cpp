@@ -22,29 +22,23 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#ifndef DSBBRANCH_H
-#define DSBBRANCH_H
-
-#include <QList>
-#include <QString>
+#include "dsbfork.h"
 
 namespace dunnart {
 
-class DSBNode;
-
-class DSBBranch
+DSBFork::DSBFork(DSBClone *c)
 {
-public:
-    bool cycle;
-    QList<DSBNode*> nodes;
-    DSBNode *parent;
-    QString toString();
-    DSBBranch() : cycle(false), parent(0) {}
-    DSBNode *getPredecessor(DSBNode *node);
-    DSBNode *getSuccessor(DSBNode *node);
-
-};
-
+    m_centre = c;
 }
 
-#endif // DSBBRANCH_H
+void DSBFork::addUpstream(DSBReaction *reac)
+{
+    m_upstreamReacs.append(reac);
+}
+
+void DSBFork::addDownstream(DSBReaction *reac)
+{
+    m_downstreamReacs.append(reac);
+}
+
+}
