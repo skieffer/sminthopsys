@@ -79,6 +79,11 @@ QSizeF DSBCell::rowLayout()
     return m_size;
 }
 
+QSizeF DSBCell::getSize()
+{
+    return m_size;
+}
+
 void DSBCell::setRelPt(QPointF p)
 {
     m_relpt = p;

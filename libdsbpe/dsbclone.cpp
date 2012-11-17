@@ -118,6 +118,11 @@ QSizeF DSBClone::layout()
     return m_size;
 }
 
+QSizeF DSBClone::getSize()
+{
+    return m_size;
+}
+
 void DSBClone::setRelPt(QPointF p)
 {
     m_relpt = p;

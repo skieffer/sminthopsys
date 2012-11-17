@@ -46,6 +46,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QSizeF getSize();
 
 private:
     QList<DSBCompartment*> m_compartments;

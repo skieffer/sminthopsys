@@ -59,6 +59,7 @@ public:
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
     void redraw();
+    QSizeF getSize();
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
 
