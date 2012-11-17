@@ -25,9 +25,10 @@
 #include <QtGui>
 #include <QSet>
 
-#include "libdsbpe/dsbreaction.h"
-#include "libdsbpe/dsbspecies.h"
-#include "libdsbpe/dsbclone.h"
+#include "dsbreaction.h"
+#include "dsbspecies.h"
+#include "dsbclone.h"
+#include "dsbbranch.h"
 
 #include "sbml/SBMLTypes.h"
 

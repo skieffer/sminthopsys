@@ -28,6 +28,7 @@
 #include "dsbclone.h"
 #include "dsbspecies.h"
 #include "dsbreaction.h"
+#include "dsbbranch.h"
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/pluginshapefactory.h"

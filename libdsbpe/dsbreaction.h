@@ -38,6 +38,7 @@ namespace dunnart {
 class DSBSpecies;
 class DSBCompartment;
 class DSBClone;
+class DSBBranch;
 
 class DSBReaction : public DSBNode
 {

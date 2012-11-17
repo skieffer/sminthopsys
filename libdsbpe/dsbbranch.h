@@ -22,39 +22,27 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#ifndef DSBNODE_H
-#define DSBNODE_H
+#ifndef DSBBRANCH_H
+#define DSBBRANCH_H
 
 #include <QList>
 #include <QString>
-#include <QSizeF>
 
 namespace dunnart {
 
-class DSBBranch;
+class DSBNode;
 
-class DSBNode
+class DSBBranch
 {
 public:
-    virtual QList<DSBBranch*> findBranchesRec(
-            QList<QString>& seen, QList<QString> blacklist,
-            bool forward, DSBNode *last = 0) = 0;
+    bool cycle;
+    QList<DSBNode*> nodes;
+    DSBNode *parent;
+    QString toString();
+    DSBBranch() : cycle(false), parent(0) {}
 
-    QList<DSBBranch*> findBranches(QList<QString> blacklist, bool forward, bool extended);
-
-    QList<DSBBranch*> mergeSelfWithBranches(
-            QList<DSBBranch*> branches, QList<QString> blacklist);
-
-    void setBranchHeadNumber(int n);
-
-    static bool s_followTransporters;
-
-private:
-    DSBBranch *findMergeTarget(
-            QList<DSBBranch*> branches, QList<QString> blacklist);
-    int m_branchHeadNumber;
 };
 
 }
 
-#endif // DSBNODE_H
+#endif // DSBBRANCH_H
