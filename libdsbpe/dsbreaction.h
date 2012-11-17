@@ -70,7 +70,8 @@ public:
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
     void addInputBranchHead(DSBClone *head);
     void addOutputBranchHead(DSBClone *head);
-    void addSatellite(DSBClone *sat);
+    void setMainInput(DSBClone *mi);
+    void setMainOutput(DSBClone *mo);
 
 private:
     Reaction *m_sbmlReaction;
@@ -79,21 +80,30 @@ private:
     QString m_compartmentName;
     bool m_reversible;
     DSBCompartment *m_compartment;
-    QList<DSBSpecies *> m_inputs;
-    QList<DSBSpecies *> m_outputs;
-    QList<DSBSpecies *> m_modifiers;
+    QList<DSBSpecies*> m_inputs;
+    QList<DSBSpecies*> m_outputs;
+    QList<DSBSpecies*> m_modifiers;
 
     QList<DSBClone*> m_inputBranchHeads;
     QList<DSBClone*> m_outputBranchHeads;
-    QList<DSBClone*> m_satellites;
+    QList<DSBClone*> m_inSatellites;
+    QList<DSBClone*> m_outSatellites;
+    QList<DSBClone*> m_modSatellites;
+    DSBClone *m_mainInput;
+    DSBClone *m_mainOutput;
 
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
 
-    QList<DSBClone *> getOpposedClones(DSBClone* clone);
-    QList<DSBClone *> getInputClones();
-    QList<DSBClone *> getOutputClones();
+    QList<DSBClone*> getOpposedClones(DSBClone* clone);
+    QList<DSBClone*> getInputClones();
+    QList<DSBClone*> getOutputClones();
+
+    void buildOrbit();
+    bool isBranchHead(DSBClone *clone);
+    QList<DSBSpecies*> getAllSpecies();
+    void takeNonBranchHeads(QList<DSBClone*>& src, QList<DSBClone*>& dst);
 
 
 };

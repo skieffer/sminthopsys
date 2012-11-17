@@ -84,11 +84,6 @@ void DSBReaction::addOutputBranchHead(DSBClone *head)
     m_outputBranchHeads.append(head);
 }
 
-void DSBReaction::addSatellite(DSBClone *sat)
-{
-    m_satellites.append(sat);
-}
-
 bool DSBReaction::isReversible()
 {
     return m_reversible;
@@ -282,6 +277,61 @@ QList<DSBBranch*> DSBReaction::findBranchesRec(
     }
 
     return mergeSelfWithBranches(branches, blacklist);
+}
+
+void DSBReaction::buildOrbit()
+{
+    m_inSatellites.clear();
+    m_outSatellites.clear();
+    m_modSatellites.clear();
+    QList<DSBSpecies*> allSpecies = getAllSpecies();
+    for (int i = 0; i < allSpecies.size(); i++)
+    {
+        DSBSpecies *spec = allSpecies.at(i);
+        DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+        takeNonBranchHeads(cla->reactants, m_inSatellites);
+        takeNonBranchHeads(cla->products, m_outSatellites);
+        takeNonBranchHeads(cla->modifiers, m_modSatellites);
+    }
+}
+
+/* For every clone in src list which is not currently registered as a branch head,
+   append it to the dst list.
+  */
+void DSBReaction::takeNonBranchHeads(QList<DSBClone *> &src, QList<DSBClone *> &dst)
+{
+    for (int i = 0; i < src.size(); i++)
+    {
+        DSBClone *cl = src.at(i);
+        if (!m_inputBranchHeads.contains(cl) && !m_outputBranchHeads.contains(cl))
+        {
+            dst.append(cl);
+        }
+    }
+}
+
+void DSBReaction::setMainInput(DSBClone *mi)
+{
+    m_mainInput = mi;
+}
+
+void DSBReaction::setMainOutput(DSBClone *mo)
+{
+    m_mainOutput = mo;
+}
+
+QList<DSBSpecies*> DSBReaction::getAllSpecies()
+{
+    QList<DSBSpecies*> allSpecies;
+    allSpecies.append(m_inputs);
+    allSpecies.append(m_outputs);
+    allSpecies.append(m_modifiers);
+    return allSpecies;
+}
+
+bool DSBReaction::isBranchHead(DSBClone *clone)
+{
+    return m_inputBranchHeads.contains(clone) || m_outputBranchHeads.contains(clone);
 }
 
 QSizeF DSBReaction::layout()

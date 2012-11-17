@@ -230,7 +230,7 @@ QSizeF DSBCompartment::longestBranchLayout(
     }
 
     // Find branches.
-    bool extended = true;
+    bool extended = true; // Throw away branches of length 1.
     QList<DSBBranch*> branches = endpt->findBranches(blacklist, forward, extended);
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();

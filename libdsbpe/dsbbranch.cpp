@@ -26,6 +26,8 @@
 #include "dsbclone.h"
 #include "dsbspecies.h"
 #include "dsbreaction.h"
+#include "dsbpathway.h"
+#include "dsbfork.h"
 
 namespace dunnart {
 
@@ -51,11 +53,93 @@ DSBNode *DSBBranch::getSuccessor(DSBNode *node)
     return succ;
 }
 
+QList<DSBNode*> DSBBranch::getOwnNodes()
+{
+    int s = nodes.size();
+    int n = cycle ? s - 1 : s;
+    return nodes.mid(0,n);
+}
+
 QSizeF DSBBranch::layout()
 {
-    // TODO
+    QList<DSBNode*> own = getOwnNodes();
+    setMainConnections(own);
+    int x = 0, y = 0;
+    for (int i = 0; i < own.size(); i++)
+    {
+        DSBNode *n = own.at(i);
+        //...
+    }
+
+    //...
     m_size = QSizeF(10,10);
     return m_size;
+}
+
+void DSBBranch::setMainConnections(QList<DSBNode*> own)
+{
+    for (int i = 0; i < own.size(); i++)
+    {
+        DSBNode *n = own.at(i);
+        DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+        DSBClone *cl = dynamic_cast<DSBClone*>(n);
+        if (reac)
+        {
+            // predecessor
+            n = getPredecessor(reac);
+            if (n)
+            {
+                DSBClone *c = dynamic_cast<DSBClone*>(n);
+                reac->setMainInput(c);
+            }
+            else { reac->setMainInput(NULL); }
+            // successor
+            n = getSuccessor(reac);
+            if (n)
+            {
+                DSBClone *c = dynamic_cast<DSBClone*>(n);
+                reac->setMainOutput(c);
+            }
+            else { reac->setMainOutput(NULL); }
+        }
+        else if (cl)
+        {
+            DSBFork *fork = m_pathway->getFork(cl);
+            if (fork)
+            {
+                // predecessor
+                n = getPredecessor(cl);
+                if (n)
+                {
+                    DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    fork->setMainInput(r);
+                }
+                else { fork->setMainInput(NULL); }
+                // successor
+                n = getSuccessor(cl);
+                if (n)
+                {
+                    DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    fork->setMainOutput(r);
+                }
+                else { fork->setMainOutput(NULL); }
+            }
+        }
+        else
+        {
+            // TODO: report error
+        }
+    }
+}
+
+void DSBBranch::setPathway(DSBPathway *pw)
+{
+    m_pathway = pw;
+}
+
+DSBPathway *DSBBranch::getPathway()
+{
+    return m_pathway;
 }
 
 QSizeF DSBBranch::getSize()

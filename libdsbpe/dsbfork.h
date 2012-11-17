@@ -42,6 +42,9 @@ public:
     // Building methods
     void addUpstream(DSBReaction *reac);
     void addDownstream(DSBReaction *reac);
+    // Get and set
+    void setMainInput(DSBReaction *mi);
+    void setMainOutput(DSBReaction *mo);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -54,6 +57,9 @@ private:
     DSBClone *m_centre;
     QList<DSBReaction*> m_upstreamReacs;
     QList<DSBReaction*> m_downstreamReacs;
+
+    DSBReaction *m_mainInput;
+    DSBReaction *m_mainOutput;
 
     QPointF m_relpt;
     QPointF m_basept;

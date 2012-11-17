@@ -41,6 +41,16 @@ void DSBFork::addDownstream(DSBReaction *reac)
     m_downstreamReacs.append(reac);
 }
 
+void DSBFork::setMainInput(DSBReaction *mi)
+{
+    m_mainInput = mi;
+}
+
+void DSBFork::setMainOutput(DSBReaction *mo)
+{
+    m_mainOutput = mo;
+}
+
 QSizeF DSBFork::layout()
 {
     // TODO

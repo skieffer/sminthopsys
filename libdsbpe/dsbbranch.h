@@ -33,6 +33,7 @@
 namespace dunnart {
 
 class DSBNode;
+class DSBPathway;
 
 class DSBBranch : public DSBRecLayout
 {
@@ -46,6 +47,8 @@ public:
     // Get and set
     DSBNode *getPredecessor(DSBNode *node);
     DSBNode *getSuccessor(DSBNode *node);
+    void setPathway(DSBPathway *pw);
+    DSBPathway *getPathway();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -60,6 +63,11 @@ private:
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
+
+    DSBPathway *m_pathway;
+
+    QList<DSBNode*> getOwnNodes();
+    void setMainConnections(QList<DSBNode*> own);
 };
 
 }
