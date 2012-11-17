@@ -32,6 +32,7 @@
 namespace dunnart {
 
 class DSBBranch;
+class DSBFork;
 
 class DSBNode
 {
@@ -46,6 +47,10 @@ public:
             QList<DSBBranch*> branches, QList<QString> blacklist);
 
     void setBranchHeadNumber(int n);
+#if 0
+    void addBranch(DSBBranch *branch);
+    void addFork(DSBFork *fork);
+#endif
 
     static bool s_followTransporters;
 
@@ -53,6 +58,10 @@ private:
     DSBBranch *findMergeTarget(
             QList<DSBBranch*> branches, QList<QString> blacklist);
     int m_branchHeadNumber;
+#if 0
+    QList<DSBBranch*> m_branches;
+    QList<DSBFork*> m_forks;
+#endif
 };
 
 }

@@ -29,6 +29,28 @@
 
 namespace dunnart {
 
+DSBNode *DSBBranch::getPredecessor(DSBNode *node)
+{
+    DSBNode *pred = 0;
+    int i = nodes.indexOf(node);
+    if (i>0)
+    {
+        pred = nodes.at(i-1);
+    }
+    return pred;
+}
+
+DSBNode *DSBBranch::getSuccessor(DSBNode *node)
+{
+    DSBNode *succ = 0;
+    int i = nodes.indexOf(node);
+    if (i>=0 && i+1 < nodes.size())
+    {
+        succ = nodes.at(i+1);
+    }
+    return succ;
+}
+
 QString DSBBranch::toString()
 {
     QString s;

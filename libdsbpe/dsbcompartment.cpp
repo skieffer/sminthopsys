@@ -35,6 +35,7 @@
 #include "dsbclone.h"
 #include "dsbnode.h"
 #include "dsbbranch.h"
+#include "dsbpathway.h"
 
 namespace dunnart {
 
@@ -229,6 +230,8 @@ QSizeF DSBCompartment::longestBranchLayout(
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }
+    // Build pathway.
+    DSBPathway *pathway = new DSBPathway(endpt, branches);
 
 
     // Get the clones.

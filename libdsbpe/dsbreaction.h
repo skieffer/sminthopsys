@@ -30,6 +30,7 @@
 #include <QMap>
 
 #include "dsbnode.h"
+#include "dsbreclayout.h"
 
 class Reaction;
 
@@ -40,22 +41,35 @@ class DSBCompartment;
 class DSBClone;
 class DSBBranch;
 
-class DSBReaction : public DSBNode
+class DSBReaction : public DSBNode, public DSBRecLayout
 {
 
 public:
+    // Constructors
     DSBReaction();
     DSBReaction(Reaction *reac);
+    // Get and set
     QString getCompartmentName();
-    void doublyLink(QMap<QString,DSBSpecies*> map);
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
     QString getReactionId();
     QString getName();
+    // Check properties
     bool isIntercompartmental();
     bool isReversible();
+    // RecLayout methods
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
+    // other
+    void doublyLink(QMap<QString,DSBSpecies*> map);
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
+    void addInputBranchHead(DSBClone *head);
+    void addOutputBranchHead(DSBClone *head);
+    void addSatellite(DSBClone *sat);
 
 private:
     Reaction *m_sbmlReaction;
@@ -68,9 +82,19 @@ private:
     QList<DSBSpecies *> m_outputs;
     QList<DSBSpecies *> m_modifiers;
 
+    QList<DSBClone*> m_inputBranchHeads;
+    QList<DSBClone*> m_outputBranchHeads;
+    QList<DSBClone*> m_satellites;
+
+    QPointF m_relpt;
+    QPointF m_basept;
+    QSizeF m_size;
+
     QList<DSBClone *> getOpposedClones(DSBClone* clone);
     QList<DSBClone *> getInputClones();
     QList<DSBClone *> getOutputClones();
+
+
 };
 
 }

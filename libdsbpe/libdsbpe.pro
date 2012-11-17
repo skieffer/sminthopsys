@@ -12,6 +12,7 @@ include(../common_options.qmake)
 SOURCES += \
         dsbpathway.cpp \
         dsbbranch.cpp \
+        dsbfork.cpp \
         dsbnode.cpp \
         dsbspecies.cpp \
 	dsbreaction.cpp \
@@ -22,6 +23,7 @@ SOURCES += \
 HEADERS += \
         dsbpathway.h \
         dsbbranch.h \
+        dsbfork.h \
         dsbnode.h \
         dsbreclayout.h \
         dsbspecies.h \

@@ -41,6 +41,18 @@ void DSBNode::setBranchHeadNumber(int n)
     m_branchHeadNumber = n;
 }
 
+#if 0
+void DSBNode::addBranch(DSBBranch *branch)
+{
+    m_branches.append(branch);
+}
+
+void DSBNode::addFork(DSBFork *fork)
+{
+    m_forks.append(fork);
+}
+#endif
+
 QList<DSBBranch*> DSBNode::findBranches(
         QList<QString> blacklist, bool forward, bool extended)
 {
