@@ -51,6 +51,40 @@ DSBNode *DSBBranch::getSuccessor(DSBNode *node)
     return succ;
 }
 
+QSizeF DSBBranch::layout()
+{
+    // TODO
+    m_size = QSizeF(10,10);
+    return m_size;
+}
+
+QSizeF DSBBranch::getSize()
+{
+    return m_size;
+}
+
+void DSBBranch::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+void DSBBranch::drawRelTo(QPointF q)
+{
+    QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBBranch::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBBranch::drawAt(QPointF r)
+{
+    m_basept = r;
+    // TODO
+}
+
 QString DSBBranch::toString()
 {
     QString s;

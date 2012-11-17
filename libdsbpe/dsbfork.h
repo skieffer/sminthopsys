@@ -27,21 +27,37 @@
 
 #include <QList>
 
+#include "dsbreclayout.h"
+
 namespace dunnart {
 
 class DSBClone;
 class DSBReaction;
 
-class DSBFork
+class DSBFork : public DSBRecLayout
 {
 public:
+    // Constructor
     DSBFork(DSBClone *c);
+    // Building methods
     void addUpstream(DSBReaction *reac);
     void addDownstream(DSBReaction *reac);
+    // RecLayout methods
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
+    QSizeF getSize();
+
 private:
     DSBClone *m_centre;
     QList<DSBReaction*> m_upstreamReacs;
     QList<DSBReaction*> m_downstreamReacs;
+
+    QPointF m_relpt;
+    QPointF m_basept;
+    QSizeF m_size;
 };
 
 }

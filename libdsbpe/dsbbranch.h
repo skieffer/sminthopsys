@@ -28,21 +28,38 @@
 #include <QList>
 #include <QString>
 
+#include "dsbreclayout.h"
+
 namespace dunnart {
 
 class DSBNode;
 
-class DSBBranch
+class DSBBranch : public DSBRecLayout
 {
 public:
+    // public fields (holdover from implementation as struct)
     bool cycle;
     QList<DSBNode*> nodes;
     DSBNode *parent;
-    QString toString();
+    // Constructor
     DSBBranch() : cycle(false), parent(0) {}
+    // Get and set
     DSBNode *getPredecessor(DSBNode *node);
     DSBNode *getSuccessor(DSBNode *node);
+    // RecLayout methods
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
+    QSizeF getSize();
+    // Other methods
+    QString toString();
 
+private:
+    QPointF m_relpt;
+    QPointF m_basept;
+    QSizeF m_size;
 };
 
 }
