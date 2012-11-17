@@ -41,4 +41,39 @@ void DSBFork::addDownstream(DSBReaction *reac)
     m_downstreamReacs.append(reac);
 }
 
+QSizeF DSBFork::layout()
+{
+    // TODO
+    m_size = QSizeF(10,10);
+    return m_size;
+}
+
+QSizeF DSBFork::getSize()
+{
+    return m_size;
+}
+
+void DSBFork::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+void DSBFork::drawRelTo(QPointF q)
+{
+    QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void DSBFork::redraw()
+{
+    drawAt(m_basept);
+}
+
+void DSBFork::drawAt(QPointF r)
+{
+    m_basept = r;
+    // TODO
+}
+
+
 }
