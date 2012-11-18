@@ -33,6 +33,7 @@ namespace dunnart {
 
 class DSBClone;
 class DSBReaction;
+class DSBPathway;
 
 class DSBFork : public DSBRecLayout
 {
@@ -43,6 +44,8 @@ public:
     void addUpstream(DSBReaction *reac);
     void addDownstream(DSBReaction *reac);
     // Get and set
+    void setPathway(DSBPathway *pw);
+    DSBPathway *getPathway();
     void setMainInput(DSBReaction *mi);
     void setMainOutput(DSBReaction *mo);
     // RecLayout methods
@@ -57,6 +60,7 @@ private:
     DSBClone *m_centre;
     QList<DSBReaction*> m_upstreamReacs;
     QList<DSBReaction*> m_downstreamReacs;
+    DSBPathway *m_pathway;
 
     DSBReaction *m_mainInput;
     DSBReaction *m_mainOutput;

@@ -58,6 +58,7 @@ public:
     QSizeF getSize();
     // Other methods
     QString toString();
+    friend class DSBFork;
 
 private:
     QPointF m_relpt;

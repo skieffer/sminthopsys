@@ -85,6 +85,11 @@ DSBFork *DSBPathway::getFork(DSBClone *cl)
     return m_forkMembership.value(cl, NULL);
 }
 
+DSBBranch *DSBPathway::getBranch(DSBNode *node)
+{
+    return m_branchMembership.value(node, NULL);
+}
+
 void DSBPathway::setFirstBranch(DSBBranch *branch)
 {
     m_branches.clear();
@@ -149,6 +154,7 @@ void DSBPathway::addBranch(DSBBranch *branch)
     {
         DSBClone *cl = dynamic_cast<DSBClone*>(parent);
         fork = new DSBFork(cl);
+        fork->setPathway(this);
         // Get branch with parent in it.
         DSBBranch *main = m_branchMembership.value(cl);
         // Get predecessor and successor in branch, if any.
@@ -198,8 +204,25 @@ QMap<DSBNode*, DSBBranch*> DSBPathway::countBranchPoints(QList<DSBBranch *> bran
 
 QSizeF DSBPathway::layout()
 {
-    // TODO
-    m_size = QSizeF(10,10);
+    // First layout all branches, so that their sizes are available.
+    for (int i = 0; i < m_branches.size(); i++)
+    {
+        DSBBranch *b = m_branches.at(i);
+        b->layout();
+    }
+    // Set relpt of main branch to (0,0).
+    DSBBranch *mainBranch = m_branchMembership.value(m_headNode);
+    mainBranch->setRelPt(QPointF(0,0));
+    // Now layout all forks.
+    // They will set the relpts of all remaining branches.
+    QList<DSBFork*> allForks = m_forkMembership.values();
+    for (int i = 0; i < allForks.size(); i++)
+    {
+        DSBFork *fork = allForks.at(i);
+        fork->layout();
+    }
+    //...
+    m_size = QSizeF(10,10); // TODO
     return m_size;
 }
 
