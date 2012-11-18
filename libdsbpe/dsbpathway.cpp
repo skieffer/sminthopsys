@@ -143,7 +143,7 @@ void DSBPathway::addBranch(DSBBranch *branch)
     }
 
     // Otherwise parent is a clone.
-    //DSBClone *cl = dynamic_cast<DSBClone*>(first);
+    DSBClone *cl = dynamic_cast<DSBClone*>(parent);
     //assert(cl);
     // Get existing fork, or create one.
     DSBFork *fork = 0;
@@ -153,7 +153,6 @@ void DSBPathway::addBranch(DSBBranch *branch)
     }
     else
     {
-        DSBClone *cl = dynamic_cast<DSBClone*>(parent);
         fork = new DSBFork(cl);
         fork->setPathway(this);
         // Get branch with parent in it.
@@ -177,6 +176,8 @@ void DSBPathway::addBranch(DSBBranch *branch)
     DSBNode *n = branch->nodes.first();
     DSBReaction *downstr = dynamic_cast<DSBReaction*>(n);
     fork->addDownstream(downstr);
+    // And set main input to first reaction in branch.
+    downstr->setMainInput(cl);
 
     // Add new branch to list.
     m_branches.append(branch);

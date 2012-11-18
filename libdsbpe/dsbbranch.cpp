@@ -113,7 +113,7 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
                 reac->setMainInput(c);
             }
-            else { reac->setMainInput(NULL); }
+            //else { reac->setMainInput(NULL); }
             // successor
             n = getSuccessor(reac);
             if (n)
@@ -121,7 +121,7 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
                 reac->setMainOutput(c);
             }
-            else { reac->setMainOutput(NULL); }
+            //else { reac->setMainOutput(NULL); }
         }
         else if (cl)
         {

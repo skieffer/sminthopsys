@@ -36,6 +36,7 @@ class Reaction;
 
 namespace dunnart {
 
+class Canvas;
 class DSBSpecies;
 class DSBCompartment;
 class DSBClone;
@@ -50,6 +51,7 @@ public:
     DSBReaction(Reaction *reac);
     // Get and set
     QString getCompartmentName();
+    void setCanvas(Canvas *canvas);
     void setCompartment(DSBCompartment *comp);
     DSBCompartment *getCompartment();
     QString getReactionId();
@@ -79,6 +81,7 @@ private:
     QString m_name;
     QString m_id;
     QString m_compartmentName;
+    Canvas *m_canvas;
     bool m_reversible;
     DSBCompartment *m_compartment;
     QList<DSBSpecies*> m_inputs;
