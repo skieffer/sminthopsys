@@ -22,6 +22,8 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
+#include <QtGui>
+
 #include "dsbbranch.h"
 #include "dsbclone.h"
 #include "dsbspecies.h"

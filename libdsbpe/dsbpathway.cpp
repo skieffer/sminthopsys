@@ -102,6 +102,7 @@ void DSBPathway::setFirstBranch(DSBBranch *branch)
 
     m_branches.append(branch);
     addBranchNodes(branch);
+    branch->setPathway(this);
 
     m_headNode = branch->nodes.first();
 }
@@ -180,6 +181,7 @@ void DSBPathway::addBranch(DSBBranch *branch)
     // Add new branch to list.
     m_branches.append(branch);
     addBranchNodes(branch);
+    branch->setPathway(this);
 }
 
 /* Let p1, p2, ..., pn be the parent nodes of the passed branches
