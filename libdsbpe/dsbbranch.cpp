@@ -77,9 +77,12 @@ QSizeF DSBBranch::layout()
     h = size.height();
     y += h/2;
     height += h;
+    qreal gap = 50;
     // Now place all other nodes according to their size.
     for (int i = 1; i < own.size(); i++)
     {
+        y += gap;
+        height += gap;
         node = own.at(i);
         QSizeF size = node->layout();
         h = size.height();
@@ -184,7 +187,12 @@ void DSBBranch::redraw()
 void DSBBranch::drawAt(QPointF r)
 {
     m_basept = r;
-    // TODO
+    QList<DSBNode*> own = getOwnNodes();
+    for (int i = 0; i < own.size(); i++)
+    {
+        DSBNode *node = own.at(i);
+        node->drawRelTo(r);
+    }
 }
 
 QString DSBBranch::toString()
