@@ -238,6 +238,8 @@ QSizeF DSBCompartment::longestBranchLayout(
     // Build pathway.
     DSBPathway *pathway = new DSBPathway(endpt, branches);
     pathway->layout();
+    pathway->setRelPt(QPointF(0,0));
+    pathway->draw();
 
 
     // Get the clones.

@@ -341,7 +341,7 @@ QSizeF DSBReaction::layout()
     //   16x16 box
     //   stems of length 17
     // Hence, 50x16 (horiz.), or 16x50 (vert.).
-    m_size = QSizeF(10,10);
+    m_size = QSizeF(16,50);
     return m_size;
 }
 

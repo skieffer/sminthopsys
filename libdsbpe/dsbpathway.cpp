@@ -252,7 +252,11 @@ void DSBPathway::redraw()
 void DSBPathway::drawAt(QPointF r)
 {
     m_basept = r;
-    // TODO
+    for (int i = 0; i < m_branches.size(); i++)
+    {
+        DSBBranch *b = m_branches.at(i);
+        b->drawRelTo(r);
+    }
 }
 
 }
