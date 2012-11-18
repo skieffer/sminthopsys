@@ -337,7 +337,10 @@ bool DSBReaction::isBranchHead(DSBClone *clone)
 QSizeF DSBReaction::layout()
 {
     buildOrbit();
-    // ...
+    // For now, process nodes have the fixed size of:
+    //   16x16 box
+    //   stems of length 17
+    // Hence, 50x16 (horiz.), or 16x50 (vert.).
     m_size = QSizeF(10,10);
     return m_size;
 }

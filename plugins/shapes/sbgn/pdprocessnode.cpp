@@ -34,6 +34,9 @@ using namespace dunnart;
 
 ProcessNode::ProcessNode(int o, PDProcessNodeType pt) : ShapeObj("sbgn.ProcessNode"), orientation(o), rect(16), processType(pt)
 {
+    // Set default size.
+    setSize(QSizeF(50,50));
+
     if (processType == UNCERTAIN) { setLabel("?"); }
     else if (processType == OMITTED) { setLabel("\\\\"); }
 
