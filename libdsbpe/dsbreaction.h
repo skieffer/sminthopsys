@@ -72,6 +72,7 @@ public:
     void addOutputBranchHead(DSBClone *head);
     void setMainInput(DSBClone *mi);
     void setMainOutput(DSBClone *mo);
+    enum ReacSide {ABOVE, BELOW, LEFT, RIGHT};
 
 private:
     Reaction *m_sbmlReaction;
@@ -103,7 +104,10 @@ private:
     void buildOrbit();
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
+    QList<DSBClone*> getAllSatellites();
     void takeNonBranchHeads(QList<DSBClone*>& src, QList<DSBClone*>& dst);
+
+    QPointF satPos(int num, int outOf, ReacSide side);
 
 
 };

@@ -329,19 +329,89 @@ QList<DSBSpecies*> DSBReaction::getAllSpecies()
     return allSpecies;
 }
 
+QList<DSBClone*> DSBReaction::getAllSatellites()
+{
+    QList<DSBClone*> allSats;
+    allSats.append(m_inSatellites);
+    allSats.append(m_outSatellites);
+    allSats.append(m_modSatellites);
+    return allSats;
+}
+
 bool DSBReaction::isBranchHead(DSBClone *clone)
 {
     return m_inputBranchHeads.contains(clone) || m_outputBranchHeads.contains(clone);
 }
 
+QPointF DSBReaction::satPos(int num, int outOf, ReacSide side)
+{
+    qreal x,y;
+    qreal stem = 25;
+    qreal conn = 100;
+    qreal sqrt2 = 1.414213562;
+    qreal sqrt3 = 1.732050808;
+    if (outOf == 1 || outOf == 2)
+    {
+        // Use 45 deg angles
+        y = stem + conn/sqrt2;
+        x = conn/sqrt2;
+        if (num == 1) { x *= -1; }
+    }
+    else if (outOf == 3 || outOf == 4)
+    {
+        // Use 30 and 60 deg angles
+        qreal A = conn*sqrt3/2;
+        qreal a = conn/2;
+        if (num == 1 || num == 2) {
+            x = a;
+            y = stem + A;
+        } else {
+            x = A;
+            y = stem + a;
+        }
+        if (num == 1 || num == 3) { x *= -1; }
+    }
+    else
+    {
+        // This case (more than 4 clones on one side) will be extremely rare.
+        // TODO...
+    }
+    if (side == ABOVE) { y *= -1; }
+    return QPointF(x,y);
+}
+
 QSizeF DSBReaction::layout()
 {
     buildOrbit();
+    // Layout all satellites.
+    QList<DSBClone*> allSats = getAllSatellites();
+    for (int i = 0; i < allSats.size(); i++)
+    {
+        DSBClone *cl = allSats.at(i);
+        cl->layout();
+    }
+    // Relpts for satellites above
+    int numAbove = m_inSatellites.size();
+    for (int i = 0; i < numAbove; i++)
+    {
+        DSBClone *sat = m_inSatellites.at(i);
+        QPointF p = satPos(i+1,numAbove,ABOVE);
+        sat->setRelPt(p);
+    }
+    // Relpts for satellites below
+    int numBelow = m_outSatellites.size();
+    for (int i = 0; i < numBelow; i++)
+    {
+        DSBClone *sat = m_outSatellites.at(i);
+        QPointF p = satPos(i+1,numBelow,BELOW);
+        sat->setRelPt(p);
+    }
+
     // For now, process nodes have the fixed size of:
     //   16x16 box
     //   stems of length 17
     // Hence, 50x16 (horiz.), or 16x50 (vert.).
-    m_size = QSizeF(16,50);
+    m_size = QSizeF(216,250);
     return m_size;
 }
 
@@ -369,7 +439,17 @@ void DSBReaction::redraw()
 void DSBReaction::drawAt(QPointF r)
 {
     m_basept = r;
-    // TODO
+
+    // Draw process node.
+    // TODO...
+
+    // Draw all satellites.
+    QList<DSBClone*> allSats = getAllSatellites();
+    for (int i = 0; i < allSats.size(); i++)
+    {
+        DSBClone *cl = allSats.at(i);
+        cl->drawRelTo(r);
+    }
 }
 
 }
