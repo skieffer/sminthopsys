@@ -77,7 +77,7 @@ QSizeF DSBBranch::layout()
     h = size.height();
     y += h/2;
     height += h;
-    qreal gap = 50;
+    qreal gap = 20;
     // Now place all other nodes according to their size.
     for (int i = 1; i < own.size(); i++)
     {
