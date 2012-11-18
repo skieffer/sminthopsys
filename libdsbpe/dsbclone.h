@@ -62,6 +62,7 @@ public:
     QSizeF getSize();
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
+    friend class DSBFork;
 
 private:
     QString m_cloneId;

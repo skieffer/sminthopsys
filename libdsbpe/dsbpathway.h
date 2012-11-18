@@ -44,6 +44,7 @@ public:
     DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
     // Get and set
     DSBFork *getFork(DSBClone *cl);
+    DSBBranch *getBranch(DSBNode *node);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
