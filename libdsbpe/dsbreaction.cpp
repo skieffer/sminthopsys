@@ -32,6 +32,11 @@
 
 #include "sbml/SBMLTypes.h"
 
+#include "libdunnartcanvas/pluginshapefactory.h"
+#include "libdunnartcanvas/canvas.h"
+#include "libdunnartcanvas/shape.h"
+#include "libdunnartcanvas/undo.h"
+
 namespace dunnart {
 
 DSBReaction::DSBReaction() {}
@@ -52,6 +57,11 @@ DSBReaction::DSBReaction(Reaction *reac) :
 void DSBReaction::setCompartment(DSBCompartment *comp)
 {
     m_compartment = comp;
+}
+
+void DSBReaction::setCanvas(Canvas *canvas)
+{
+    m_canvas = canvas;
 }
 
 DSBCompartment *DSBReaction::getCompartment()
@@ -296,14 +306,15 @@ void DSBReaction::buildOrbit()
 }
 
 /* For every clone in src list which is not currently registered as a branch head,
-   append it to the dst list.
+   or as mainInput or mainOutput, append it to the dst list.
   */
 void DSBReaction::takeNonBranchHeads(QList<DSBClone *> &src, QList<DSBClone *> &dst)
 {
     for (int i = 0; i < src.size(); i++)
     {
         DSBClone *cl = src.at(i);
-        if (!m_inputBranchHeads.contains(cl) && !m_outputBranchHeads.contains(cl))
+        if (!m_inputBranchHeads.contains(cl) && !m_outputBranchHeads.contains(cl) &&
+            m_mainInput != cl && m_mainOutput != cl)
         {
             dst.append(cl);
         }
@@ -347,7 +358,7 @@ QPointF DSBReaction::satPos(int num, int outOf, ReacSide side)
 {
     qreal x,y;
     qreal stem = 25;
-    qreal conn = 100;
+    qreal conn = 70;
     qreal sqrt2 = 1.414213562;
     qreal sqrt3 = 1.732050808;
     if (outOf == 1 || outOf == 2)
@@ -411,7 +422,12 @@ QSizeF DSBReaction::layout()
     //   16x16 box
     //   stems of length 17
     // Hence, 50x16 (horiz.), or 16x50 (vert.).
-    m_size = QSizeF(216,250);
+    qreal height = 50;
+    if (numAbove > 0) { height += 90; }
+    if (numAbove > 2) { height += 10; }
+    if (numBelow > 0) { height += 90; }
+    if (numBelow > 2) { height += 10; }
+    m_size = QSizeF(216,height);
     return m_size;
 }
 
@@ -441,7 +457,13 @@ void DSBReaction::drawAt(QPointF r)
     m_basept = r;
 
     // Draw process node.
-    // TODO...
+    PluginShapeFactory *factory = sharedPluginShapeFactory();
+    QString type("org.sbgn.pd.ProcessNodeVertical");
+    ShapeObj *shape = factory->createShape(type);
+    shape->setCentrePos(m_basept);
+    // Add it to the canvas.
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, shape);
+    m_canvas->currentUndoMacro()->addCommand(cmd);
 
     // Draw all satellites.
     QList<DSBClone*> allSats = getAllSatellites();

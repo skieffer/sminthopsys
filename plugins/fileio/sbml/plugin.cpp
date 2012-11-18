@@ -172,6 +172,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 id = reac->getId();
                 DSBReaction *dsbreac = new DSBReaction(reac);
                 dsbreac->doublyLink(speciesMap);
+                dsbreac->setCanvas(canvas);
 
                 // If it belongs to a new compartment, then add that to the compartment map.
                 QString compName = dsbreac->getCompartmentName();
