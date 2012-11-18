@@ -336,7 +336,8 @@ bool DSBReaction::isBranchHead(DSBClone *clone)
 
 QSizeF DSBReaction::layout()
 {
-    // TODO
+    buildOrbit();
+    // ...
     m_size = QSizeF(10,10);
     return m_size;
 }

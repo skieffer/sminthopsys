@@ -28,6 +28,7 @@
 #include "dsbreaction.h"
 #include "dsbpathway.h"
 #include "dsbfork.h"
+#include "dsbnode.h"
 
 namespace dunnart {
 
@@ -64,15 +65,30 @@ QSizeF DSBBranch::layout()
 {
     QList<DSBNode*> own = getOwnNodes();
     setMainConnections(own);
-    int x = 0, y = 0;
-    for (int i = 0; i < own.size(); i++)
+    // Put lead node at (0,0).
+    // So base point of branch is center of lead node.
+    qreal x = 0, y = 0, w = 0, h = 0;
+    qreal width = 0, height = 0;
+    DSBNode *node = own.first();
+    node->setRelPt(QPointF(x,y));
+    QSizeF size = node->layout();
+    h = size.height();
+    y += h/2;
+    height += h;
+    // Now place all other nodes according to their size.
+    for (int i = 1; i < own.size(); i++)
     {
-        DSBNode *n = own.at(i);
-        //...
+        node = own.at(i);
+        QSizeF size = node->layout();
+        h = size.height();
+        y += h/2;
+        node->setRelPt(QPointF(x,y));
+        y += h/2;
+        height += h;
+        w = size.width();
+        width = w > width ? w : width;
     }
-
-    //...
-    m_size = QSizeF(10,10);
+    m_size = QSizeF(width, height);
     return m_size;
 }
 

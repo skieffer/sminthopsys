@@ -29,12 +29,14 @@
 #include <QString>
 #include <QSizeF>
 
+#include "dsbreclayout.h"
+
 namespace dunnart {
 
 class DSBBranch;
 class DSBFork;
 
-class DSBNode
+class DSBNode : public DSBRecLayout
 {
 public:
     virtual QList<DSBBranch*> findBranchesRec(
@@ -51,6 +53,8 @@ public:
     void addBranch(DSBBranch *branch);
     void addFork(DSBFork *fork);
 #endif
+
+
 
     static bool s_followTransporters;
 
