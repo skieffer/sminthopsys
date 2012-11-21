@@ -35,6 +35,7 @@ namespace dunnart {
 
 class DSBBranch;
 class DSBFork;
+class ShapeObj;
 
 class DSBNode : public DSBRecLayout
 {
@@ -49,6 +50,7 @@ public:
             QList<DSBBranch*> branches, QList<QString> blacklist);
 
     void setBranchHeadNumber(int n);
+    virtual ShapeObj *getShape() = 0;
 #if 0
     void addBranch(DSBBranch *branch);
     void addFork(DSBFork *fork);

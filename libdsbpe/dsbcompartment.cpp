@@ -21,7 +21,7 @@
  *
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
-#include "libdsbpe/dsbcompartment.h"
+#include "dsbcompartment.h"
 
 #include <QtGui>
 #include <QString>
@@ -36,6 +36,8 @@
 #include "dsbnode.h"
 #include "dsbbranch.h"
 #include "dsbpathway.h"
+
+#include "libdunnartcanvas/canvas.h"
 
 namespace dunnart {
 
@@ -77,6 +79,12 @@ QString DSBCompartment::getName()
 void DSBCompartment::setCell(DSBCell *cell)
 {
     m_cell = cell;
+}
+
+void DSBCompartment::setCanvas(Canvas *canvas)
+{
+    m_canvas = canvas;
+    qDebug() << " compartment has canvas: " << m_canvas;
 }
 
 QList<DSBClone*> DSBCompartment::getAllClones()
@@ -237,6 +245,7 @@ QSizeF DSBCompartment::longestBranchLayout(
     }
     // Build pathway.
     DSBPathway *pathway = new DSBPathway(endpt, branches);
+    pathway->setCanvas(m_canvas);
     pathway->layout();
     pathway->setRelPt(QPointF(0,0));
     pathway->draw();

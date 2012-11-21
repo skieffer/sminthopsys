@@ -53,8 +53,8 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     m_endpointEdit = new QLineEdit(this);
 
     m_endpointCBox = new QComboBox(this);
-    m_endpointCBox->addItem(tr("start"));
-    m_endpointCBox->addItem(tr("finish"));
+    m_endpointCBox->addItem(tr("first"));
+    m_endpointCBox->addItem(tr("last"));
 
     QLabel *layoutLabel = new QLabel(this);
     layoutLabel->setText(tr("Layout:"));

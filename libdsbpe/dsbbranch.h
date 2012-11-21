@@ -34,6 +34,9 @@ namespace dunnart {
 
 class DSBNode;
 class DSBPathway;
+class Canvas;
+class ShapeObj;
+class Guideline;
 
 class DSBBranch : public DSBRecLayout
 {
@@ -49,11 +52,14 @@ public:
     DSBNode *getSuccessor(DSBNode *node);
     void setPathway(DSBPathway *pw);
     DSBPathway *getPathway();
+    void setCanvas(Canvas *canvas);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
     void drawRelTo(QPointF q);
     void drawAt(QPointF r);
+    void drawConnectors();
+    void setGuideline();
     void redraw();
     QSizeF getSize();
     // Other methods
@@ -64,11 +70,15 @@ private:
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
+    Canvas *m_canvas;
+    Guideline *m_guideline;
 
     DSBPathway *m_pathway;
 
     QList<DSBNode*> getOwnNodes();
     void setMainConnections(QList<DSBNode*> own);
+    //void connect(ShapeObj *shp1, ShapeObj *shp2);
+    void connect(DSBNode *node1, DSBNode *node2);
 };
 
 }

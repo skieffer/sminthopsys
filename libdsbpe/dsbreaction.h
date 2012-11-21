@@ -37,6 +37,7 @@ class Reaction;
 namespace dunnart {
 
 class Canvas;
+class ShapeObj;
 class DSBSpecies;
 class DSBCompartment;
 class DSBClone;
@@ -75,6 +76,8 @@ public:
     void setMainInput(DSBClone *mi);
     void setMainOutput(DSBClone *mo);
     enum ReacSide {ABOVE, BELOW, LEFT, RIGHT};
+    ShapeObj *getShape();
+    void connectTo(DSBClone *cl);
 
 private:
     Reaction *m_sbmlReaction;
@@ -104,6 +107,7 @@ private:
     QList<DSBClone*> getInputClones();
     QList<DSBClone*> getOutputClones();
 
+    ShapeObj *m_shape;
     void buildOrbit();
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
