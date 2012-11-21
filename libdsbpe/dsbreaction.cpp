@@ -36,6 +36,7 @@
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/shape.h"
 #include "libdunnartcanvas/undo.h"
+#include "libdunnartcanvas/connector.h"
 
 namespace dunnart {
 
@@ -459,10 +460,11 @@ void DSBReaction::drawAt(QPointF r)
     // Draw process node.
     PluginShapeFactory *factory = sharedPluginShapeFactory();
     QString type("org.sbgn.pd.ProcessNodeVertical");
-    ShapeObj *shape = factory->createShape(type);
-    shape->setCentrePos(m_basept);
+    ShapeObj *procNode = factory->createShape(type);
+    m_shape = procNode;
+    procNode->setCentrePos(m_basept);
     // Add it to the canvas.
-    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, shape);
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, procNode);
     m_canvas->currentUndoMacro()->addCommand(cmd);
 
     // Draw all satellites.
@@ -471,7 +473,40 @@ void DSBReaction::drawAt(QPointF r)
     {
         DSBClone *cl = allSats.at(i);
         cl->drawRelTo(r);
+        // connector
+        /*
+        Connector *conn = new Connector();
+        conn->initWithConnection(procNode,cl->getShape());
+        QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, conn);
+        m_canvas->currentUndoMacro()->addCommand(cmd);
+        */
+        connectTo(cl);
     }
+}
+
+void DSBReaction::connectTo(DSBClone *cl)
+{
+    Connector *conn = new Connector();
+    conn->initWithConnection(m_shape,cl->getShape());
+    if (cl==m_mainInput || m_inputBranchHeads.contains(cl)
+            || m_inSatellites.contains(cl))
+    {
+        if (m_reversible) {
+            conn->setDirected(true);
+        }
+    }
+    else if (cl==m_mainOutput || m_outputBranchHeads.contains(cl)
+             || m_outSatellites.contains(cl))
+    {
+        conn->setDirected(true);
+    }
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, conn);
+    m_canvas->currentUndoMacro()->addCommand(cmd);
+}
+
+ShapeObj *DSBReaction::getShape()
+{
+    return m_shape;
 }
 
 }

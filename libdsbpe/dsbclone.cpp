@@ -162,6 +162,11 @@ void DSBClone::drawAt(QPointF r)
     m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
 }
 
+ShapeObj *DSBClone::getShape()
+{
+    return m_epn;
+}
+
 /* Both reactions entered, and reversible reactions exited, are
   enterable. Compute list of all those.
   */

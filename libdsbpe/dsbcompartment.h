@@ -39,6 +39,7 @@ class DSBClone;
 class DSBCell;
 class DSBNode;
 class DSBBranch;
+class Canvas;
 
 class DSBCompartment : public DSBRecLayout
 {
@@ -65,6 +66,7 @@ public:
     // Misc get and set
     QString getName();
     void setCell(DSBCell *cell);
+    void setCanvas(Canvas *canvas);
 
     QList<QString> m_default_blacklist;
 
@@ -73,6 +75,7 @@ private:
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
+    Canvas *m_canvas;
     DSBCell *m_cell;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;

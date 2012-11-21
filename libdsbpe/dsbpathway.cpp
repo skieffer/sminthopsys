@@ -33,6 +33,8 @@
 #include "dsbreaction.h"
 #include "dsbfork.h"
 
+#include "libdunnartcanvas/canvas.h"
+
 namespace dunnart {
 
 DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches)
@@ -90,6 +92,16 @@ DSBBranch *DSBPathway::getBranch(DSBNode *node)
     return m_branchMembership.value(node, NULL);
 }
 
+void DSBPathway::setCanvas(Canvas *canvas)
+{
+    m_canvas = canvas;
+    for (int i = 0; i < m_branches.size(); i++)
+    {
+        DSBBranch *b = m_branches.at(i);
+        b->setCanvas(m_canvas);
+    }
+}
+
 void DSBPathway::setFirstBranch(DSBBranch *branch)
 {
     m_branches.clear();
@@ -103,6 +115,7 @@ void DSBPathway::setFirstBranch(DSBBranch *branch)
     m_branches.append(branch);
     addBranchNodes(branch);
     branch->setPathway(this);
+    //branch->setCanvas(m_canvas);
 
     m_headNode = branch->nodes.first();
 }
@@ -183,6 +196,7 @@ void DSBPathway::addBranch(DSBBranch *branch)
     m_branches.append(branch);
     addBranchNodes(branch);
     branch->setPathway(this);
+    //branch->setCanvas(m_canvas);
 }
 
 /* Let p1, p2, ..., pn be the parent nodes of the passed branches
@@ -258,6 +272,15 @@ void DSBPathway::drawAt(QPointF r)
         DSBBranch *b = m_branches.at(i);
         b->drawRelTo(r);
     }
+    // After all branches have been drawn, can ask them to
+    // draw their connectors, and add guidelines.
+    for (int i = 0; i < m_branches.size(); i++)
+    {
+        DSBBranch *b = m_branches.at(i);
+        b->drawConnectors();
+        b->setGuideline();
+    }
+
 }
 
 }

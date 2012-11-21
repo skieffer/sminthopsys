@@ -24,6 +24,9 @@
 
 #include <QtGui>
 
+#include <stdio.h>
+#include <assert.h>
+
 #include "dsbbranch.h"
 #include "dsbclone.h"
 #include "dsbspecies.h"
@@ -31,6 +34,13 @@
 #include "dsbpathway.h"
 #include "dsbfork.h"
 #include "dsbnode.h"
+
+#include "libdunnartcanvas/connector.h"
+#include "libdunnartcanvas/canvas.h"
+#include "libdunnartcanvas/canvasitem.h"
+#include "libdunnartcanvas/shape.h"
+#include "libdunnartcanvas/guideline.h"
+#include "libdunnartcanvas/relationship.h"
 
 namespace dunnart {
 
@@ -158,6 +168,11 @@ void DSBBranch::setPathway(DSBPathway *pw)
     m_pathway = pw;
 }
 
+void DSBBranch::setCanvas(Canvas *canvas)
+{
+    m_canvas = canvas;
+}
+
 DSBPathway *DSBBranch::getPathway()
 {
     return m_pathway;
@@ -194,6 +209,89 @@ void DSBBranch::drawAt(QPointF r)
         node->drawRelTo(r);
     }
 }
+
+void DSBBranch::setGuideline()
+{
+    CanvasItemList shapes;
+    QList<DSBNode*> own = getOwnNodes();
+    for (int i = 0; i < own.size(); i++)
+    {
+        DSBNode *node = own.at(i);
+        ShapeObj *shape = node->getShape();
+        shapes.append(shape);
+    }
+    m_guideline = createAlignment(ALIGN_CENTER, shapes);
+}
+
+#if 0
+void DSBBranch::drawConnectors()
+{
+    ShapeObj *shp1 = 0, *shp2 = 0;
+    if (parent && parent != nodes.first())
+    {
+        shp1 = parent->getShape();
+        shp2 = nodes.first()->getShape();
+        connect(shp1,shp2);
+    }
+    for (int i = 0; i+1 < nodes.size(); i++)
+    {
+        shp1 = nodes.at(i)->getShape();
+        shp2 = nodes.at(i+1)->getShape();
+        connect(shp1,shp2);
+    }
+}
+#endif
+
+#if 1
+void DSBBranch::drawConnectors()
+{
+    DSBNode *node1, *node2;
+    if (parent && parent != nodes.first())
+    {
+        node1 = parent;
+        node2 = nodes.first();
+        connect(node1,node2);
+    }
+    for (int i = 0; i+1 < nodes.size(); i++)
+    {
+        node1 = nodes.at(i);
+        node2 = nodes.at(i+1);
+        connect(node1,node2);
+    }
+}
+#endif
+
+#if 1
+void DSBBranch::connect(DSBNode *node1, DSBNode *node2)
+{
+    DSBReaction *reac1 = dynamic_cast<DSBReaction*>(node1);
+    DSBReaction *reac2 = dynamic_cast<DSBReaction*>(node2);
+    DSBReaction *reac = 0;
+    DSBClone *cl = 0;
+    if (reac1)
+    {
+        reac = reac1;
+        cl = dynamic_cast<DSBClone*>(node2);
+    }
+    else
+    {
+        reac = reac2;
+        cl = dynamic_cast<DSBClone*>(node1);
+    }
+    assert(cl); assert(reac);
+    reac->connectTo(cl);
+}
+#endif
+
+#if 0
+void DSBBranch::connect(ShapeObj *shp1, ShapeObj *shp2)
+{
+    Connector *conn = new Connector();
+    conn->initWithConnection(shp1,shp2);
+    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, conn);
+    m_canvas->currentUndoMacro()->addCommand(cmd);
+}
+#endif
 
 QString DSBBranch::toString()
 {

@@ -36,6 +36,7 @@ class DSBBranch;
 class DSBFork;
 class DSBNode;
 class DSBClone;
+class Canvas;
 
 class DSBPathway : public DSBRecLayout
 {
@@ -45,6 +46,7 @@ public:
     // Get and set
     DSBFork *getFork(DSBClone *cl);
     DSBBranch *getBranch(DSBNode *node);
+    void setCanvas(Canvas *canvas);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -62,6 +64,7 @@ private:
     QPointF m_basept;
     QSizeF m_size;
     DSBNode *m_headNode;
+    Canvas *m_canvas;
     QList<DSBBranch*> m_branches;
     QList<DSBNode*> m_allNodes;
     QMap<DSBNode*, DSBBranch*> m_branchMembership;

@@ -154,6 +154,8 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 {
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
+                    comp->setCanvas(canvas);
+                    qDebug() << "Canvas is: " << canvas;
                 }
                 // Now add the species to its compartment.
                 DSBCompartment *comp = compMap.value(compName);
@@ -180,6 +182,8 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 {
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
+                    comp->setCanvas(canvas);
+                    qDebug() << "Canvas is: " << canvas;
                 }
                 // Now add the reaction to its compartment.
                 DSBCompartment *comp = compMap.value(compName);

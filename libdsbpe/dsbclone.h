@@ -37,6 +37,7 @@ class PDEPN;
 class DSBSpecies;
 class DSBReaction;
 class DSBBranch;
+class ShapeObj;
 
 class DSBClone : public DSBRecLayout, public DSBNode
 {
@@ -63,6 +64,7 @@ public:
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
     friend class DSBFork;
+    ShapeObj *getShape();
 
 private:
     QString m_cloneId;
