@@ -37,8 +37,8 @@ class Canvas;
 class CanvasItem;
 
 // The UndoMacro represents an object we can push to the undo stack
-// immediately, but that may has some of it's items modified later by
-// the automatically layout.  We can't do this using just children of
+// immediately, but that may have some of its items modified later by
+// the automatic layout.  We can't do this using just children of
 // QUndoCommand because the actions happen only when the parent is pushed
 // to the undo stack and the SIGNALS are sent at the wrong time.  Hence,
 // we manually handle addition and merging in addCommand.

@@ -367,7 +367,7 @@ GraphData::GraphData(Canvas *canvas, bool ignoreEdges,
                     if (level > 0)
                     {
                         // Find the number of connector sources on each side
-                        // of the channel between levels.  The nodes if the
+                        // of the channel between levels.  The nodes of the
                         // previous level are in "prevNodes" and the nodes of
                         // this level are in "nodes".
                         for (std::set<unsigned>::const_iterator it = nodes.begin();
@@ -388,10 +388,10 @@ GraphData::GraphData(Canvas *canvas, bool ignoreEdges,
                             }
                         }
 
-                        // Based on the numer of sources on the smaller side,
+                        // Based on the number of sources on the smaller side,
                         // give an ordering to the nodes where these
                         // connectors terminate.  For example in a directed
-                        // tree flowing to th left, three nodes on one level
+                        // tree flowing to the left, three nodes on one level
                         // might point to seven nodes, so each of the seven
                         // nodes would be given a group based on the three
                         // sources [0-2].  This is not the best solution, but
