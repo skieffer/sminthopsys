@@ -153,7 +153,7 @@ public:
     bool ignoreEdges;
     //! (re)starts the layout thread
     void apply(bool ignoreEdges);
-    //! interrupt from the GUI thread, basically abondons any in-process layout
+    //! interrupt from the GUI thread, basically abandons any in-process layout
     void setInterruptFromDunnart(void);
     //! interrupt from the GUI thread caused by "alt-dragging"
     void setLayoutSuspended(bool value);

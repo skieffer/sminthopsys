@@ -2306,7 +2306,7 @@ void Canvas::selectionChangeTriggers(void)
             if (!shape->sizeLocked())
             {
                 // Build the bounding rectangle from the union of all
-                // shape's boundingRects in the selection.
+                // shapes' boundingRects in the selection.
                 m_selection_shapes_bounding_rect =
                         m_selection_shapes_bounding_rect.united(
                         shape->boundingRect().translated(shape->scenePos()));
