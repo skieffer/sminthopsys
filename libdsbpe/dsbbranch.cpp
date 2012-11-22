@@ -221,6 +221,7 @@ void DSBBranch::setGuideline()
         shapes.append(shape);
     }
     m_guideline = createAlignment(ALIGN_CENTER, shapes);
+    m_canvas->interrupt_graph_layout();
 }
 
 #if 0
