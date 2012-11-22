@@ -218,7 +218,7 @@ static void usage(char *title, char *editor)
 "                     Fit page to diagram, write out SVG and then exit.\n"
 "   -y                Enable rounded poly-line segment corners on connectors.\n"
 "   -z xing_penalty   Set the connector crossing penalty (0 to 500).\n"
-"   -w nudge_distance 'Nudge' connectors by this amount to separate then.\n"
+"   -w nudge_distance 'Nudge' connectors by this amount to separate them.\n"
 "                     Only valid in batch mode (-b), otherwise use CTRL-N.\n"
 "\n", title, editor);
       
