@@ -22,6 +22,7 @@ public:
 private slots:
     void findBranches();
     void canvasSelectionChanged();
+    void test();
 
 private:
     void getSelectedClone();

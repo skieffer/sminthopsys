@@ -246,11 +246,15 @@ QSizeF DSBCompartment::longestBranchLayout(
     // Build pathway.
     DSBPathway *pathway = new DSBPathway(endpt, branches);
     pathway->setCanvas(m_canvas);
-    pathway->layout();
+    QSizeF pathwaySize = pathway->layout();
     pathway->setRelPt(QPointF(0,0));
-    pathway->draw();
+    //pathway->draw();
+
+    m_size = QSizeF(10,10); // TODO
+    return m_size;
 
 
+    /*
     // Get the clones.
     QList<DSBClone*> clones = getAllClones();
     int numClones = clones.size();
@@ -276,7 +280,6 @@ QSizeF DSBCompartment::longestBranchLayout(
         return m_size;
     }
 
-    // Square layout, until we get the real one figured out!
     int cols = ceil(sqrt(numClones)); // number of columns in array
     int rows = ceil(numClones/cols);
     int u = 50; // unit of separation
@@ -296,6 +299,7 @@ QSizeF DSBCompartment::longestBranchLayout(
     m_show_reactions = false;
     m_size = QSizeF(width,height);
     return m_size;
+    */
 }
 
 void DSBCompartment::setRelPt(QPointF p)

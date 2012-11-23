@@ -68,9 +68,11 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     QPushButton *findButton = new QPushButton(tr("Find"),this);
     findButton->setDefault(true);
     QPushButton *cancelButton = new QPushButton(tr("Cancel"),this);
+    QPushButton *testButton = new QPushButton(tr("Test"),this);
 
     connect(findButton, SIGNAL(clicked()), this, SLOT(findBranches()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(testButton, SIGNAL(clicked()), this, SLOT(test()));
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(endpointLabel,  0, 0);
@@ -80,6 +82,7 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     layout->addWidget(m_layoutCBox,     1, 1);
     layout->addWidget(cancelButton,   2, 0);
     layout->addWidget(findButton,     2, 1);
+    layout->addWidget(testButton,     2, 2);
     setLayout(layout);
 
     setWindowTitle(tr("Find Branches"));
@@ -90,6 +93,10 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
     // Watch change of selection.
     connect(m_canvas, SIGNAL(selectionChanged()),
             this, SLOT(canvasSelectionChanged()));
+}
+
+void FindBranchesDialog::test(){
+    m_canvas->deleteSelection();
 }
 
 /* Respond to a change in the canvas selection.

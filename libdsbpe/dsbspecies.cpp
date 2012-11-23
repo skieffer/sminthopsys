@@ -123,6 +123,7 @@ void DSBSpecies::deleteClonesAndAssignments()
     {
         m_clones.at(i)->deleteShape();
     }
+
     // Clear the clone assignment map, and delete the DSBCloneAssignment
     // structs themselves.
     QList<QString> reacIds = m_cloneAssignmentsByReactionId.keys();
@@ -218,8 +219,6 @@ void DSBSpecies::setDiscreteCloning()
     // Create a new clone for each role played by this species.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
     {
-        //DSBClone *cl = new DSBClone(this);
-        //m_clones.append(cl);
         DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsEntered.at(i);
         cl->addReactionEntered(reac);
@@ -232,8 +231,6 @@ void DSBSpecies::setDiscreteCloning()
 
     for (int i = 0; i < m_reactionsExited.size(); i++)
     {
-        //DSBClone *cl = new DSBClone(this);
-        //m_clones.append(cl);
         DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsExited.at(i);
         cl->addReactionExited(reac);
@@ -246,8 +243,6 @@ void DSBSpecies::setDiscreteCloning()
 
     for (int i = 0; i < m_reactionsModified.size(); i++)
     {
-        //DSBClone *cl = new DSBClone(this);
-        //m_clones.append(cl);
         DSBClone *cl = makeNewClone();
         DSBReaction *reac = m_reactionsModified.at(i);
         cl->addReactionModified(reac);
