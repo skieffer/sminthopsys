@@ -36,9 +36,9 @@ namespace dunnart {
 class DSBSpecies;
 class DSBReaction;
 class DSBClone;
-class DSBCell;
 class DSBNode;
 class DSBBranch;
+class DSBPathway;
 class Canvas;
 
 class DSBCompartment : public DSBRecLayout
@@ -46,12 +46,15 @@ class DSBCompartment : public DSBRecLayout
 
 public:
     // Constructors
-    DSBCompartment();
+    //DSBCompartment();
     DSBCompartment(QString compartmentName);
     // Building methods
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
+    void addCompartment(DSBCompartment *comp);
+    void addCompartments(QList<DSBCompartment*> comps);
     // Various layout methods
+    QSizeF rowLayout();
     QSizeF squareLayout();
     QSizeF squareLayout2();
     QSizeF longestBranchLayout(DSBClone *endpt, bool forward);
@@ -65,7 +68,7 @@ public:
     QSizeF getSize();
     // Misc get and set
     QString getName();
-    void setCell(DSBCell *cell);
+    void setParent(DSBCompartment *comp);
     void setCanvas(Canvas *canvas);
 
     QList<QString> m_default_blacklist;
@@ -76,9 +79,11 @@ private:
     QPointF m_basept;
     QSizeF m_size;
     Canvas *m_canvas;
-    DSBCell *m_cell;
+    DSBCompartment *m_parentCompartment;
     QList<DSBSpecies *> m_species;
     QList<DSBReaction *> m_reactions;
+    QList<DSBCompartment*> m_compartments;
+    QList<DSBPathway*> m_pathways;
     bool m_show_reactions;
 
     QList<DSBClone*> getAllClones();

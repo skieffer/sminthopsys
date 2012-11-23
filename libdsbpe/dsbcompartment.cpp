@@ -42,7 +42,8 @@
 namespace dunnart {
 
 DSBCompartment::DSBCompartment(QString compartmentName)
-    : m_compartmentName(compartmentName)
+    : m_compartmentName(compartmentName),
+      m_parentCompartment(NULL)
 {
     m_default_blacklist <<
                            "ATP" <<
@@ -71,20 +72,34 @@ void DSBCompartment::addReaction(DSBReaction *reac)
     m_reactions.append(reac);
 }
 
+void DSBCompartment::addCompartment(DSBCompartment *comp)
+{
+    m_compartments.append(comp);
+    comp->setParent(this);
+}
+
+void DSBCompartment::addCompartments(QList<DSBCompartment *> comps)
+{
+    for (int i = 0; i < comps.size(); i++)
+    {
+        DSBCompartment *comp = comps.at(i);
+        addCompartment(comp);
+    }
+}
+
 QString DSBCompartment::getName()
 {
     return m_compartmentName;
 }
 
-void DSBCompartment::setCell(DSBCell *cell)
+void DSBCompartment::setParent(DSBCompartment *comp)
 {
-    m_cell = cell;
+    m_parentCompartment = comp;
 }
 
 void DSBCompartment::setCanvas(Canvas *canvas)
 {
     m_canvas = canvas;
-    qDebug() << " compartment has canvas: " << m_canvas;
 }
 
 QList<DSBClone*> DSBCompartment::getAllClones()
@@ -106,6 +121,32 @@ QSizeF DSBCompartment::layout()
 
 QSizeF DSBCompartment::getSize()
 {
+    return m_size;
+}
+
+QSizeF DSBCompartment::rowLayout()
+{
+    int pad = 100;
+    int numComps = m_compartments.size();
+    int *widths = new int[numComps];
+    int maxHeight = 0;
+    for (int i = 0; i < numComps; i++)
+    {
+        DSBCompartment *comp = m_compartments.at(i);
+        QSizeF size = comp->layout();
+        widths[i] = size.width();
+        int h = size.height();
+        if (h > maxHeight) { maxHeight = h; }
+    }
+    int x = 0, y = 0;
+    for (int i = 0; i < numComps; i++)
+    {
+        DSBCompartment *comp = m_compartments.at(i);
+        comp->setRelPt(QPointF(x,y));
+        x += widths[i] + pad;
+    }
+    delete[] widths;
+    m_size = QSizeF(x,maxHeight);
     return m_size;
 }
 
@@ -328,6 +369,13 @@ void DSBCompartment::drawAt(QPointF r)
     if (m_show_reactions)
     {
         // TODO
+    }
+
+    // Sub-compartments:
+    for (int i = 0; i < m_compartments.size(); i++)
+    {
+        DSBCompartment *comp = m_compartments.at(i);
+        comp->drawRelTo(m_basept);
     }
 
     // Clones:
