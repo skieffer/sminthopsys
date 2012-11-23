@@ -252,6 +252,9 @@ class Canvas : public QGraphicsScene
         void copySelection(void);
         void pasteSelection(void);
         void deleteSelection(void);
+        void deleteItem(CanvasItem *item);
+        void deleteItems(QList<CanvasItem*> items);
+
         void toggleSelectedShapePinning(void);
         void selectAll(void);
         void templateFromSelection(int type);

@@ -37,7 +37,8 @@
 namespace dunnart {
 
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
-    m_dsbspec(dsbspec)
+    m_dsbspec(dsbspec),
+    m_epn(NULL)
 {}
 
 void DSBClone::setCloneNum(int num)
@@ -94,9 +95,16 @@ void DSBClone::setReactionsModified(QList<DSBReaction *> reacs)
 void DSBClone::deleteShape()
 {
     Canvas *canvas = m_dsbspec->canvas();
+    /*
     canvas->deselectAll();
     m_epn->setSelected(true);
     canvas->deleteSelection();
+    */
+    //m_epn->setSelected(true);
+    //canvas->removeItem(m_epn);
+    canvas->deleteItem(m_epn);
+    m_epn = NULL;
+    //m_epn->setSelected(true);
 }
 
 DSBSpecies *DSBClone::getSpecies()
@@ -141,13 +149,23 @@ void DSBClone::redraw()
 
 void DSBClone::drawAt(QPointF r)
 {
+    static int n = 0;
+    qDebug() << "clone drawing " << ++n;
     m_basept = r;
-    PluginShapeFactory *factory = sharedPluginShapeFactory();
-    QString type("org.sbgn.pd.00UnspecifiedEPN");
-    ShapeObj *shape = factory->createShape(type);
-    m_epn = dynamic_cast<PDEPN*>  (shape);
-    // Give the epn a pointer to the species it represents.
-    m_epn->setClone(this);
+    // Create shape if don't already have one.
+    bool addToCanvas = false;
+    if (!m_epn)
+    {
+        qDebug() << "m_epn was not already initialized";
+        addToCanvas = true;
+        PluginShapeFactory *factory = sharedPluginShapeFactory();
+        QString type("org.sbgn.pd.00UnspecifiedEPN");
+        ShapeObj *shape = factory->createShape(type);
+        m_epn = dynamic_cast<PDEPN*>  (shape);
+        // Give the epn a pointer to the species it represents.
+        m_epn->setClone(this);
+    }
+    qDebug() << "after m_epn initialization";
     // Set its properties.
     // Clone marker state
     m_epn->set_is_cloned(m_is_cloned);
@@ -157,9 +175,12 @@ void DSBClone::drawAt(QPointF r)
     m_epn->setCentrePos(m_basept);
     // Label
     m_epn->setLabel(m_dsbspec->getName());
-    // Add it to the canvas.
-    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_dsbspec->canvas(), m_epn);
-    m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
+    // Add it to the canvas, if necessary.
+    if (addToCanvas)
+    {
+        QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_dsbspec->canvas(), m_epn);
+        m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
+    }
 }
 
 ShapeObj *DSBClone::getShape()

@@ -1677,10 +1677,23 @@ void Canvas::pasteSelection(void)
     restart_graph_layout();
 }
 
-
 void Canvas::deleteSelection(void)
 {
-    if (selectedItems().empty())
+    QList<CanvasItem *> sel_copy = this->selectedItems();
+    deleteItems(sel_copy);
+}
+
+void Canvas::deleteItem(CanvasItem *item)
+{
+    qDebug() << "deleting item: " << item;
+    QList<CanvasItem*> items;
+    items.append(item);
+    deleteItems(items);
+}
+
+void Canvas::deleteItems(QList<CanvasItem*> items)
+{
+    if (items.empty())
     {
         return;
     }
@@ -1697,10 +1710,8 @@ void Canvas::deleteSelection(void)
     UndoMacro *undoMacro = beginUndoMacro(tr("Delete"));
 
     // Disconnect all shape--connector connections where one is inside the
-    // selection and one is outside the selection.
+    // set and one is outside the set.
     CanvasItemSet selSet;
-    // Use a copy since the deselect action will change the selection.
-    QList<CanvasItem *> sel_copy = this->selectedItems();
     QList<ShapeObj *> sel_shapes;
 
     stop_graph_layout();
@@ -1708,8 +1719,8 @@ void Canvas::deleteSelection(void)
     {
         // If structural editing is disabled then we should only allow
         // deletion of constraint indicators.
-        for (QList<CanvasItem *>::iterator sh = sel_copy.begin();
-                sh != sel_copy.end(); )
+        for (QList<CanvasItem *>::iterator sh = items.begin();
+                sh != items.end(); )
         {
             Indicator *indicator = dynamic_cast<Indicator *> (*sh);
             if (indicator)
@@ -1720,16 +1731,16 @@ void Canvas::deleteSelection(void)
             else
             {
                 // Not an idicator, so remove from list.
-                sh = sel_copy.erase(sh);
+                sh = items.erase(sh);
             }
         }
     }
 
     this->deselectAll();
 
-    // Do distro's first, incase they have guidelines and distros selected.
-    for (QList<CanvasItem *>::iterator sh = sel_copy.begin();
-            sh != sel_copy.end(); ++sh)
+    // Do distro's first, in case they have guidelines and distros selected.
+    for (QList<CanvasItem *>::iterator sh = items.begin();
+            sh != items.end(); ++sh)
     {
         Distribution *distro = dynamic_cast<Distribution *> (*sh);
         Separation *sep = dynamic_cast<Separation *> (*sh);
@@ -1740,8 +1751,8 @@ void Canvas::deleteSelection(void)
             (*sh)->deactivateAll(selSet);
         }
     }
-    for (QList<CanvasItem *>::iterator sh = sel_copy.begin();
-            sh != sel_copy.end(); ++sh)
+    for (QList<CanvasItem *>::iterator sh = items.begin();
+            sh != items.end(); ++sh)
     {
         Connector  *conn  = dynamic_cast<Connector *>  (*sh);
         ShapeObj *shape = dynamic_cast<ShapeObj *> (*sh);
@@ -1768,9 +1779,10 @@ void Canvas::deleteSelection(void)
         }
     }
 
-    for (QList<CanvasItem *>::iterator sh = sel_copy.begin();
-            sh != sel_copy.end(); ++sh)
+    for (QList<CanvasItem *>::iterator sh = items.begin();
+            sh != items.end(); ++sh)
     {
+        qDebug() << "removing item: " << *sh;
         QUndoCommand *cmd = new CmdCanvasSceneRemoveItem(this, *sh);
         undoMacro->addCommand(cmd);
     }

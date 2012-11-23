@@ -23,6 +23,8 @@
  * Author(s): Michael Wybrow  <http://michael.wybrow.info/>
 */
 
+#include <QtGui>
+
 #include "libdunnartcanvas/undo.h"
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/canvasitem.h"
@@ -140,6 +142,7 @@ void CmdCanvasSceneRemoveItem::undo()
 
 void CmdCanvasSceneRemoveItem::redo()
 {
+    qDebug() << "removing (undo command) item: " << m_item;
     m_canvas->removeItem(m_item);
     m_item_memory_owned_by_canvas = false;
 }

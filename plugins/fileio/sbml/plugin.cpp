@@ -199,6 +199,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             cell->rowLayout();
             cell->setRelPt(QPointF(0,0));
             cell->draw();
+            canvas->interrupt_graph_layout();
             return true;
         }
 
