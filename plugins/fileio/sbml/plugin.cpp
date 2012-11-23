@@ -50,7 +50,6 @@
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbreaction.h"
 #include "libdsbpe/dsbcompartment.h"
-#include "libdsbpe/dsbcell.h"
 
 #include "plugins/shapes/sbgn/pdepn.h"
 
@@ -155,7 +154,6 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
                     comp->setCanvas(canvas);
-                    qDebug() << "Canvas is: " << canvas;
                 }
                 // Now add the species to its compartment.
                 DSBCompartment *comp = compMap.value(compName);
@@ -183,7 +181,6 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                     DSBCompartment *comp = new DSBCompartment(compName);
                     compMap.insert(compName, comp);
                     comp->setCanvas(canvas);
-                    qDebug() << "Canvas is: " << canvas;
                 }
                 // Now add the reaction to its compartment.
                 DSBCompartment *comp = compMap.value(compName);
@@ -194,12 +191,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
             // Do simple, square layout of each compartment, and
             // lay them out side by side.
-            DSBCell *cell = new DSBCell();
-            cell->setCompartments( compMap.values() );
-            cell->rowLayout();
-            cell->setRelPt(QPointF(0,0));
-            cell->draw();
-            canvas->interrupt_graph_layout();
+            DSBCompartment *comp = new DSBCompartment(QString("_root"));
+            comp->addCompartments(compMap.values());
+            comp->rowLayout();
+            comp->setRelPt(QPointF(0,0));
+            comp->draw();
             return true;
         }
 

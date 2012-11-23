@@ -17,8 +17,7 @@ SOURCES += \
         dsbspecies.cpp \
 	dsbreaction.cpp \
         dsbcompartment.cpp \
-        dsbclone.cpp \
-        dsbcell.cpp
+        dsbclone.cpp
 
 HEADERS += \
         dsbpathway.h \
@@ -29,5 +28,4 @@ HEADERS += \
         dsbspecies.h \
 	dsbreaction.h \
         dsbcompartment.h \
-        dsbclone.h \
-        dsbcell.h
+        dsbclone.h
