@@ -193,7 +193,8 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             // lay them out side by side.
             DSBCompartment *comp = new DSBCompartment(QString("_root"));
             comp->addCompartments(compMap.values());
-            comp->rowLayout();
+            comp->setTrivialCloning();
+            comp->layout();
             comp->setRelPt(QPointF(0,0));
             comp->draw();
             return true;

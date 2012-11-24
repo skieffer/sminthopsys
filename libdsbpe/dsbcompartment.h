@@ -53,12 +53,12 @@ public:
     void addReaction(DSBReaction *reac);
     void addCompartment(DSBCompartment *comp);
     void addCompartments(QList<DSBCompartment*> comps);
+    QSizeF findBranches(DSBClone *endpt, bool forward);
+    QSizeF findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
+    void setTrivialCloning();
     // Various layout methods
     QSizeF rowLayout();
-    QSizeF squareLayout();
-    QSizeF squareLayout2();
-    QSizeF longestBranchLayout(DSBClone *endpt, bool forward);
-    QSizeF longestBranchLayout(DSBClone *endpt, bool forward, QList<QString> blacklist);
+    QSizeF layoutSquareCloneArray(QList<DSBClone*> clones, int ulx, int uly);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -87,6 +87,7 @@ private:
     bool m_show_reactions;
 
     QList<DSBClone*> getAllClones();
+    QList<DSBClone*> getLooseClones();
 
 };
 

@@ -39,7 +39,7 @@ class DSBReaction;
 class DSBBranch;
 class ShapeObj;
 
-class DSBClone : public DSBRecLayout, public DSBNode
+class DSBClone : public DSBNode, public DSBRecLayout
 {
 
 public:

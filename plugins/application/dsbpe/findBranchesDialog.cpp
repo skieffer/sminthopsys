@@ -153,7 +153,8 @@ void FindBranchesDialog::findBranches()
         bool forward = (whichEnd == 0);
 
         // Ask the compartment to switch to a "longest branch layout", and redraw.
-        comp->longestBranchLayout(m_endpointClone, forward);
+        comp->findBranches(m_endpointClone, forward);
+        comp->layout();
         comp->redraw();
     }
     // random testing:
