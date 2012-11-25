@@ -189,11 +189,16 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 dsbreac->setCompartment(comp);
             }
 
-            // Do simple, square layout of each compartment, and
-            // lay them out side by side.
+            // Set all trivial clonings.
+            QList<DSBCompartment*> comps = compMap.values();
+            for (int i = 0; i < comps.size(); i++)
+            {
+                DSBCompartment *comp = comps.at(i);
+                comp->setTrivialCloning();
+            }
+            // Put all compartments in a single container.
             DSBCompartment *comp = new DSBCompartment(QString("_root"));
             comp->addCompartments(compMap.values());
-            comp->setTrivialCloning();
             comp->layout();
             comp->setRelPt(QPointF(0,0));
             comp->draw();

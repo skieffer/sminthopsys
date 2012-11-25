@@ -30,6 +30,8 @@
 
 #include "dsbreclayout.h"
 
+class QRectF;
+
 namespace dunnart {
 
 class DSBBranch;
@@ -47,6 +49,7 @@ public:
     DSBFork *getFork(DSBClone *cl);
     DSBBranch *getBranch(DSBNode *node);
     void setCanvas(Canvas *canvas);
+    QRectF getBbox();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);

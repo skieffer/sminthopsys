@@ -23,6 +23,7 @@
 */
 
 #include <QtGui>
+#include <QRectF>
 
 #include <assert.h>
 
@@ -238,9 +239,28 @@ QSizeF DSBPathway::layout()
         DSBFork *fork = allForks.at(i);
         fork->layout();
     }
-    //...
-    m_size = QSizeF(10,10); // TODO
+    // Get size.
+    QRectF rect = getBbox();
+    m_size = rect.size();
     return m_size;
+}
+
+QRectF DSBPathway::getBbox()
+{
+    // layout methods of all branches should have been called first
+    QRectF rect = QRectF(0,0,0,0);
+    if (!m_branches.empty())
+    {
+        DSBBranch *b = m_branches.first();
+        rect = b->getBbox();
+        for (int i = 1; i < m_branches.size(); i++)
+        {
+            b = m_branches.at(i);
+            QRectF r = b->getBbox();
+            rect = rect.united(r);
+        }
+    }
+    return rect;
 }
 
 QSizeF DSBPathway::getSize()

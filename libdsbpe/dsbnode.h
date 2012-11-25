@@ -31,8 +31,11 @@
 
 #include "dsbreclayout.h"
 
+class QRectF;
+
 namespace dunnart {
 
+class DSBPathway;
 class DSBBranch;
 class DSBFork;
 class ShapeObj;
@@ -40,6 +43,7 @@ class ShapeObj;
 class DSBNode : public DSBRecLayout
 {
 public:
+    DSBNode() : m_branch(NULL), m_pathway(NULL) {}
     virtual QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist,
             bool forward, DSBNode *last = 0) = 0;
@@ -51,12 +55,15 @@ public:
 
     void setBranchHeadNumber(int n);
     virtual ShapeObj *getShape() = 0;
+    virtual QRectF getBbox() = 0;
+    void setBranch(DSBBranch *b);
+    DSBBranch *getBranch(void);
+    void setPathway(DSBPathway *pw);
+    DSBPathway *getPathway(void);
 #if 0
     void addBranch(DSBBranch *branch);
     void addFork(DSBFork *fork);
 #endif
-
-
 
     static bool s_followTransporters;
 
@@ -64,6 +71,9 @@ private:
     DSBBranch *findMergeTarget(
             QList<DSBBranch*> branches, QList<QString> blacklist);
     int m_branchHeadNumber;
+protected:
+    DSBBranch *m_branch;
+    DSBPathway *m_pathway;
 #if 0
     QList<DSBBranch*> m_branches;
     QList<DSBFork*> m_forks;

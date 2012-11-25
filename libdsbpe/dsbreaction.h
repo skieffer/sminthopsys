@@ -33,6 +33,7 @@
 #include "dsbreclayout.h"
 
 class Reaction;
+class QRectF;
 
 namespace dunnart {
 
@@ -77,6 +78,7 @@ public:
     void setMainOutput(DSBClone *mo);
     enum ReacSide {ABOVE, BELOW, LEFT, RIGHT};
     ShapeObj *getShape();
+    QRectF getBbox();
     void connectTo(DSBClone *cl);
 
 private:

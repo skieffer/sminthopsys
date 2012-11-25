@@ -107,6 +107,25 @@ QSizeF DSBBranch::layout()
     return m_size;
 }
 
+QRectF DSBBranch::getBbox()
+{
+    // layout should have already been called
+    QRectF rect = QRectF(0,0,0,0);
+    QList<DSBNode*> own = getOwnNodes();
+    if (!own.empty())
+    {
+        DSBNode *n = own.first();
+        rect = n->getBbox();
+        for (int i = 1; i < own.size(); i++)
+        {
+            n = own.at(i);
+            QRectF r = n->getBbox();
+            rect = rect.united(r);
+        }
+    }
+    return rect;
+}
+
 void DSBBranch::setMainConnections(QList<DSBNode*> own)
 {
     for (int i = 0; i < own.size(); i++)
@@ -166,6 +185,11 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
 void DSBBranch::setPathway(DSBPathway *pw)
 {
     m_pathway = pw;
+    for (int i = 0; i < nodes.size(); i++)
+    {
+        DSBNode *n = nodes.at(i);
+        n->setPathway(pw);
+    }
 }
 
 void DSBBranch::setCanvas(Canvas *canvas)
