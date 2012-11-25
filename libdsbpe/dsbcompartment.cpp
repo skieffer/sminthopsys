@@ -39,6 +39,11 @@
 
 #include "libdunnartcanvas/canvas.h"
 
+//debugging:
+#include "libdunnartcanvas/graphlayout.h"
+#include "libdunnartcanvas/graphdata.h"
+//
+
 namespace dunnart {
 
 DSBCompartment::DSBCompartment(QString compartmentName)
@@ -335,6 +340,18 @@ void DSBCompartment::redisplay()
     {
         layout();
         redraw();
+        //debugging:
+        /*
+        qDebug() << "Flag1";
+        qDebug() << "canvas is at: " << m_canvas;
+        GraphLayout *gl = m_canvas->getGraphLayout();
+        GraphData *gd = gl->getGraphData();
+        qDebug() << "Graph Data =================================";
+        qDebug() << "  Node count: " << gd->getNodeCount();
+        qDebug() << "  Edge count: " << gd->getEdgeCount();
+        qDebug() << "  Constraint count: " << gd->ccs.size();
+        */
+        //
     }
 }
 

@@ -155,6 +155,7 @@ class Canvas : public QGraphicsScene
         // FIXME
         // for debugging; delete when done
         QString getClipboard();
+        GraphLayout *getGraphLayout();
         //
 
         bool loadGmlDiagram(const QFileInfo& fileInfo);

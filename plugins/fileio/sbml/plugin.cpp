@@ -198,6 +198,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             }
             // Put all compartments in a single container.
             DSBCompartment *comp = new DSBCompartment(QString("_root"));
+            comp->setCanvas(canvas);
             comp->addCompartments(compMap.values());
             comp->layout();
             comp->setRelPt(QPointF(0,0));
