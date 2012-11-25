@@ -30,6 +30,8 @@
 
 #include "dsbreclayout.h"
 
+class QRectF;
+
 namespace dunnart {
 
 class DSBNode;
@@ -46,13 +48,14 @@ public:
     QList<DSBNode*> nodes;
     DSBNode *parent;
     // Constructor
-    DSBBranch() : cycle(false), parent(0) {}
+    DSBBranch() : cycle(false), parent(0), m_pathway(NULL) {}
     // Get and set
     DSBNode *getPredecessor(DSBNode *node);
     DSBNode *getSuccessor(DSBNode *node);
     void setPathway(DSBPathway *pw);
     DSBPathway *getPathway();
     void setCanvas(Canvas *canvas);
+    QRectF getBbox();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);

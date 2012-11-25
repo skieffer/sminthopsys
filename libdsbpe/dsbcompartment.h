@@ -66,6 +66,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void redisplay();
     // Misc get and set
     QString getName();
     void setParent(DSBCompartment *comp);

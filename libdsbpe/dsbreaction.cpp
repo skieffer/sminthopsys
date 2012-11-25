@@ -24,6 +24,7 @@
 
 #include <QtGui>
 #include <QSet>
+#include <QRect>
 
 #include "dsbreaction.h"
 #include "dsbspecies.h"
@@ -40,9 +41,10 @@
 
 namespace dunnart {
 
-DSBReaction::DSBReaction() {}
+DSBReaction::DSBReaction() : DSBNode() {}
 
 DSBReaction::DSBReaction(Reaction *reac) :
+    DSBNode(),
     m_sbmlReaction(reac)
 {
     m_name = QString(reac->getName().c_str());
@@ -308,6 +310,8 @@ void DSBReaction::buildOrbit()
 
 /* For every clone in src list which is not currently registered as a branch head,
    or as mainInput or mainOutput, append it to the dst list.
+   Also, mark all clones appended to the dst list as belonging to the
+   same pathway as this reaction.
   */
 void DSBReaction::takeNonBranchHeads(QList<DSBClone *> &src, QList<DSBClone *> &dst)
 {
@@ -318,6 +322,7 @@ void DSBReaction::takeNonBranchHeads(QList<DSBClone *> &src, QList<DSBClone *> &
             m_mainInput != cl && m_mainOutput != cl)
         {
             dst.append(cl);
+            cl->setPathway(m_pathway);
         }
     }
 }
@@ -430,6 +435,24 @@ QSizeF DSBReaction::layout()
     if (numBelow > 2) { height += 10; }
     m_size = QSizeF(216,height);
     return m_size;
+}
+
+QRectF DSBReaction::getBbox()
+{
+    // layout should have already been called, and relpt set
+    QPointF centre = m_relpt;
+    QSizeF minsize = QSizeF(16,50);
+    QPointF ulc = QPointF( centre.x()-minsize.width()/2,
+                           centre.y()-minsize.height()/2);
+    QRectF rect = QRectF(ulc,minsize);
+    QList<DSBClone*> allSats = getAllSatellites();
+    for (int i = 0; i < allSats.size(); i++)
+    {
+        DSBClone *cl = allSats.at(i);
+        QRectF clRect = cl->getBbox();
+        rect = rect.united(clRect);
+    }
+    return rect;
 }
 
 QSizeF DSBReaction::getSize()

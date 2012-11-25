@@ -41,6 +41,26 @@ void DSBNode::setBranchHeadNumber(int n)
     m_branchHeadNumber = n;
 }
 
+void DSBNode::setBranch(DSBBranch *b)
+{
+    m_branch = b;
+}
+
+DSBBranch *DSBNode::getBranch()
+{
+    return m_branch;
+}
+
+void DSBNode::setPathway(DSBPathway *pw)
+{
+    m_pathway = pw;
+}
+
+DSBPathway *DSBNode::getPathway()
+{
+    return m_pathway;
+}
+
 #if 0
 void DSBNode::addBranch(DSBBranch *branch)
 {

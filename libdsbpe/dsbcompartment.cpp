@@ -128,7 +128,21 @@ QSizeF DSBCompartment::getSize()
  */
 QList<DSBClone*> DSBCompartment::getLooseClones()
 {
-    // TODO
+    QList<DSBClone*> all = getAllClones();
+    qDebug() << "number of all clones: " << all.size();
+    QList<DSBClone*> loose;
+    for (int i = 0; i < all.size(); i++)
+    {
+        DSBClone *cl = all.at(i);
+        qDebug() << "considering clone of: " << cl->getSpecies()->getName();
+        DSBPathway *pw = cl->getPathway();
+        qDebug() << "pathway of clone: " << pw;
+        if (!pw)
+        {
+            loose.append(cl);
+        }
+    }
+    return loose;
 }
 
 QSizeF DSBCompartment::rowLayout()
@@ -148,13 +162,6 @@ QSizeF DSBCompartment::rowLayout()
         maxHeight = (h > maxHeight? h : maxHeight);
     }
 
-    // Loose clones
-    QList<DSBClone*> loose = getLooseClones();
-    QSizeF size = layoutSquareCloneArray(loose, x, 0);
-    x += size.width() + pad;
-    int h = size.height();
-    maxHeight = (h > maxHeight? h : maxHeight);
-
     // Pathways
     for (int i = 0; i < m_pathways.size(); i++)
     {
@@ -165,6 +172,13 @@ QSizeF DSBCompartment::rowLayout()
         int h = size.height();
         maxHeight = (h > maxHeight? h : maxHeight);
     }
+
+    // Loose clones
+    QList<DSBClone*> loose = getLooseClones();
+    QSizeF size = layoutSquareCloneArray(loose, x, 0);
+    x += size.width() + pad;
+    int h = size.height();
+    maxHeight = (h > maxHeight? h : maxHeight);
 
     int width = (pad <= x ? x-pad : x);
     m_size = QSizeF(width,maxHeight);
@@ -187,12 +201,10 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
     // For now we simply assume they are the default size
     // of 70x50.
     int numClones = clones.size();
-    // If there are no clones, then it is an empty compartment.
-    // We return a default "small" size.
+    // If there are no clones, then there is nothing to do.
     if (numClones == 0)
     {
-        m_size = QSizeF(100,100);
-        return m_size;
+        return QSizeF(0,0);
     }
     // Call the clones' layout methods, even though for now
     // we are not using the sizes that they return. This serves
@@ -204,7 +216,7 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
     }
 
     int cols = ceil(sqrt(numClones)); // number of columns in array
-    int rows = ceil(numClones/cols);
+    int rows = ceil(numClones/cols); // number of rows
     int u = 50; // unit of separation
     int sepUnits = 2; // separation between adjacent nodes, in units u
     int x0 = ulx, y0 = uly, x, y, col, row;
@@ -214,13 +226,13 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
         row = i/cols;
         x = x0 + col*sepUnits*u;
         y = y0 + row*sepUnits*u;
+        qDebug() << "for clone of " << clones.at(i)->getSpecies()->getName();
+        qDebug() << "setting rel pt " << x << ", " << y;
         clones.at(i)->setRelPt(QPointF(x,y));
     }
     int width = cols*sepUnits*u + 70;
     int height = rows*sepUnits*u + 50;
-    // Set reactions to be undisplayed.
-    m_size = QSizeF(width,height);
-    return m_size;
+    return QSizeF(width,height);
 }
 
 QSizeF DSBCompartment::findBranches(DSBClone *endpt, bool forward)
@@ -231,8 +243,8 @@ QSizeF DSBCompartment::findBranches(DSBClone *endpt, bool forward)
 QSizeF DSBCompartment::findBranches(
         DSBClone *endpt, bool forward, QList<QString> blacklist)
 {
-    // Set discrete clonings for all blacklisted species.
-    // The exception is that if the selected endpoint clone is of a
+    // Set discrete clonings for all blacklisted species, with
+    // the exception that if the selected endpoint clone is of a
     // blacklisted species, then we do not change its cloning.
     QString endptSpecName = endpt->getSpecies()->getName();
     for (int i = 0; i < m_species.size(); i++)
@@ -275,6 +287,7 @@ void DSBCompartment::redraw()
 
 void DSBCompartment::drawAt(QPointF r)
 {
+    qDebug() << "drawing compartment " << m_compartmentName;
     m_basept = r;
     // Compartment boundary
     //   (TODO)
@@ -288,23 +301,40 @@ void DSBCompartment::drawAt(QPointF r)
     // Sub-compartments:
     for (int i = 0; i < m_compartments.size(); i++)
     {
+        qDebug() << "drawing sub-compartment";
         DSBCompartment *comp = m_compartments.at(i);
         comp->drawRelTo(m_basept);
-    }
-
-    // Loose clones:
-    QList<DSBClone*> clones = getLooseClones();
-    for (int i = 0; i < clones.size(); i++)
-    {
-        DSBClone *cl = clones.at(i);
-        cl->drawRelTo(m_basept);
     }
 
     // Pathways:
     for (int i = 0; i < m_pathways.size(); i++)
     {
+        qDebug() << "drawing pathway";
         DSBPathway *pw = m_pathways.at(i);
         pw->drawRelTo(m_basept);
+    }
+
+    // Loose clones:
+    QList<DSBClone*> clones = getLooseClones();
+    qDebug() << "number of loose clones: " << clones.size();
+    for (int i = 0; i < clones.size(); i++)
+    {
+        qDebug() << "drawing loose clone";
+        DSBClone *cl = clones.at(i);
+        cl->drawRelTo(m_basept);
+    }
+}
+
+void DSBCompartment::redisplay()
+{
+    if (m_parentCompartment)
+    {
+        m_parentCompartment->redisplay();
+    }
+    else
+    {
+        layout();
+        redraw();
     }
 }
 

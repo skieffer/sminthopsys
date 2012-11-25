@@ -24,6 +24,7 @@
 
 #include <QtGui>
 #include <QSet>
+#include <QRectF>
 
 #include "dsbclone.h"
 #include "dsbspecies.h"
@@ -37,6 +38,7 @@
 namespace dunnart {
 
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
+    DSBNode(),
     m_dsbspec(dsbspec),
     m_epn(NULL)
 {}
@@ -162,7 +164,7 @@ void DSBClone::drawAt(QPointF r)
         QString type("org.sbgn.pd.00UnspecifiedEPN");
         ShapeObj *shape = factory->createShape(type);
         m_epn = dynamic_cast<PDEPN*>  (shape);
-        // Give the epn a pointer to the species it represents.
+        // Give the epn a pointer to the clone it represents.
         m_epn->setClone(this);
     }
     qDebug() << "after m_epn initialization";
@@ -180,7 +182,21 @@ void DSBClone::drawAt(QPointF r)
     {
         QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_dsbspec->canvas(), m_epn);
         m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
+    } else {
+        // Otherwise, recompute the layout, in case size or position
+        // have changed.
+        m_dsbspec->canvas()->interrupt_graph_layout();
     }
+}
+
+QRectF DSBClone::getBbox()
+{
+    // layout should have already been called, and relpt set
+    QPointF centre = m_relpt;
+    QSizeF size = m_size;
+    QPointF ulc = QPointF( centre.x()-size.width()/2,
+                           centre.y()-size.height()/2);
+    return QRectF(ulc,size);
 }
 
 ShapeObj *DSBClone::getShape()

@@ -31,6 +31,8 @@
 #include "dsbreclayout.h"
 #include "dsbnode.h"
 
+class QRectF;
+
 namespace dunnart {
 
 class PDEPN;
@@ -65,6 +67,7 @@ public:
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
     friend class DSBFork;
     ShapeObj *getShape();
+    QRectF getBbox();
 
 private:
     QString m_cloneId;

@@ -154,8 +154,9 @@ void FindBranchesDialog::findBranches()
 
         // Ask the compartment to switch to a "longest branch layout", and redraw.
         comp->findBranches(m_endpointClone, forward);
-        comp->layout();
-        comp->redraw();
+        //comp->layout();
+        //comp->redraw();
+        comp->redisplay();
     }
     // random testing:
     //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
