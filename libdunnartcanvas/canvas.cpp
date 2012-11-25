@@ -286,6 +286,11 @@ Canvas::~Canvas()
     }
 }
 
+// For debugging; delete when finished.
+GraphLayout *Canvas::getGraphLayout()
+{
+    return m_graphlayout;
+}
 
 bool Canvas::loadGmlDiagram(const QFileInfo& fileInfo)
 {
