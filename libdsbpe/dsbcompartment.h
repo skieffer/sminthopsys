@@ -53,8 +53,8 @@ public:
     void addReaction(DSBReaction *reac);
     void addCompartment(DSBCompartment *comp);
     void addCompartments(QList<DSBCompartment*> comps);
-    QSizeF findBranches(DSBClone *endpt, bool forward);
-    QSizeF findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
+    void findBranches(DSBClone *endpt, bool forward);
+    void findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
     void setTrivialCloning();
     // Various layout methods
     QSizeF rowLayout();

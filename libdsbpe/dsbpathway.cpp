@@ -51,27 +51,6 @@ DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches)
         else { otherBranches.append(b); }
     }
     assert(mainBranch!=0);
-    /*
-    qDebug() << "\nMain branch: " << mainBranch->toString();
-    qDebug() << "\nOther branches: ";
-    for (int i = 0; i < otherBranches.size(); i++) {
-        qDebug() << otherBranches.at(i)->toString();
-    }
-    */
-
-    /*
-    // Count branch points in otherBranches.
-    QMap<DSBNode*, DSBBranch*> bpCounts = countBranchPoints(otherBranches);
-    // Get list of nodes that occur as branch points.
-    QList<DSBNode*> branchPts = bpCounts.uniqueKeys();
-    // Tell them their "branch head number", i.e. the number of branches
-    // of which they are the head node.
-    for (int i = 0; i < branchPts.size(); i++)
-    {
-        DSBNode *n = branchPts.at(i);
-        n->setBranchHeadNumber( bpCounts.count(n) );
-    }
-    */
 
     setFirstBranch(mainBranch);
 

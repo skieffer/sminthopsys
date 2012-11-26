@@ -151,14 +151,11 @@ void DSBClone::redraw()
 
 void DSBClone::drawAt(QPointF r)
 {
-    static int n = 0;
-    qDebug() << "clone drawing " << ++n;
     m_basept = r;
     // Create shape if don't already have one.
     bool addToCanvas = false;
     if (!m_epn)
     {
-        qDebug() << "m_epn was not already initialized";
         addToCanvas = true;
         PluginShapeFactory *factory = sharedPluginShapeFactory();
         QString type("org.sbgn.pd.00UnspecifiedEPN");
@@ -167,7 +164,6 @@ void DSBClone::drawAt(QPointF r)
         // Give the epn a pointer to the clone it represents.
         m_epn->setClone(this);
     }
-    qDebug() << "after m_epn initialization";
     // Set its properties.
     // Clone marker state
     m_epn->set_is_cloned(m_is_cloned);
@@ -209,7 +205,6 @@ ShapeObj *DSBClone::getShape()
   */
 QList<DSBReaction*> DSBClone::computeEnterableReactions()
 {
-    qDebug() << "Clone enterableReactions FLAG0";
     QSet<DSBReaction*> enterable;
     // Get reactions entered.
     for (int i = 0; i < m_reactionsEntered.size(); i++)
@@ -252,7 +247,6 @@ QList<DSBReaction*> DSBClone::computeExitableReactions()
 QList<DSBBranch*> DSBClone::findBranchesRec(
         QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last)
 {
-    qDebug() << "Clone findBranchesRec FLAG0";
     seen.append(m_cloneId); // Mark self as seen.
 
     QList<DSBBranch*> branches; // Prepare return value.
@@ -260,7 +254,6 @@ QList<DSBBranch*> DSBClone::findBranchesRec(
     // Now consider all usable reactions.
     QList<DSBReaction*> usable =
             forward ? computeEnterableReactions() : computeExitableReactions();
-    qDebug() << "Clone findBranchesRec FLAG1";
     for (int i = 0; i < usable.size(); i++)
     {
         DSBReaction *reac = usable.at(i);
@@ -272,11 +265,9 @@ QList<DSBBranch*> DSBClone::findBranchesRec(
         if (!DSBNode::s_followTransporters && reac->isIntercompartmental()) {
             continue;
         }
-        qDebug() << "Clone findBranchesRec FLAG2";
 
         // Consider whether this reaction has already been seen or not.
         QString rid = reac->getReactionId();
-        qDebug() << "Clone findBranchesRec FLAG3";
         if (seen.contains(rid))
         {
             // Reaction has already been seen, so we have found a cycle.
