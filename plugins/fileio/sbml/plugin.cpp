@@ -95,6 +95,9 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
         bool saveDiagramToFile(Canvas *canvas, const QFileInfo& fileInfo,
                 QString& errorMessage)
         {
+            Q_UNUSED(canvas);
+            Q_UNUSED(fileInfo);
+            Q_UNUSED(errorMessage);
             // TODO
             return false;
         }

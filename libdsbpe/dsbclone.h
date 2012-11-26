@@ -41,7 +41,7 @@ class DSBReaction;
 class DSBBranch;
 class ShapeObj;
 
-class DSBClone : public DSBNode, public DSBRecLayout
+class DSBClone : public DSBNode
 {
 
 public:

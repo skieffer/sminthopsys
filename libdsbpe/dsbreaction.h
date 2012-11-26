@@ -45,7 +45,7 @@ class DSBClone;
 class DSBBranch;
 class Connector;
 
-class DSBReaction : public DSBNode, public DSBRecLayout
+class DSBReaction : public DSBNode
 {
 
 public:
