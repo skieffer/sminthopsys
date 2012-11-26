@@ -123,6 +123,7 @@ void DSBSpecies::deleteClonesAndAssignments()
     {
         m_clones.at(i)->deleteShape();
     }
+    qDebug() << "species " << m_name << " finished deleting clone shapes";
 
     // Clear the clone assignment map, and delete the DSBCloneAssignment
     // structs themselves.
@@ -134,12 +135,14 @@ void DSBSpecies::deleteClonesAndAssignments()
         m_cloneAssignmentsByReactionId.remove(id);
         delete ca;
     }
+    qDebug() << "next loop completed";
     // Clear the list of clones, and delete the DSBClone objects themselves.
     while (!m_clones.isEmpty())
     {
         DSBClone *cl = m_clones.takeFirst(); // removes it from the list
         delete cl;
     }
+    qDebug() << "next loop completed";
     // Reset nextCloneId to 0.
     m_nextCloneId = 0;
 }

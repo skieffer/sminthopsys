@@ -252,6 +252,7 @@ QSizeF DSBCompartment::findBranches(
     // the exception that if the selected endpoint clone is of a
     // blacklisted species, then we do not change its cloning.
     QString endptSpecName = endpt->getSpecies()->getName();
+    m_canvas->stop_graph_layout();
     for (int i = 0; i < m_species.size(); i++)
     {
         DSBSpecies *spec = m_species.at(i);
@@ -261,6 +262,8 @@ QSizeF DSBCompartment::findBranches(
             spec->setDiscreteCloning();
         }
     }
+    qDebug() << "finished setting discrete clonings";
+    m_canvas->restart_graph_layout();
 
     // Find branches.
     bool extended = true; // Throw away branches of length 1.
@@ -269,9 +272,12 @@ QSizeF DSBCompartment::findBranches(
         qDebug() << branches.at(i)->toString();
     }
     // Build pathway.
-    DSBPathway *pathway = new DSBPathway(endpt, branches);
-    pathway->setCanvas(m_canvas);
-    m_pathways.append(pathway);
+    if (branches.size()>0)
+    {
+        DSBPathway *pathway = new DSBPathway(endpt, branches);
+        pathway->setCanvas(m_canvas);
+        m_pathways.append(pathway);
+    }
 }
 
 void DSBCompartment::setRelPt(QPointF p)

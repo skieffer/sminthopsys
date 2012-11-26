@@ -1686,6 +1686,7 @@ void Canvas::deleteSelection(void)
 {
     QList<CanvasItem *> sel_copy = this->selectedItems();
     deleteItems(sel_copy);
+    restart_graph_layout();
 }
 
 void Canvas::deleteItem(CanvasItem *item)
@@ -1743,6 +1744,8 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
 
     this->deselectAll();
 
+    qDebug() << "Deleting: FLAG1";
+
     // Do distro's first, in case they have guidelines and distros selected.
     for (QList<CanvasItem *>::iterator sh = items.begin();
             sh != items.end(); ++sh)
@@ -1756,6 +1759,9 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
             (*sh)->deactivateAll(selSet);
         }
     }
+
+    qDebug() << "Deleting: FLAG2";
+
     for (QList<CanvasItem *>::iterator sh = items.begin();
             sh != items.end(); ++sh)
     {
@@ -1772,6 +1778,8 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
             sel_shapes.push_back(shape); 
         }
     }
+
+    qDebug() << "Deleting: FLAG3";
     
     // Remove containment relationships.
     QList<CanvasItem *> canvas_items = this->items();
@@ -1784,6 +1792,8 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
         }
     }
 
+    qDebug() << "Deleting: FLAG4";
+
     for (QList<CanvasItem *>::iterator sh = items.begin();
             sh != items.end(); ++sh)
     {
@@ -1791,7 +1801,10 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
         QUndoCommand *cmd = new CmdCanvasSceneRemoveItem(this, *sh);
         undoMacro->addCommand(cmd);
     }
-    restart_graph_layout();
+
+    qDebug() << "Deleting: FLAG5";
+
+    //restart_graph_layout();
 }
 
 // Delay, in milliseconds, to give the event loop time to respond to normal
