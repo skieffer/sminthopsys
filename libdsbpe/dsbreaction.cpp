@@ -41,11 +41,24 @@
 
 namespace dunnart {
 
-DSBReaction::DSBReaction() : DSBNode() {}
+DSBReaction::DSBReaction() :
+    DSBNode(),
+    m_sbmlReaction(NULL),
+    m_canvas(NULL),
+    m_compartment(NULL),
+    m_mainInput(NULL),
+    m_mainOutput(NULL),
+    m_shape(NULL)
+{}
 
 DSBReaction::DSBReaction(Reaction *reac) :
     DSBNode(),
-    m_sbmlReaction(reac)
+    m_sbmlReaction(reac),
+    m_canvas(NULL),
+    m_compartment(NULL),
+    m_mainInput(NULL),
+    m_mainOutput(NULL),
+    m_shape(NULL)
 {
     m_name = QString(reac->getName().c_str());
     m_id = QString(reac->getId().c_str());
@@ -481,14 +494,17 @@ void DSBReaction::drawAt(QPointF r)
     m_basept = r;
 
     // Draw process node.
-    PluginShapeFactory *factory = sharedPluginShapeFactory();
-    QString type("org.sbgn.pd.ProcessNodeVertical");
-    ShapeObj *procNode = factory->createShape(type);
-    m_shape = procNode;
-    procNode->setCentrePos(m_basept);
-    // Add it to the canvas.
-    QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, procNode);
-    m_canvas->currentUndoMacro()->addCommand(cmd);
+    if (!m_shape)
+    {
+        PluginShapeFactory *factory = sharedPluginShapeFactory();
+        QString type("org.sbgn.pd.ProcessNodeVertical");
+        ShapeObj *procNode = factory->createShape(type);
+        m_shape = procNode;
+        procNode->setCentrePos(m_basept);
+        // Add it to the canvas.
+        QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, procNode);
+        m_canvas->currentUndoMacro()->addCommand(cmd);
+    }
 
     // Draw all satellites.
     QList<DSBClone*> allSats = getAllSatellites();
@@ -509,6 +525,9 @@ void DSBReaction::drawAt(QPointF r)
 
 void DSBReaction::connectTo(DSBClone *cl)
 {
+    // Do we already have a connection to this clone?
+    if (m_connectors.contains(cl)) { return; }
+    // If not, then create one.
     Connector *conn = new Connector();
     conn->initWithConnection(m_shape,cl->getShape());
     if (cl==m_mainInput || m_inputBranchHeads.contains(cl)
@@ -523,6 +542,7 @@ void DSBReaction::connectTo(DSBClone *cl)
     {
         conn->setDirected(true);
     }
+    m_connectors.insert(cl,conn);
     QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, conn);
     m_canvas->currentUndoMacro()->addCommand(cmd);
 }

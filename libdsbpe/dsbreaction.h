@@ -43,6 +43,7 @@ class DSBSpecies;
 class DSBCompartment;
 class DSBClone;
 class DSBBranch;
+class Connector;
 
 class DSBReaction : public DSBNode, public DSBRecLayout
 {
@@ -108,6 +109,8 @@ private:
     QList<DSBClone*> getOpposedClones(DSBClone* clone);
     QList<DSBClone*> getInputClones();
     QList<DSBClone*> getOutputClones();
+
+    QMap<DSBClone*,Connector*> m_connectors;
 
     ShapeObj *m_shape;
     void buildOrbit();
