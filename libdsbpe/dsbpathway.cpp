@@ -72,6 +72,11 @@ DSBBranch *DSBPathway::getBranch(DSBNode *node)
     return m_branchMembership.value(node, NULL);
 }
 
+QList<DSBBranch*> DSBPathway::getBranches()
+{
+    return m_branches;
+}
+
 void DSBPathway::setCanvas(Canvas *canvas)
 {
     m_canvas = canvas;
@@ -269,7 +274,7 @@ void DSBPathway::drawAt(QPointF r)
     for (int i = 0; i < m_branches.size(); i++)
     {
         DSBBranch *b = m_branches.at(i);
-        b->drawRelTo(r);
+        b->drawRelTo(m_basept);
     }
     // After all branches have been drawn, can ask them to
     // draw their connectors, and add guidelines.

@@ -200,6 +200,11 @@ ShapeObj *DSBClone::getShape()
     return m_epn;
 }
 
+QPointF DSBClone::getBasePt()
+{
+    return m_basept;
+}
+
 /* Both reactions entered, and reversible reactions exited, are
   enterable. Compute list of all those.
   */

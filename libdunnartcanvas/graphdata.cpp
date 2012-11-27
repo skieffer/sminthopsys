@@ -971,9 +971,11 @@ size_t GraphData::shapeToNode(ShapeObj* shape) {
     }
     Rectangle *r = new Rectangle(rect.left(), rect.right(),
             rect.top(), rect.bottom(), allowOverlap);
+    /*
     qWarning("Node id=%d, (x,y)=(%f,%f), (w,h)=%f,%f",
             shape->internalId(),r->getCentreX(), r->getCentreY(),
             r->width(), r->height());
+    */
 
     rs.push_back(r);
 

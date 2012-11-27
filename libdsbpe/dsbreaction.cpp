@@ -473,6 +473,11 @@ QSizeF DSBReaction::getSize()
     return m_size;
 }
 
+QPointF DSBReaction::getBasePt()
+{
+    return m_basept;
+}
+
 void DSBReaction::setRelPt(QPointF p)
 {
     m_relpt = p;

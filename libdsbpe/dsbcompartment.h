@@ -72,6 +72,8 @@ public:
     void setParent(DSBCompartment *comp);
     void setCanvas(Canvas *canvas);
 
+    void dumpPathwayNodePositions();
+
     QList<QString> m_default_blacklist;
 
 private:

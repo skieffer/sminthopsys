@@ -42,6 +42,7 @@
 //debugging:
 #include "libdunnartcanvas/graphlayout.h"
 #include "libdunnartcanvas/graphdata.h"
+#include "plugins/shapes/sbgn/pdepn.h"
 //
 
 namespace dunnart {
@@ -323,6 +324,10 @@ void DSBCompartment::drawAt(QPointF r)
         DSBClone *cl = clones.at(i);
         cl->drawRelTo(m_basept);
     }
+
+    //debug:
+    dumpPathwayNodePositions();
+    //
 }
 
 void DSBCompartment::redisplay()
@@ -335,6 +340,7 @@ void DSBCompartment::redisplay()
     {
         layout();
         redraw();
+        qDebug() << "breakpoint";
         //debugging:
         /*
         qDebug() << "Flag1";
@@ -347,6 +353,40 @@ void DSBCompartment::redisplay()
         qDebug() << "  Constraint count: " << gd->ccs.size();
         */
         //
+    }
+}
+
+/* For debugging purposes only.
+  */
+void DSBCompartment::dumpPathwayNodePositions()
+{
+    foreach(DSBPathway *pw, m_pathways)
+    {
+        foreach(DSBBranch *br, pw->getBranches())
+        {
+            foreach(DSBNode *nd, br->nodes)
+            {
+                ShapeObj *shape = nd->getShape();
+                DSBClone *cl = dynamic_cast<DSBClone*>(nd);
+                DSBReaction *re = dynamic_cast<DSBReaction*>(nd);
+                if (cl)
+                {
+                    if (shape) {
+                        qDebug() << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
+                    } else {
+                        qDebug() << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
+                    }
+                }
+                else if (re)
+                {
+                    if (shape) {
+                        qDebug() << re->getName() << " " << re->getBasePt() << " " << shape->pos();
+                    } else {
+                        qDebug() << re->getName() << " " << re->getBasePt() << " no shape";
+                    }
+                }
+            }
+        }
     }
 }
 
