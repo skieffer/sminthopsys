@@ -48,6 +48,7 @@ public:
     // Get and set
     DSBFork *getFork(DSBClone *cl);
     DSBBranch *getBranch(DSBNode *node);
+    QList<DSBBranch*> getBranches();
     void setCanvas(Canvas *canvas);
     QRectF getBbox();
     // RecLayout methods

@@ -63,6 +63,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    QPointF getBasePt();
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
     friend class DSBFork;

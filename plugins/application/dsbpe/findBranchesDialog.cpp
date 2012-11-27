@@ -96,7 +96,12 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
 }
 
 void FindBranchesDialog::test(){
-    m_canvas->deleteSelection();
+    if (m_endpointClone)
+    {
+        DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
+        comp->dumpPathwayNodePositions();
+    }
+    m_canvas->restart_graph_layout();
 }
 
 /* Respond to a change in the canvas selection.

@@ -245,6 +245,13 @@ void DSBBranch::setGuideline()
         shapes.append(shape);
     }
     m_guideline = createAlignment(ALIGN_CENTER, shapes);
+    // Make sure position is set correctly.
+    DSBNode *first = own.first();
+    QPointF pt = first->getBasePt();
+    double x0 = (double) pt.x();
+    m_guideline->setPosition(x0);
+    // Finally, reinitialize the GraphData object, so that the layout thread knows this
+    // guideline is there.
     m_canvas->interrupt_graph_layout();
 }
 
@@ -291,8 +298,8 @@ void DSBBranch::connect(DSBNode *node1, DSBNode *node2)
 {
     DSBReaction *reac1 = dynamic_cast<DSBReaction*>(node1);
     DSBReaction *reac2 = dynamic_cast<DSBReaction*>(node2);
-    DSBReaction *reac = 0;
-    DSBClone *cl = 0;
+    DSBReaction *reac = NULL;
+    DSBClone *cl = NULL;
     if (reac1)
     {
         reac = reac1;

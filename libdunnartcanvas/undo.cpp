@@ -142,7 +142,6 @@ void CmdCanvasSceneRemoveItem::undo()
 
 void CmdCanvasSceneRemoveItem::redo()
 {
-    qDebug() << "removing (undo command) item: " << m_item;
     m_canvas->removeItem(m_item);
     m_item_memory_owned_by_canvas = false;
 }
