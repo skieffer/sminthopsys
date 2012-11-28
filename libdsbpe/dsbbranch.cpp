@@ -154,7 +154,7 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
         }
         else if (cl)
         {
-            DSBFork *fork = m_pathway->getFork(cl);
+            DSBFork *fork = cl->getFork();
             if (fork)
             {
                 // predecessor

@@ -73,7 +73,7 @@ QSizeF DSBFork::layout()
     // We assume our centre clone has already been given a relpt within its branch,
     // and that its branch has as well.
     QPointF crel = m_centre->m_relpt;
-    DSBBranch *b = m_pathway->getBranch(m_centre);
+    DSBBranch *b = m_centre->getBranch();
     QPointF brel = b->m_relpt;
     QPointF frel = brel + crel; // relpt of this fork within pathway,
                                 // where basept of fork is centre of centre clone
@@ -87,7 +87,7 @@ QSizeF DSBFork::layout()
         if (reac == m_mainOutput) { continue; }
         // FIXME: should this cast be necessary?
         //DSBNode *n = dynamic_cast<DSBNode*>(reac);
-        DSBBranch *b = m_pathway->getBranch(reac);
+        DSBBranch *b = reac->getBranch();
         b->setRelPt(QPointF(x,y));
         // Prepare next x value.
         if (disp<0) { disp *= -1; }
