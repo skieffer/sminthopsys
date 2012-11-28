@@ -64,16 +64,6 @@ DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches) :
 
 }
 
-DSBFork *DSBPathway::getFork(DSBClone *cl)
-{
-    return m_forkMembership.value(cl, NULL);
-}
-
-DSBBranch *DSBPathway::getBranch(DSBNode *node)
-{
-    return m_branchMembership.value(node, NULL);
-}
-
 QList<DSBBranch*> DSBPathway::getBranches()
 {
     return m_branches;
@@ -103,17 +93,9 @@ void DSBPathway::setFirstBranch(DSBBranch *branch)
 {
     m_branches.clear();
     m_allNodes.clear();
-    // FIXME: Do we need these maps?
-    // If each Node belongs to exactly one branch, and each Clone to at most
-    // one fork, then this is overkill.
-    m_branchMembership.clear();
-    m_forkMembership.clear();
-
     m_branches.append(branch);
     addBranchNodes(branch);
     branch->setPathway(this);
-    //branch->setCanvas(m_canvas);
-
     m_headNode = branch->nodes.first();
 }
 
@@ -123,8 +105,7 @@ void DSBPathway::addBranchNodes(DSBBranch *branch)
     {
         DSBNode *n = branch->nodes.at(i);
         m_allNodes.append(n);
-        // FIXME: Do not need insertMulti, if each Node belongs to exactly one branch.
-        m_branchMembership.insertMulti(n,branch);
+        n->setBranch(branch);
     }
 }
 
@@ -154,19 +135,15 @@ void DSBPathway::addBranch(DSBBranch *branch)
 
     // Otherwise parent is a clone.
     DSBClone *cl = dynamic_cast<DSBClone*>(parent);
-    //assert(cl);
+    assert(cl);
     // Get existing fork, or create one.
-    DSBFork *fork = 0;
-    if (m_forkMembership.contains(parent))
-    {
-        fork = m_forkMembership.value(parent);
-    }
-    else
+    DSBFork *fork = cl->getFork();
+    if (!fork)
     {
         fork = new DSBFork(cl);
         fork->setPathway(this);
         // Get branch with parent in it.
-        DSBBranch *main = m_branchMembership.value(cl);
+        DSBBranch *main = cl->getBranch();
         // Get predecessor and successor in branch, if any.
         DSBNode *n = main->getPredecessor(cl);
         if (n) {
@@ -179,7 +156,7 @@ void DSBPathway::addBranch(DSBBranch *branch)
             fork->addDownstream(reac);
         }
         // Register fork.
-        m_forkMembership.insert(cl,fork);
+        cl->setFork(fork);
     }
     // Add branch head as downstream member of fork.
     assert(fork);
@@ -225,14 +202,16 @@ QSizeF DSBPathway::layout()
         b->layout();
     }
     // Set relpt of main branch to (0,0).
-    DSBBranch *mainBranch = m_branchMembership.value(m_headNode);
+    DSBBranch *mainBranch = m_headNode->getBranch();
     mainBranch->setRelPt(QPointF(0,0));
     // Now layout all forks.
     // They will set the relpts of all remaining branches.
-    QList<DSBFork*> allForks = m_forkMembership.values();
-    for (int i = 0; i < allForks.size(); i++)
+    foreach (DSBNode *node, m_allNodes)
     {
-        DSBFork *fork = allForks.at(i);
+        DSBClone *cl = dynamic_cast<DSBClone*>(node);
+        if (!cl) { continue; }
+        DSBFork *fork = cl->getFork();
+        if (!fork) { continue; }
         fork->layout();
     }
     // Get size.

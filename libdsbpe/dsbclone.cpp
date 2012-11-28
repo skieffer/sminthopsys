@@ -40,7 +40,8 @@ namespace dunnart {
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
     DSBNode(),
     m_dsbspec(dsbspec),
-    m_epn(NULL)
+    m_epn(NULL),
+    m_fork(NULL)
 {}
 
 void DSBClone::setCloneNum(int num)
@@ -198,6 +199,16 @@ QRectF DSBClone::getBbox()
 ShapeObj *DSBClone::getShape()
 {
     return m_epn;
+}
+
+void DSBClone::setFork(DSBFork *fork)
+{
+    m_fork = fork;
+}
+
+DSBFork *DSBClone::getFork()
+{
+    return m_fork;
 }
 
 void DSBClone::moveShape(qreal dx, qreal dy)

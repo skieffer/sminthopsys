@@ -39,6 +39,7 @@ class PDEPN;
 class DSBSpecies;
 class DSBReaction;
 class DSBBranch;
+class DSBFork;
 class ShapeObj;
 
 class DSBClone : public DSBNode
@@ -70,6 +71,8 @@ public:
     ShapeObj *getShape();
     void moveShape(qreal dx, qreal dy);
     QRectF getBbox();
+    DSBFork *getFork();
+    void setFork(DSBFork *fork);
 
 private:
     QString m_cloneId;
@@ -78,6 +81,7 @@ private:
     QPointF m_basept;
     QSizeF m_size;
     PDEPN *m_epn;
+    DSBFork *m_fork;
     bool m_is_cloned;
     QList<DSBReaction *> m_reactionsEntered;
     QList<DSBReaction *> m_reactionsExited;

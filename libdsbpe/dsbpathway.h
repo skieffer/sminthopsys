@@ -46,8 +46,6 @@ public:
     // Constructors
     DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
     // Get and set
-    DSBFork *getFork(DSBClone *cl);
-    DSBBranch *getBranch(DSBNode *node);
     QList<DSBBranch*> getBranches();
     void setCanvas(Canvas *canvas);
     QRectF getBbox();
@@ -72,8 +70,6 @@ private:
     Canvas *m_canvas;
     QList<DSBBranch*> m_branches;
     QList<DSBNode*> m_allNodes;
-    QMap<DSBNode*, DSBBranch*> m_branchMembership;
-    QMap<DSBNode*, DSBFork*> m_forkMembership;
 
     void addBranchNodes(DSBBranch *branch);
 };
