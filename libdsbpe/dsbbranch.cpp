@@ -46,7 +46,7 @@ namespace dunnart {
 
 DSBNode *DSBBranch::getPredecessor(DSBNode *node)
 {
-    DSBNode *pred = 0;
+    DSBNode *pred = NULL;
     int i = nodes.indexOf(node);
     if (i>0)
     {
@@ -57,7 +57,7 @@ DSBNode *DSBBranch::getPredecessor(DSBNode *node)
 
 DSBNode *DSBBranch::getSuccessor(DSBNode *node)
 {
-    DSBNode *succ = 0;
+    DSBNode *succ = NULL;
     int i = nodes.indexOf(node);
     if (i>=0 && i+1 < nodes.size())
     {
@@ -140,17 +140,17 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
             if (n)
             {
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
+                assert(c);
                 reac->setMainInput(c);
             }
-            //else { reac->setMainInput(NULL); }
             // successor
             n = getSuccessor(reac);
             if (n)
             {
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
+                assert(c);
                 reac->setMainOutput(c);
             }
-            //else { reac->setMainOutput(NULL); }
         }
         else if (cl)
         {
@@ -162,22 +162,22 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
                 if (n)
                 {
                     DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    assert(r);
                     fork->setMainInput(r);
                 }
-                else { fork->setMainInput(NULL); }
                 // successor
                 n = getSuccessor(cl);
                 if (n)
                 {
                     DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    assert(r);
                     fork->setMainOutput(r);
                 }
-                else { fork->setMainOutput(NULL); }
             }
         }
         else
         {
-            // TODO: report error
+            qDebug() << "ERROR: Found Node which was neither Clone nor Reaction: " << n;
         }
     }
 }

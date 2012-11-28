@@ -101,11 +101,11 @@ void DSBPathway::setFirstBranch(DSBBranch *branch)
 
 void DSBPathway::addBranchNodes(DSBBranch *branch)
 {
-    for (int i = 0; i < branch->nodes.size(); i++)
+    QList<DSBNode*> nodes = branch->getOwnNodes();
+    foreach (DSBNode *node, nodes)
     {
-        DSBNode *n = branch->nodes.at(i);
-        m_allNodes.append(n);
-        n->setBranch(branch);
+        m_allNodes.append(node);
+        node->setBranch(branch);
     }
 }
 
@@ -115,12 +115,9 @@ void DSBPathway::addBranch(DSBBranch *branch)
     DSBNode *parent = branch->parent;
     if (!m_allNodes.contains(parent))
     {
-        // TODO: report error: could not find node in pathway
+        qDebug() << "ERROR: could not find node\n" << parent << "\nin pathway\n" << this;
         return;
     }
-    // No node should belong to more than one branch.
-    // Can we also be sure that every node belongs to at least one branch?
-    // For now we proceed as if we can.
 
     // If parent is a reaction, simply add the branch to it.
     DSBReaction *reac = dynamic_cast<DSBReaction*>(parent);
@@ -142,26 +139,28 @@ void DSBPathway::addBranch(DSBBranch *branch)
     {
         fork = new DSBFork(cl);
         fork->setPathway(this);
+        cl->setFork(fork);
         // Get branch with parent in it.
         DSBBranch *main = cl->getBranch();
-        // Get predecessor and successor in branch, if any.
+        // Get predecessor and successor of parent in its branch, if any,
+        // and set them as upstream resp. downstream reactions.
         DSBNode *n = main->getPredecessor(cl);
         if (n) {
             DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+            assert(reac);
             fork->addUpstream(reac);
         }
         n = main->getSuccessor(cl);
         if (n) {
             DSBReaction *reac = dynamic_cast<DSBReaction*>(n);
+            assert(reac);
             fork->addDownstream(reac);
         }
-        // Register fork.
-        cl->setFork(fork);
     }
     // Add branch head as downstream member of fork.
-    assert(fork);
     DSBNode *n = branch->nodes.first();
     DSBReaction *downstr = dynamic_cast<DSBReaction*>(n);
+    assert(downstr);
     fork->addDownstream(downstr);
     // And set main input to first reaction in branch.
     downstr->setMainInput(cl);
@@ -170,7 +169,6 @@ void DSBPathway::addBranch(DSBBranch *branch)
     m_branches.append(branch);
     addBranchNodes(branch);
     branch->setPathway(this);
-    //branch->setCanvas(m_canvas);
 }
 
 /* Let p1, p2, ..., pn be the parent nodes of the passed branches
