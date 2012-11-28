@@ -28,6 +28,7 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QObject>
 
 #include "dsbreclayout.h"
 
@@ -41,9 +42,8 @@ class DSBBranch;
 class DSBPathway;
 class Canvas;
 
-class DSBCompartment : public DSBRecLayout
+class DSBCompartment : public DSBRecLayout, public QObject
 {
-
 public:
     // Constructors
     //DSBCompartment();
@@ -76,6 +76,9 @@ public:
 
     QList<QString> m_default_blacklist;
 
+public slots:
+    void jogPathways();
+
 private:
     QString m_compartmentName;
     QPointF m_relpt;
@@ -91,6 +94,7 @@ private:
 
     QList<DSBClone*> getAllClones();
     QList<DSBClone*> getLooseClones();
+
 
 };
 

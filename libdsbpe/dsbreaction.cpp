@@ -557,6 +557,14 @@ ShapeObj *DSBReaction::getShape()
     return m_shape;
 }
 
+void DSBReaction::moveShape(qreal dx, qreal dy)
+{
+    if (m_shape)
+    {
+        m_shape->moveBy(dx,dy);
+    }
+}
+
 }
 
 

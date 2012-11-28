@@ -199,6 +199,8 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 DSBCompartment *comp = comps.at(i);
                 comp->setTrivialCloning();
             }
+            // Turn on automatic graph layout.
+            canvas->setOptAutomaticGraphLayout(true);
             // Put all compartments in a single container.
             DSBCompartment *comp = new DSBCompartment(QString("_root"));
             comp->setCanvas(canvas);
