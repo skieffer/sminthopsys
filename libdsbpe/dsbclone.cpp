@@ -200,6 +200,14 @@ ShapeObj *DSBClone::getShape()
     return m_epn;
 }
 
+void DSBClone::moveShape(qreal dx, qreal dy)
+{
+    if (m_epn)
+    {
+        m_epn->moveBy(dx,dy);
+    }
+}
+
 QPointF DSBClone::getBasePt()
 {
     return m_basept;

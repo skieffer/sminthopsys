@@ -79,6 +79,7 @@ public:
     void setMainOutput(DSBClone *mo);
     enum ReacSide {ABOVE, BELOW, LEFT, RIGHT};
     ShapeObj *getShape();
+    void moveShape(qreal dx, qreal dy);
     QPointF getBasePt();
     QRectF getBbox();
     void connectTo(DSBClone *cl);

@@ -100,8 +100,8 @@ void FindBranchesDialog::test(){
     {
         DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
         comp->dumpPathwayNodePositions();
+        comp->jogPathways();
     }
-    m_canvas->restart_graph_layout();
 }
 
 /* Respond to a change in the canvas selection.

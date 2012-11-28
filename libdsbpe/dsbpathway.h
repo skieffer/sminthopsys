@@ -51,6 +51,7 @@ public:
     QList<DSBBranch*> getBranches();
     void setCanvas(Canvas *canvas);
     QRectF getBbox();
+    DSBClone *getLeadClone();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);

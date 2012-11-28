@@ -55,6 +55,7 @@ public:
 
     void setBranchHeadNumber(int n);
     virtual ShapeObj *getShape() = 0;
+    virtual void moveShape(qreal dx, qreal dy) = 0;
     virtual QPointF getBasePt() = 0;
     virtual QRectF getBbox() = 0;
     void setBranch(DSBBranch *b);

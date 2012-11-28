@@ -38,7 +38,9 @@
 
 namespace dunnart {
 
-DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches)
+DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches) :
+    m_headNode(NULL),
+    m_canvas(NULL)
 {
     // Find branch starting with selected endpt clone.
     QList<DSBBranch*> otherBranches;
@@ -85,6 +87,16 @@ void DSBPathway::setCanvas(Canvas *canvas)
         DSBBranch *b = m_branches.at(i);
         b->setCanvas(m_canvas);
     }
+}
+
+DSBClone *DSBPathway::getLeadClone()
+{
+    DSBClone *cl = NULL;
+    if (m_headNode)
+    {
+        cl = dynamic_cast<DSBClone*>(m_headNode);
+    }
+    return cl;
 }
 
 void DSBPathway::setFirstBranch(DSBBranch *branch)
@@ -282,7 +294,7 @@ void DSBPathway::drawAt(QPointF r)
     {
         DSBBranch *b = m_branches.at(i);
         b->drawConnectors();
-        b->setGuideline();
+        //b->setGuideline();
     }
 
 }

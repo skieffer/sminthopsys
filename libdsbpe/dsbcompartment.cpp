@@ -26,6 +26,8 @@
 #include <QtGui>
 #include <QString>
 #include <QList>
+#include <QTimer>
+#include <QThread>
 
 #include <math.h>
 #include <assert.h>
@@ -340,19 +342,45 @@ void DSBCompartment::redisplay()
     {
         layout();
         redraw();
-        qDebug() << "breakpoint";
-        //debugging:
-        /*
-        qDebug() << "Flag1";
-        qDebug() << "canvas is at: " << m_canvas;
-        GraphLayout *gl = m_canvas->getGraphLayout();
-        GraphData *gd = gl->getGraphData();
-        qDebug() << "Graph Data =================================";
-        qDebug() << "  Node count: " << gd->getNodeCount();
-        qDebug() << "  Edge count: " << gd->getEdgeCount();
-        qDebug() << "  Constraint count: " << gd->ccs.size();
-        */
-        //
+        // The following two commands are necessary in order to get
+        // the layout to respond. Neither one alone is sufficient.
+        m_canvas->getActions().clear();
+        m_canvas->restart_graph_layout();
+    }
+}
+
+void DSBCompartment::jogPathways()
+{
+    foreach (DSBPathway *pw, m_pathways)
+    {
+        //Try to jog the canvas to get layout to take effect!
+        DSBClone *cl = pw->getLeadClone();
+        if (cl)
+        {
+            //ShapeObj *shape = cl->getShape();
+            //m_canvas->restart_graph_layout();
+            //m_canvas->restart_graph_layout();
+            //m_canvas->processResponseTasks();
+            //m_canvas->processResponseTasks();
+            m_canvas->getActions().clear();
+            m_canvas->restart_graph_layout();
+
+            /*
+            Actions& actions = m_canvas->getActions();
+            //
+            actions.moveList.push_back(shape);
+            cl->moveShape(1,1);
+            m_canvas->interrupt_graph_layout();
+            //
+            actions.moveList.push_back(shape);
+            cl->moveShape(1,1);
+            m_canvas->interrupt_graph_layout();
+            */
+        }
+    }
+    foreach (DSBCompartment *comp, m_compartments)
+    {
+        comp->jogPathways();
     }
 }
 

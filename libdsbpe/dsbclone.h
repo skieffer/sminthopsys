@@ -68,6 +68,7 @@ public:
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);
     friend class DSBFork;
     ShapeObj *getShape();
+    void moveShape(qreal dx, qreal dy);
     QRectF getBbox();
 
 private:
