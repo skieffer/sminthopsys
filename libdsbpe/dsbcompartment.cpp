@@ -400,9 +400,9 @@ void DSBCompartment::dumpPathwayNodePositions()
                 if (cl)
                 {
                     if (shape) {
-                        qDebug() << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
+                        qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
                     } else {
-                        qDebug() << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
+                        qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
                     }
                 }
                 else if (re)

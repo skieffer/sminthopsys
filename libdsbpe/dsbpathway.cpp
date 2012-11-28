@@ -294,7 +294,7 @@ void DSBPathway::drawAt(QPointF r)
     {
         DSBBranch *b = m_branches.at(i);
         b->drawConnectors();
-        //b->setGuideline();
+        b->setGuideline();
     }
 
 }
