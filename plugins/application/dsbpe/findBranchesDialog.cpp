@@ -100,7 +100,7 @@ void FindBranchesDialog::test(){
     {
         DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
         comp->dumpPathwayNodePositions();
-        comp->jogPathways();
+        //comp->jogPathways();
     }
 }
 
