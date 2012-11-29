@@ -37,10 +37,22 @@ class DSBReaction;
 class FreePathway : public DSBPathway
 {
 public:
+    // Constructor
     FreePathway(QList<DSBClone*> clones, QList<DSBReaction*> reacs);
+    // RecLayout methods
+    QSizeF layout();
+    void setRelPt(QPointF p);
+    void drawRelTo(QPointF q);
+    void drawAt(QPointF r);
+    void redraw();
+    QSizeF getSize();
 private:
     QList<DSBClone*> m_clones;
     QList<DSBReaction*> m_reactions;
+
+    QPointF m_relpt;
+    QPointF m_basept;
+    QSizeF m_size;
 };
 
 }
