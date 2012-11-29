@@ -200,22 +200,27 @@ QList<DSBClone*> DSBCompartment::getLooseClones()
 
 QSizeF DSBCompartment::rowLayout()
 {
-    int width = 0;
-    int pad = 100;
-    int x = pad;
-    int y = pad;
-    int maxHeight = 0;
+    int topPad=50, bottomPad=50, leftPad=50, rightPad=50;
+    int horizSpacer=100;
+    int x = leftPad;
+    int y = topPad;
+    int width = leftPad+rightPad;
+    int height = topPad+bottomPad;
+    int maxObjHeight = 0;
+    int objCount = 0;
 
     // Compartments
     for (int i = 0; i < m_compartments.size(); i++)
     {
         DSBCompartment *comp = m_compartments.at(i);
         QSizeF size = comp->layout();
+        if (objCount > 0) { x += horizSpacer; }
         comp->setRelPt(QPointF(x,y));
-        x += size.width() + pad;
+        x += size.width();
         width += size.width();
         int h = size.height();
-        maxHeight = (h > maxHeight? h : maxHeight);
+        maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+        objCount++;
     }
 
     // Pathways
@@ -223,21 +228,27 @@ QSizeF DSBCompartment::rowLayout()
     {
         DSBPathway *pw = m_pathways.at(i);
         QSizeF size = pw->layout();
+        if (objCount > 0) { x += horizSpacer; }
         pw->setRelPt(QPointF(x,y));
-        x += size.width() + pad;
+        x += size.width();
+        width += size.width();
         int h = size.height();
-        maxHeight = (h > maxHeight? h : maxHeight);
+        maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+        objCount++;
     }
 
     // Loose clones
     QList<DSBClone*> loose = getLooseClones();
+    if (objCount > 0) { x += horizSpacer; }
     QSizeF size = layoutSquareCloneArray(loose, x, y);
-    x += size.width() + pad;
+    x += size.width();
+    width += size.width();
     int h = size.height();
-    maxHeight = (h > maxHeight? h : maxHeight);
+    maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+    objCount++;
 
-    int width = (pad <= x ? x-pad : x);
-    m_size = QSizeF(width,maxHeight);
+    height += maxObjHeight;
+    m_size = QSizeF(width,height);
     return m_size;
 }
 
@@ -296,20 +307,22 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
     }
 
     int cols = ceil(sqrt(numClones)); // number of columns in array
-    int rows = ceil(numClones/cols); // number of rows
-    int u = 50; // unit of separation
-    int sepUnits = 2; // separation between adjacent nodes, in units u
-    int x0 = ulx, y0 = uly, x, y, col, row;
+    int rows = ceil(numClones/float(cols)); // number of rows
+    int horizSpacer = 30;
+    int vertSpacer  = 30;
+    int w = 70, h = 50;
+    int x0 = ulx + w/2, y0 = uly + h/2;
+    int x, y, col, row;
     for (int i = 0; i < numClones; i++)
     {
         col = i%cols;
         row = i/cols;
-        x = x0 + col*sepUnits*u;
-        y = y0 + row*sepUnits*u;
+        x = x0 + col*(w + horizSpacer);
+        y = y0 + row*(h + vertSpacer);
         clones.at(i)->setRelPt(QPointF(x,y));
     }
-    int width = cols*sepUnits*u + 70;
-    int height = rows*sepUnits*u + 50;
+    int width  = w + (cols - 1)*(w + horizSpacer);
+    int height = h + (rows - 1)*(h + vertSpacer);
     return QSizeF(width,height);
 }
 
