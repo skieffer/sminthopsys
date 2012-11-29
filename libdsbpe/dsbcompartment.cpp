@@ -30,6 +30,7 @@
 #include <QRectF>
 #include <QPainter>
 #include <QPen>
+#include <QBrush>
 #include <QTimer>
 #include <QThread>
 
@@ -82,11 +83,15 @@ void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QRectF rect = QRectF(0,0,m_width,m_height);
     QPen pen;
     pen.setWidthF(m_penWidth);
     painter->setPen(pen);
-    painter->drawRoundedRect(rect, m_cornerRadius, m_cornerRadius);
+    QBrush brush(Qt::white);
+    painter->setBrush(brush);
+    QPainterPath path;
+    QRectF rect = QRectF(0,0,m_width,m_height);
+    path.addRoundedRect(rect, m_cornerRadius, m_cornerRadius);
+    painter->drawPath(path);
 }
 
 DSBCompartment::DSBCompartment(QString compartmentName)
