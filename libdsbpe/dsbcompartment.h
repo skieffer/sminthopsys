@@ -96,6 +96,7 @@ public:
     void setBoundaryVisible(bool b);
 
     void dumpPathwayNodePositions(void);
+    void dumpAllClonePositions(void);
 
     QList<QString> m_default_blacklist;
 
