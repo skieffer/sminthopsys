@@ -37,6 +37,9 @@ class QRectF;
 class QPainter;
 class QStyleOptionGraphicsItem;
 class QWidget;
+class QGraphicsSceneMouseEvent;
+class QAction;
+class QMenu;
 
 namespace dunnart {
 
@@ -48,14 +51,20 @@ class DSBBranch;
 class DSBPathway;
 class Canvas;
 
+class DSBCompartment;
+
 class CompartmentShape : public QGraphicsItem
 {
 public:
-    CompartmentShape(qreal x, qreal y, qreal w, qreal h);
+    CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void resize(qreal w, qreal h);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    QAction *buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu& menu);
 private:
+    DSBCompartment *m_compartment;
     qreal m_width;
     qreal m_height;
     qreal m_penWidth;
@@ -93,6 +102,7 @@ public:
     QString getName(void);
     void setParent(DSBCompartment *comp);
     void setCanvas(Canvas *canvas);
+    Canvas *getCanvas(void);
     void setBoundaryVisible(bool b);
 
     void dumpPathwayNodePositions(void);
