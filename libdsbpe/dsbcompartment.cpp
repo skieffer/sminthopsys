@@ -72,8 +72,9 @@ void CompartmentShape::resize(qreal w, qreal h)
 
 QRectF CompartmentShape::boundingRect() const
 {
-    return QRectF(x() - m_penWidth/2, y() - m_penWidth/2,
+    QRectF rect = QRectF(- m_penWidth/2, - m_penWidth/2,
                   m_width + m_penWidth, m_height + m_penWidth);
+    return rect;
 }
 
 void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -81,7 +82,7 @@ void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QRectF rect = boundingRect();
+    QRectF rect = QRectF(0,0,m_width,m_height);
     QPen pen;
     pen.setWidthF(m_penWidth);
     painter->setPen(pen);
@@ -199,8 +200,10 @@ QList<DSBClone*> DSBCompartment::getLooseClones()
 
 QSizeF DSBCompartment::rowLayout()
 {
+    int width = 0;
     int pad = 100;
-    int x = 0;
+    int x = pad;
+    int y = pad;
     int maxHeight = 0;
 
     // Compartments
@@ -208,8 +211,9 @@ QSizeF DSBCompartment::rowLayout()
     {
         DSBCompartment *comp = m_compartments.at(i);
         QSizeF size = comp->layout();
-        comp->setRelPt(QPointF(x,0));
+        comp->setRelPt(QPointF(x,y));
         x += size.width() + pad;
+        width += size.width();
         int h = size.height();
         maxHeight = (h > maxHeight? h : maxHeight);
     }
@@ -219,7 +223,7 @@ QSizeF DSBCompartment::rowLayout()
     {
         DSBPathway *pw = m_pathways.at(i);
         QSizeF size = pw->layout();
-        pw->setRelPt(QPointF(x,0));
+        pw->setRelPt(QPointF(x,y));
         x += size.width() + pad;
         int h = size.height();
         maxHeight = (h > maxHeight? h : maxHeight);
@@ -227,7 +231,7 @@ QSizeF DSBCompartment::rowLayout()
 
     // Loose clones
     QList<DSBClone*> loose = getLooseClones();
-    QSizeF size = layoutSquareCloneArray(loose, x, 0);
+    QSizeF size = layoutSquareCloneArray(loose, x, y);
     x += size.width() + pad;
     int h = size.height();
     maxHeight = (h > maxHeight? h : maxHeight);
@@ -367,6 +371,9 @@ void DSBCompartment::redraw()
 void DSBCompartment::drawAt(QPointF r)
 {
     m_basept = r;
+    //qDebug() << "=====================================================================";
+    //qDebug() << m_compartmentName << " basept: " << m_basept.x() << ", " << m_basept.y();
+
     // Compartment boundary
     if (m_boundaryVisible)
     {
@@ -412,7 +419,8 @@ void DSBCompartment::drawAt(QPointF r)
     }
 
     //debug:
-    dumpPathwayNodePositions();
+    //dumpAllClonePositions();
+    //dumpPathwayNodePositions();
     //
 }
 
@@ -499,6 +507,21 @@ void DSBCompartment::dumpPathwayNodePositions()
                     }
                 }
             }
+        }
+    }
+}
+
+// More debugging output
+void DSBCompartment::dumpAllClonePositions()
+{
+    QList<DSBClone*> clones = getAllClones();
+    foreach (DSBClone *cl, clones)
+    {
+        ShapeObj *shape = cl->getShape();
+        if (shape) {
+            qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
+        } else {
+            qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
         }
     }
 }

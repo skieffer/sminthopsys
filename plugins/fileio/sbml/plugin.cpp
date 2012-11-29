@@ -137,9 +137,12 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
 
             // Build a map from species id's to internal objects representing those species.
             QMap<QString, DSBSpecies*> speciesMap;
-
             // Also a map from compartment names to DSBCompartment objects.
             QMap<QString, DSBCompartment*> compMap;
+            // Some species and/or reactions (usually reactions) may not have an
+            // explicitly declared compartment. Prepare lists for them.
+            QList<DSBSpecies*> homelessSpecies;
+            QList<DSBReaction*> homelessReacs;
 
             for (unsigned int i = 0; i < numSpecies; i++)
             {
@@ -151,19 +154,30 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 // Save it in the species map.
                 speciesMap.insert(QString(id.c_str()), dsbspec);
 
-                // If it belongs to a new compartment, then add that to the compartment map.
+                // Get compartment name.
                 QString compName = dsbspec->getCompartmentName();
-                if (!compMap.contains(compName))
+                // If no name...
+                if (compName.size() == 0)
                 {
-                    DSBCompartment *comp = new DSBCompartment(compName);
-                    compMap.insert(compName, comp);
-                    comp->setCanvas(canvas);
+                    // ...add to homeless list.
+                    homelessSpecies.append(dsbspec);
                 }
-                // Now add the species to its compartment.
-                DSBCompartment *comp = compMap.value(compName);
-                comp->addSpecies(dsbspec);
-                // And give it a reference to its compartment.
-                dsbspec->setCompartment(comp);
+                else // it does have a name
+                {
+                    // If this name has not yet been seen...
+                    if (!compMap.contains(compName))
+                    {
+                        // ...create new entry for it.
+                        DSBCompartment *comp = new DSBCompartment(compName);
+                        compMap.insert(compName, comp);
+                        comp->setCanvas(canvas);
+                    }
+                    // Now add the species to its compartment.
+                    DSBCompartment *comp = compMap.value(compName);
+                    comp->addSpecies(dsbspec);
+                    // And give it a reference to its compartment.
+                    dsbspec->setCompartment(comp);
+                }
             }
 
             // Now get the reactions.
@@ -178,19 +192,30 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
                 dsbreac->doublyLink(speciesMap);
                 dsbreac->setCanvas(canvas);
 
-                // If it belongs to a new compartment, then add that to the compartment map.
+                // Get compartment name.
                 QString compName = dsbreac->getCompartmentName();
-                if (!compMap.contains(compName))
+                // If no name...
+                if (compName.size() == 0)
                 {
-                    DSBCompartment *comp = new DSBCompartment(compName);
-                    compMap.insert(compName, comp);
-                    comp->setCanvas(canvas);
+                    // ...add to homeless list.
+                    homelessReacs.append(dsbreac);
                 }
-                // Now add the reaction to its compartment.
-                DSBCompartment *comp = compMap.value(compName);
-                comp->addReaction(dsbreac);
-                // And give it a reference to its compartment.
-                dsbreac->setCompartment(comp);
+                else // it does have a name
+                {
+                    // If this name has not yet been seen...
+                    if (!compMap.contains(compName))
+                    {
+                        // ...create new entry for it.
+                        DSBCompartment *comp = new DSBCompartment(compName);
+                        compMap.insert(compName, comp);
+                        comp->setCanvas(canvas);
+                    }
+                    // Now add the reaction to its compartment.
+                    DSBCompartment *comp = compMap.value(compName);
+                    comp->addReaction(dsbreac);
+                    // And give it a reference to its compartment.
+                    dsbreac->setCompartment(comp);
+                }
             }
 
             // Set all trivial clonings.
@@ -207,6 +232,20 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             comp->setCanvas(canvas);
             comp->setBoundaryVisible(false);
             comp->addCompartments(compMap.values());
+            // Stash homeless species and reactions in there too.
+            foreach (DSBSpecies *spec, homelessSpecies)
+            {
+                comp->addSpecies(spec);
+                spec->setCompartment(comp);
+            }
+            foreach (DSBReaction *reac, homelessReacs)
+            {
+                comp->addReaction(reac);
+                reac->setCompartment(comp);
+            }
+            // Set trivial cloning for any homeless species.
+            comp->setTrivialCloning();
+            // Finally, layout and draw.
             comp->layout();
             comp->setRelPt(QPointF(0,0));
             comp->draw();
