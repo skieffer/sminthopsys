@@ -23,6 +23,7 @@
 */
 #include "dsbcompartment.h"
 
+#include <QObject>
 #include <QtGui>
 #include <QString>
 #include <QList>
@@ -31,6 +32,8 @@
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 #include <QTimer>
 #include <QThread>
 
@@ -55,7 +58,8 @@
 
 namespace dunnart {
 
-CompartmentShape::CompartmentShape(qreal x, qreal y, qreal w, qreal h) :
+CompartmentShape::CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+    m_compartment(comp),
     m_penWidth(10),
     m_cornerRadius(20)
 {
@@ -69,6 +73,7 @@ void CompartmentShape::resize(qreal w, qreal h)
     qreal cr2 = 2*m_cornerRadius;
     m_width  = (w > cr2 ? w : cr2);
     m_height = (h > cr2 ? h : cr2);
+    update();
 }
 
 QRectF CompartmentShape::boundingRect() const
@@ -92,6 +97,52 @@ void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QRectF rect = QRectF(0,0,m_width,m_height);
     path.addRoundedRect(rect, m_cornerRadius, m_cornerRadius);
     painter->drawPath(path);
+}
+
+void CompartmentShape::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_compartment->getCanvas() == NULL)
+    {
+        return;
+    }
+
+    if (event->button() == Qt::LeftButton)
+    {
+        QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+        // Drop through to parent handler.
+    }
+    else if (event->button() == Qt::RightButton)
+    {
+        QMenu menu;
+        QAction *action = buildAndExecContextMenu(event, menu);
+        if (action)
+        {
+            event->accept();
+        }
+    }
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu &menu)
+{
+    if (!menu.isEmpty())
+    {
+        menu.addSeparator();
+    }
+    // Add actions to menu.
+    QAction *cloneCurrencyMolecules = menu.addAction(QObject::tr("Clone currency molecules"));
+    //
+
+    QApplication::restoreOverrideCursor();
+    QAction *action = menu.exec(event->screenPos());
+
+    if (action == cloneCurrencyMolecules)
+    {
+        m_compartment->cloneCurrencyMolecules();
+        m_compartment->redisplay();
+    }
+    return action;
 }
 
 DSBCompartment::DSBCompartment(QString compartmentName)
@@ -161,6 +212,11 @@ void DSBCompartment::setParent(DSBCompartment *comp)
 void DSBCompartment::setCanvas(Canvas *canvas)
 {
     m_canvas = canvas;
+}
+
+Canvas *DSBCompartment::getCanvas()
+{
+    return m_canvas;
 }
 
 QList<DSBClone*> DSBCompartment::getAllClones()
@@ -397,7 +453,7 @@ void DSBCompartment::drawAt(QPointF r)
     {
         if (!m_boundaryShape)
         {
-            m_boundaryShape = new CompartmentShape(m_basept.x(), m_basept.y(),
+            m_boundaryShape = new CompartmentShape(this, m_basept.x(), m_basept.y(),
                                                           m_size.width(), m_size.height());
             m_canvas->addItem(m_boundaryShape);
         }
