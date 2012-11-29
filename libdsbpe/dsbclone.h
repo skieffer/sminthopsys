@@ -73,6 +73,7 @@ public:
     QRectF getBbox();
     DSBFork *getFork();
     void setFork(DSBFork *fork);
+    void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
 
 private:
     QString m_cloneId;
@@ -83,12 +84,13 @@ private:
     PDEPN *m_epn;
     DSBFork *m_fork;
     bool m_is_cloned;
-    QList<DSBReaction *> m_reactionsEntered;
-    QList<DSBReaction *> m_reactionsExited;
-    QList<DSBReaction *> m_reactionsModified;
+    QList<DSBReaction*> m_reactionsEntered;
+    QList<DSBReaction*> m_reactionsExited;
+    QList<DSBReaction*> m_reactionsModified;
 
-    QList<DSBReaction *> computeEnterableReactions();
-    QList<DSBReaction *> computeExitableReactions();
+    QList<DSBReaction*> computeEnterableReactions();
+    QList<DSBReaction*> computeExitableReactions();
+    QList<DSBReaction*> getAllReactions();
 };
 
 }

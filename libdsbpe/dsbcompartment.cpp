@@ -26,6 +26,10 @@
 #include <QtGui>
 #include <QString>
 #include <QList>
+#include <QSet>
+#include <QRectF>
+#include <QPainter>
+#include <QPen>
 #include <QTimer>
 #include <QThread>
 
@@ -38,6 +42,7 @@
 #include "dsbnode.h"
 #include "dsbbranch.h"
 #include "dsbpathway.h"
+#include "freepathway.h"
 
 #include "libdunnartcanvas/canvas.h"
 
@@ -49,9 +54,46 @@
 
 namespace dunnart {
 
+CompartmentShape::CompartmentShape(qreal x, qreal y, qreal w, qreal h) :
+    m_penWidth(10),
+    m_cornerRadius(20)
+{
+    setX(x);
+    setY(y);
+    resize(w,h);
+}
+
+void CompartmentShape::resize(qreal w, qreal h)
+{
+    qreal cr2 = 2*m_cornerRadius;
+    m_width  = (w > cr2 ? w : cr2);
+    m_height = (h > cr2 ? h : cr2);
+}
+
+QRectF CompartmentShape::boundingRect() const
+{
+    return QRectF(x() - m_penWidth/2, y() - m_penWidth/2,
+                  m_width + m_penWidth, m_height + m_penWidth);
+}
+
+void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                             QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    QRectF rect = boundingRect();
+    QPen pen;
+    pen.setWidthF(m_penWidth);
+    painter->setPen(pen);
+    painter->drawRoundedRect(rect, m_cornerRadius, m_cornerRadius);
+}
+
 DSBCompartment::DSBCompartment(QString compartmentName)
     : m_compartmentName(compartmentName),
-      m_parentCompartment(NULL)
+      m_parentCompartment(NULL),
+      m_show_reactions(false),
+      m_boundaryVisible(true),
+      m_boundaryShape(NULL)
 {
     m_default_blacklist <<
                            "ATP" <<
@@ -68,6 +110,11 @@ DSBCompartment::DSBCompartment(QString compartmentName)
                            "CO2" <<
                            "P" <<
                            "PP";
+}
+
+void DSBCompartment::setBoundaryVisible(bool b)
+{
+    m_boundaryVisible = b;
 }
 
 void DSBCompartment::addSpecies(DSBSpecies *spec)
@@ -190,13 +237,37 @@ QSizeF DSBCompartment::rowLayout()
     return m_size;
 }
 
+/* Set all clonings to trivial.
+  */
 void DSBCompartment::setTrivialCloning()
 {
-    // Set all clonings to trivial.
+    m_canvas->stop_graph_layout();
     for (int i = 0; i < m_species.size(); i++)
     {
         m_species.at(i)->setTrivialCloning();
     }
+    m_canvas->restart_graph_layout();
+}
+
+/* Set discrete clonings for all species named.
+  */
+void DSBCompartment::setDiscreteCloningsByName(QList<QString> names)
+{
+    m_canvas->stop_graph_layout();
+    foreach (DSBSpecies *spec, m_species)
+    {
+        QString name = spec->getName();
+        if (names.contains(name))
+        {
+            spec->setDiscreteCloning();
+        }
+    }
+    m_canvas->restart_graph_layout();
+}
+
+void DSBCompartment::cloneCurrencyMolecules()
+{
+    setDiscreteCloningsByName(m_default_blacklist);
 }
 
 QSizeF DSBCompartment::layoutSquareCloneArray(
@@ -297,7 +368,20 @@ void DSBCompartment::drawAt(QPointF r)
 {
     m_basept = r;
     // Compartment boundary
-    //   (TODO)
+    if (m_boundaryVisible)
+    {
+        if (!m_boundaryShape)
+        {
+            m_boundaryShape = new CompartmentShape(m_basept.x(), m_basept.y(),
+                                                          m_size.width(), m_size.height());
+            m_canvas->addItem(m_boundaryShape);
+        }
+        else
+        {
+            m_boundaryShape->setPos(m_basept.x(), m_basept.y());
+            m_boundaryShape->resize(m_size.width(), m_size.height());
+        }
+    }
 
     // Loose reactions:
     if (m_show_reactions)
@@ -349,6 +433,7 @@ void DSBCompartment::redisplay()
     }
 }
 
+// TODO This function was for debugging and can be removed.
 void DSBCompartment::jogPathways()
 {
     foreach (DSBPathway *pw, m_pathways)
@@ -384,7 +469,7 @@ void DSBCompartment::jogPathways()
     }
 }
 
-/* For debugging purposes only.
+/* For debugging output.
   */
 void DSBCompartment::dumpPathwayNodePositions()
 {
@@ -418,4 +503,42 @@ void DSBCompartment::dumpPathwayNodePositions()
     }
 }
 
+/* Build one pathway (FreePathway class) for each connected component made
+   up by the reactions and the current clones.
+  */
+void DSBCompartment::buildConnectedPathways()
+{
+    QSet<DSBClone*> clones = getAllClones().toSet();
+    while (!clones.empty())
+    {
+        DSBClone *cl = clones.toList().first();
+        QSet<DSBClone*> ccClones; // connected component clones
+        QSet<DSBReaction*> ccReacs; // connected component reactions
+        cl->connectedComponent(ccClones, ccReacs);
+        FreePathway *pw = new FreePathway(ccClones.toList(), ccReacs.toList());
+        m_pathways.append(pw);
+        clones.subtract(ccClones);
+    }
 }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

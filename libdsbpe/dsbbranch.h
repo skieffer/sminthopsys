@@ -68,6 +68,7 @@ public:
     QSizeF getSize();
     // Other methods
     QString toString();
+    // Friends
     friend class DSBFork;
 
 private:
@@ -82,6 +83,7 @@ private:
     void setMainConnections(QList<DSBNode*> own);
     //void connect(ShapeObj *shp1, ShapeObj *shp2);
     void connect(DSBNode *node1, DSBNode *node2);
+    void align();
 };
 
 }

@@ -311,9 +311,8 @@ void DSBReaction::buildOrbit()
     m_outSatellites.clear();
     m_modSatellites.clear();
     QList<DSBSpecies*> allSpecies = getAllSpecies();
-    for (int i = 0; i < allSpecies.size(); i++)
+    foreach (DSBSpecies *spec, allSpecies)
     {
-        DSBSpecies *spec = allSpecies.at(i);
         DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
         takeNonBranchHeads(cla->reactants, m_inSatellites);
         takeNonBranchHeads(cla->products, m_outSatellites);
@@ -366,6 +365,20 @@ QList<DSBClone*> DSBReaction::getAllSatellites()
     allSats.append(m_outSatellites);
     allSats.append(m_modSatellites);
     return allSats;
+}
+
+QList<DSBClone*> DSBReaction::getAllClones()
+{
+    QList<DSBClone*> clones;
+    QList<DSBSpecies*> species = getAllSpecies();
+    foreach (DSBSpecies *spec, species)
+    {
+        DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+        clones.append(cla->reactants);
+        clones.append(cla->modifiers);
+        clones.append(cla->products);
+    }
+    return clones;
 }
 
 bool DSBReaction::isBranchHead(DSBClone *clone)
@@ -562,6 +575,18 @@ void DSBReaction::moveShape(qreal dx, qreal dy)
     if (m_shape)
     {
         m_shape->moveBy(dx,dy);
+    }
+}
+
+void DSBReaction::connectedComponent(QSet<DSBClone *> &ccClones, QSet<DSBReaction *> &ccReacs)
+{
+    ccReacs.insert(this); // add self to component
+    // ignore clones already seen
+    QSet<DSBClone*> cset = getAllClones().toSet().subtract(ccClones);
+    // ask remaining ones to add to the connected component
+    foreach (DSBClone *cl, cset)
+    {
+        cl->connectedComponent(ccClones, ccReacs);
     }
 }
 
