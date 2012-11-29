@@ -23,6 +23,7 @@
 */
 
 #include "freepathway.h"
+#include "dsbreaction.h"
 
 namespace dunnart{
 
@@ -31,6 +32,47 @@ FreePathway::FreePathway(QList<DSBClone *> clones, QList<DSBReaction *> reacs) :
     m_reactions(reacs)
 {
     //...
+}
+
+QSizeF FreePathway::getSize()
+{
+    return m_size;
+}
+
+void FreePathway::setRelPt(QPointF p)
+{
+    m_relpt = p;
+}
+
+void FreePathway::drawRelTo(QPointF q)
+{
+    QPointF r = m_relpt + q;
+    drawAt(r);
+}
+
+void FreePathway::redraw()
+{
+    drawAt(m_basept);
+}
+
+QSizeF FreePathway::layout()
+{
+    foreach (DSBReaction *reac, m_reactions)
+    {
+        reac->setRelPt(QPointF(500,500));
+        reac->layout();
+    }
+    m_size = QSizeF(1000,1000);
+    return m_size;
+}
+
+void FreePathway::drawAt(QPointF r)
+{
+    m_basept = r;
+    foreach (DSBReaction *reac, m_reactions)
+    {
+        reac->drawRelTo(m_basept);
+    }
 }
 
 }

@@ -120,7 +120,6 @@ void DSBFork::redraw()
 void DSBFork::drawAt(QPointF r)
 {
     m_basept = r;
-    // TODO
 }
 
 
