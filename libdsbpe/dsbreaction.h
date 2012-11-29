@@ -83,6 +83,7 @@ public:
     QPointF getBasePt();
     QRectF getBbox();
     void connectTo(DSBClone *cl);
+    void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
 
 private:
     Reaction *m_sbmlReaction;
@@ -118,6 +119,7 @@ private:
     void buildOrbit();
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
+    QList<DSBClone*> getAllClones();
     QList<DSBClone*> getAllSatellites();
     void takeNonBranchHeads(QList<DSBClone*>& src, QList<DSBClone*>& dst);
 

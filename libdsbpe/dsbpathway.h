@@ -44,6 +44,7 @@ class DSBPathway : public DSBRecLayout
 {
 public:
     // Constructors
+    DSBPathway();
     DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
     // Get and set
     QList<DSBBranch*> getBranches();

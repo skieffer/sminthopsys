@@ -36,6 +36,7 @@
 #include <QList>
 
 #include <string>
+#include <sstream>
 #include <math.h>
 
 #include "sbml/SBMLTypes.h"
@@ -84,11 +85,11 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
         {
             if (extension == "sbml")
             {
-                return "Systems Biology Markup Language";
+                return "Systems Biology Markup Language (sbml)";
             }
             else if (extension == "xml")
             {
-                return "Systems Biology Markup Language";
+                return "Systems Biology Markup Language (xml)";
             }
             return QString();
         }
@@ -115,20 +116,20 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
         {
             QString filename = fileInfo.absoluteFilePath();
             SBMLDocument *doc = readSBML(filename.toStdString().c_str());
-            Model *model = doc->getModel();
 
             // Check for errors.
             unsigned int errors = doc->getNumErrors();
             if (errors > 0)
             {
-                errorMessage = tr("Error reading SBML.");
-                // TODO: Use doc->printErrors(stream=...) to write a description of
-                // the errors to a std::ostream object. Then append this to
-                // the errorMessage.
+                std::stringstream ss;
+                ss << "Error reading SBML.\n";
+                doc->printErrors(ss);
+                errorMessage = QString(ss.str().c_str());
                 return false;
             }
 
             // Get the species and reactions.
+            Model *model = doc->getModel();
             ListOfSpecies *los = model->getListOfSpecies();
             unsigned int numSpecies = los->size();
             Species *spec;
@@ -204,6 +205,7 @@ class SBMLFileIOPlugin : public QObject, public FileIOPluginInterface
             // Put all compartments in a single container.
             DSBCompartment *comp = new DSBCompartment(QString("_root"));
             comp->setCanvas(canvas);
+            comp->setBoundaryVisible(false);
             comp->addCompartments(compMap.values());
             comp->layout();
             comp->setRelPt(QPointF(0,0));

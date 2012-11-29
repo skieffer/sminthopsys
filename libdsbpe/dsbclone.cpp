@@ -243,7 +243,7 @@ QList<DSBReaction*> DSBClone::computeEnterableReactions()
         // We can only use it if it is reversible.
         if (reac->isReversible()) { enterable.insert(reac); }
     }
-    return QList<DSBReaction*>::fromSet(enterable);
+    return enterable.toList();
 }
 
 /* Both reactions exited, and reversible reactions entered, are
@@ -265,7 +265,7 @@ QList<DSBReaction*> DSBClone::computeExitableReactions()
         // We can only use it if it is reversible.
         if (reac->isReversible()) { exitable.insert(reac); }
     }
-    return QList<DSBReaction*>::fromSet(exitable);
+    return exitable.toList();
 }
 
 QList<DSBBranch*> DSBClone::findBranchesRec(
@@ -308,6 +308,27 @@ QList<DSBBranch*> DSBClone::findBranchesRec(
         }
     }
     return mergeSelfWithBranches(branches, blacklist);
+}
+
+QList<DSBReaction*> DSBClone::getAllReactions()
+{
+    QList<DSBReaction*> all;
+    all.append(m_reactionsEntered);
+    all.append(m_reactionsExited);
+    all.append(m_reactionsModified);
+    return all;
+}
+
+void DSBClone::connectedComponent(QSet<DSBClone *> &ccClones, QSet<DSBReaction *> &ccReacs)
+{
+    ccClones.insert(this); // add self to component
+    // ignore reactions already seen
+    QSet<DSBReaction*> rset = getAllReactions().toSet().subtract(ccReacs);
+    // ask remaining ones to add to the connected component
+    foreach (DSBReaction *reac, rset)
+    {
+        reac->connectedComponent(ccClones, ccReacs);
+    }
 }
 
 }

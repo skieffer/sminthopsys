@@ -26,6 +26,7 @@
 #define DSBNODE_H
 
 #include <QList>
+#include <QSet>
 #include <QString>
 #include <QSizeF>
 
@@ -39,6 +40,8 @@ class DSBPathway;
 class DSBBranch;
 class DSBFork;
 class ShapeObj;
+class DSBClone;
+class DSBReaction;
 
 class DSBNode : public DSBRecLayout
 {
@@ -62,6 +65,7 @@ public:
     DSBBranch *getBranch(void);
     void setPathway(DSBPathway *pw);
     DSBPathway *getPathway(void);
+    virtual void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs) = 0;
 #if 0
     void addBranch(DSBBranch *branch);
     void addFork(DSBFork *fork);

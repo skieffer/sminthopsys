@@ -234,6 +234,37 @@ void DSBBranch::drawAt(QPointF r)
     }
 }
 
+/*
+void DSBBranch::align()
+{
+    if (cycle) { return; } // Shouldn't align cycles.
+    if (nodes.size() < 2) { return; } // Can't align less than 2 nodes.
+    CanvasItemList items;
+    for (int i = 0; i+1 < nodes.size(); i++)
+    {
+        DSBNode *node1 = nodes.at(i);
+        DSBNode *node2 = nodes.at(i+1);
+        items.append(node2);
+
+        // Create separation constraint.
+        //...
+
+        if (i==0)
+        {
+            items.push_front(node1);
+            m_guideline = createAlignment(ALIGN_CENTER, items);
+        }
+        else
+        {
+            items.push_front(m_guideline);
+            createAlignment(ALIGN_CENTER, items);
+        }
+        // Do we need m_canvas.getActions().clear(); ?
+        m_canvas->interrupt_graph_layout();
+    }
+}
+*/
+
 void DSBBranch::setGuideline()
 {
     CanvasItemList shapes;

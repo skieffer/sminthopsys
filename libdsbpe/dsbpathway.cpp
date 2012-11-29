@@ -38,6 +38,11 @@
 
 namespace dunnart {
 
+DSBPathway::DSBPathway() :
+    m_headNode(NULL),
+    m_canvas(NULL)
+{}
+
 DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches) :
     m_headNode(NULL),
     m_canvas(NULL)
