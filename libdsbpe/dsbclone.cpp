@@ -327,6 +327,8 @@ void DSBClone::connectedComponent(QSet<DSBClone *> &ccClones, QSet<DSBReaction *
     // ask remaining ones to add to the connected component
     foreach (DSBReaction *reac, rset)
     {
+        // skip intercompartmental reactions
+        if (reac->isIntercompartmental()) { continue; }
         reac->connectedComponent(ccClones, ccReacs);
     }
 }
