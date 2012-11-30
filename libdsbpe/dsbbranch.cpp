@@ -41,6 +41,7 @@
 #include "libdunnartcanvas/shape.h"
 #include "libdunnartcanvas/guideline.h"
 #include "libdunnartcanvas/separation.h"
+#include "libdunnartcanvas/distribution.h"
 #include "libdunnartcanvas/relationship.h"
 
 namespace dunnart {
@@ -240,12 +241,13 @@ void DSBBranch::align()
 {
     if (cycle) { return; } // Shouldn't align cycles.
     if (nodes.size() < 2) { return; } // Can't align fewer than 2 nodes.
-    CanvasItemList items;
     m_guideline = NULL;
+    /*
     for (int i = 0; i+1 < nodes.size(); i++)
     {
         ShapeObj *shape1 = nodes.at(i)->getShape();
         ShapeObj *shape2 = nodes.at(i+1)->getShape();
+        CanvasItemList items;
         items.append(shape1);
         items.append(shape2);
 
@@ -271,6 +273,17 @@ void DSBBranch::align()
         //m_canvas->getActions().clear();
         //m_canvas->interrupt_graph_layout();
     }
+    */
+    CanvasItemList items;
+    foreach (DSBNode *node, nodes)
+    {
+        ShapeObj *shape = node->getShape();
+        items.append(shape);
+    }
+    dtype type = DIST_MIDDLE;
+    bool preserveOrder = true;
+    Distribution *dist = createDistribution(NULL, type, items, preserveOrder);
+    dist->setSeparation(50);
 }
 
 

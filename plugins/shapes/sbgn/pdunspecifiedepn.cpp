@@ -25,6 +25,8 @@
 
 #include "pdunspecifiedepn.h"
 
+#include "libdunnartcanvas/canvas.h"
+
 #include "libdsbpe/dsbcompartment.h"
 #include "libdsbpe/dsbbranch.h"
 #include "libdsbpe/dsbclone.h"
@@ -85,7 +87,12 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
         QList<DSBBranch*> branches = comp->findBranches(m_clone, forward);
         foreach (DSBBranch *branch, branches)
         {
+            if (branch->nodes.first() != m_clone) {continue;}
             branch->align();
+            Canvas *canvas = comp->getCanvas();
+            canvas->stop_graph_layout();
+            canvas->getActions().clear();
+            canvas->restart_graph_layout();
         }
     }
     else if (action == flowBackward)
