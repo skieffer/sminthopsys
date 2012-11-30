@@ -492,7 +492,10 @@ bool Router::processTransaction(void)
         // XXX: We don't really need to do this if we're not using Partial
         //      Feedback.  Without this the blocked edges still route
         //      around the shape until it leaves the connector.
-        obstacle->makeInactive();
+        if (obstacle->isActive())
+        {
+            obstacle->makeInactive();
+        }
 
         if (!isMove)
         {
