@@ -61,6 +61,27 @@ DSBPathway *DSBNode::getPathway()
     return m_pathway;
 }
 
+bool DSBNode::isConnectedTo(DSBNode *other)
+{
+    DSBClone *cl    = dynamic_cast<DSBClone*>(this);
+    DSBReaction *re = dynamic_cast<DSBReaction*>(this);
+    if (cl)
+    {
+        re = dynamic_cast<DSBReaction*>(other);
+    }
+    else if (re)
+    {
+        cl = dynamic_cast<DSBClone*>(other);
+    }
+    else
+    {
+        qDebug() << "ERROR: Found Node that is neither Clone nor Reaction.";
+        return false; // this shouldn't happen!
+    }
+    if (!cl || !re) { return false; } // can only be connected if one clone and one reaction
+    return re->hasCloneAsInputOrOutput(cl);
+}
+
 #if 0
 void DSBNode::addBranch(DSBBranch *branch)
 {
