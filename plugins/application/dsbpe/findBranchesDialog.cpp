@@ -27,6 +27,7 @@
 //diag:
 #include <iostream>
 #include "libdunnartcanvas/templates.h"
+#include "libdunnartcanvas/graphlayout.h"
 //
 
 #include "findBranchesDialog.h"
@@ -100,10 +101,13 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
 void FindBranchesDialog::test(){
     if (m_endpointClone)
     {
-        DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
-        comp->dumpPathwayNodePositions();
+        //DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
+        //comp->dumpPathwayNodePositions();
         //comp->jogPathways();
         //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
+        //m_canvas->m_graphlayout->initThread();
+        //m_canvas->m_graphlayout = new GraphLayout(m_canvas);
+        //m_canvas->m_graphlayout->freeShiftFromDunnart = false;
     }
 }
 

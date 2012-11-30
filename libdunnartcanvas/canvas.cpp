@@ -1242,6 +1242,7 @@ void Canvas::setOptAutomaticGraphLayout(const bool value)
     if (m_opt_automatic_graph_layout)
     {
         m_router->SimpleRouting = m_simple_paths_during_layout;
+        setLayoutSuspended(false);
     }
     else
     {
