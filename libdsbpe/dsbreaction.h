@@ -62,6 +62,7 @@ public:
     // Check properties
     bool isIntercompartmental();
     bool isReversible();
+    bool hasCloneAsInputOrOutput(DSBClone *cl);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);

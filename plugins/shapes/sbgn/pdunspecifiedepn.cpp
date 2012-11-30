@@ -80,24 +80,25 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
         update();
     }
     */
-    if (action == flowForward)
+    if (action == flowForward || action == flowBackward)
     {
         DSBCompartment *comp = m_clone->getSpecies()->getCompartment();
-        bool forward = true;
+        bool forward = (action == flowForward);
         QList<DSBBranch*> branches = comp->findBranches(m_clone, forward);
         foreach (DSBBranch *branch, branches)
         {
+            // if only want principal branch:
             if (branch->nodes.first() != m_clone) {continue;}
-            branch->align();
+            //
+            // if want chord-free subbranch:
+            branch = branch->computeChordfreeSubbranch();
+            //
+            branch->align(forward);
             Canvas *canvas = comp->getCanvas();
             canvas->stop_graph_layout();
             canvas->getActions().clear();
             canvas->restart_graph_layout();
         }
-    }
-    else if (action == flowBackward)
-    {
-        //...
     }
     return action;
 }

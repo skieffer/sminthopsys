@@ -236,8 +236,32 @@ void DSBBranch::drawAt(QPointF r)
     }
 }
 
+DSBBranch *DSBBranch::computeChordfreeSubbranch()
+{
+    if (cycle) {return this;}
+    if (nodes.size() < 3) {return this;}
+    DSBBranch *cfsb = new DSBBranch;
+    cfsb->parent = parent;
+    int i = 0;
+    DSBNode *node = nodes.at(i);
+    cfsb->nodes.append(node);
+    while (i+1 < nodes.size())
+    {
+        int j = nodes.size();
+        bool connected = false;
+        while (!connected && j > i+1)
+        {
+            j--;
+            connected = node->isConnectedTo(nodes.at(j));
+        }
+        i = j;
+        node = nodes.at(i);
+        cfsb->nodes.append(node);
+    }
+    return cfsb;
+}
 
-void DSBBranch::align()
+void DSBBranch::align(bool forward)
 {
     if (cycle) { return; } // Shouldn't align cycles.
     if (nodes.size() < 2) { return; } // Can't align fewer than 2 nodes.
@@ -275,15 +299,29 @@ void DSBBranch::align()
     }
     */
     CanvasItemList items;
-    foreach (DSBNode *node, nodes)
+    if (forward)
     {
-        ShapeObj *shape = node->getShape();
-        items.append(shape);
+        foreach (DSBNode *node, nodes)
+        {
+            ShapeObj *shape = node->getShape();
+            items.append(shape);
+        }
+    }
+    else
+    {
+        for (int i = nodes.size()-1; i >= 0; i--)
+        {
+            DSBNode *node = nodes.at(i);
+            ShapeObj *shape = node->getShape();
+            items.append(shape);
+        }
     }
     dtype type = DIST_MIDDLE;
     bool preserveOrder = true;
     Distribution *dist = createDistribution(NULL, type, items, preserveOrder);
     dist->setSeparation(50);
+
+    m_guideline = createAlignment(ALIGN_CENTER, items);
 }
 
 

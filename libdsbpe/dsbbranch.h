@@ -68,7 +68,8 @@ public:
     QSizeF getSize();
     // Other methods
     QString toString();
-    void align();
+    void align(bool forward);
+    DSBBranch *computeChordfreeSubbranch(void);
     // Friends
     friend class DSBFork;
 

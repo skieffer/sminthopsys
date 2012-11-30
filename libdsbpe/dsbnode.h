@@ -66,6 +66,7 @@ public:
     void setPathway(DSBPathway *pw);
     DSBPathway *getPathway(void);
     virtual void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs) = 0;
+    bool isConnectedTo(DSBNode *other);
 #if 0
     void addBranch(DSBBranch *branch);
     void addFork(DSBFork *fork);

@@ -141,6 +141,14 @@ bool DSBReaction::isIntercompartmental()
     return (comps.size() > 1);
 }
 
+bool DSBReaction::hasCloneAsInputOrOutput(DSBClone *cl)
+{
+    // Orbit should have been built before calling this!
+    return (m_inputBranchHeads.contains(cl) || m_outputBranchHeads.contains(cl) ||
+            m_inSatellites.contains(cl) || m_outSatellites.contains(cl) ||
+            m_mainInput == cl || m_mainOutput == cl);
+}
+
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */

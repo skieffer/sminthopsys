@@ -317,6 +317,11 @@ QSizeF DSBCompartment::rowLayout()
 
     height += maxObjHeight;
     m_size = QSizeF(width,height);
+
+    // KLUDGE:
+    if (!m_pathways.empty()) { m_size = QSizeF(2000,1500); }
+    //
+
     return m_size;
 }
 
