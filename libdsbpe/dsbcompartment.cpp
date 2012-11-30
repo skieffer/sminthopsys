@@ -133,6 +133,7 @@ QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *eve
     // Add actions to menu.
     QAction *cloneCurrencyMolecules = menu.addAction(QObject::tr("Clone currency molecules"));
     QAction *showPathways = menu.addAction(QObject::tr("Show pathways"));
+
     //
 
     QApplication::restoreOverrideCursor();
@@ -393,14 +394,15 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
     return QSizeF(width,height);
 }
 
-void DSBCompartment::findBranches(DSBClone *endpt, bool forward)
+QList<DSBBranch*> DSBCompartment::findBranches(DSBClone *endpt, bool forward)
 {
-    findBranches(endpt, forward, m_default_blacklist);
+    return findBranches(endpt, forward, m_default_blacklist);
 }
 
-void DSBCompartment::findBranches(
+QList<DSBBranch*> DSBCompartment::findBranches(
         DSBClone *endpt, bool forward, QList<QString> blacklist)
 {
+    /*
     // Set discrete clonings for all blacklisted species, with
     // the exception that if the selected endpoint clone is of a
     // blacklisted species, then we do not change its cloning.
@@ -416,6 +418,7 @@ void DSBCompartment::findBranches(
         }
     }
     m_canvas->restart_graph_layout();
+    */
 
     // Find branches.
     bool extended = true; // Throw away branches of length 1.
@@ -423,13 +426,12 @@ void DSBCompartment::findBranches(
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }
-    // Build pathway.
-    if (branches.size()>0)
-    {
-        DSBPathway *pathway = new DSBPathway(endpt, branches);
-        pathway->setCanvas(m_canvas);
-        m_pathways.append(pathway);
-    }
+    return branches;
+}
+
+void DSBCompartment::addPathway(DSBPathway *pw)
+{
+    m_pathways.append(pw);
 }
 
 void DSBCompartment::setRelPt(QPointF p)

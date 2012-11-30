@@ -38,6 +38,8 @@
 #include "libdsbpe/dsbclone.h"
 #include "libdsbpe/dsbspecies.h"
 #include "libdsbpe/dsbcompartment.h"
+#include "libdsbpe/dsbbranch.h"
+#include "libdsbpe/dsbpathway.h"
 
 namespace dunnart {
 
@@ -101,6 +103,7 @@ void FindBranchesDialog::test(){
         DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
         comp->dumpPathwayNodePositions();
         //comp->jogPathways();
+        //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
     }
 }
 
@@ -157,16 +160,26 @@ void FindBranchesDialog::findBranches()
         int whichEnd = m_endpointCBox->currentIndex();
         bool forward = (whichEnd == 0);
 
-        // Ask the compartment to switch to a "longest branch layout", and redraw.
-        comp->findBranches(m_endpointClone, forward);
-        //comp->layout();
-        //comp->redraw();
+        // Ask the compartment to clone all blacklisted species except for
+        // that of the selected clone.
+        QSet<QString> names = comp->m_default_blacklist.toSet();
+        QString name = m_endpointClone->getSpecies()->getName();
+        names.remove(name);
+        comp->setDiscreteCloningsByName(names.toList());
+
+        // Find branches.
+        QList<DSBBranch*> branches = comp->findBranches(m_endpointClone, forward);
+
+        // Build pathway.
+        if (branches.size()>0)
+        {
+            DSBPathway *pathway = new DSBPathway(m_endpointClone, branches);
+            pathway->setCanvas(m_canvas);
+            comp->addPathway(pathway);
+        }
+        // Redisplay compartment.
         comp->redisplay();
     }
-    // random testing:
-    //LinearTemplate *lintemp = new LinearTemplate(0,0,TEMPLATE_LINEAR_VERT,m_canvas);
-    //
-    //
 
     // Finally, "accept" the click on the dialog's OK button.
     accept();

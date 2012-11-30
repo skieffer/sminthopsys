@@ -40,6 +40,7 @@
 #include "libdunnartcanvas/canvasitem.h"
 #include "libdunnartcanvas/shape.h"
 #include "libdunnartcanvas/guideline.h"
+#include "libdunnartcanvas/separation.h"
 #include "libdunnartcanvas/relationship.h"
 
 namespace dunnart {
@@ -234,36 +235,44 @@ void DSBBranch::drawAt(QPointF r)
     }
 }
 
-/*
+
 void DSBBranch::align()
 {
     if (cycle) { return; } // Shouldn't align cycles.
-    if (nodes.size() < 2) { return; } // Can't align less than 2 nodes.
+    if (nodes.size() < 2) { return; } // Can't align fewer than 2 nodes.
     CanvasItemList items;
+    m_guideline = NULL;
     for (int i = 0; i+1 < nodes.size(); i++)
     {
-        DSBNode *node1 = nodes.at(i);
-        DSBNode *node2 = nodes.at(i+1);
-        items.append(node2);
+        ShapeObj *shape1 = nodes.at(i)->getShape();
+        ShapeObj *shape2 = nodes.at(i+1)->getShape();
+        items.append(shape1);
+        items.append(shape2);
 
         // Create separation constraint.
-        //...
+        double sep = 50;
+        dtype type = SEP_VERTICAL;
+        createSeparation(NULL, type, items, sep);
 
-        if (i==0)
+        // If guideline has not yet been created...
+        if (!m_guideline)
         {
-            items.push_front(node1);
+            // ...create it.
             m_guideline = createAlignment(ALIGN_CENTER, items);
         }
         else
         {
+            // ...otherwise simply align the next node to the guideline.
+            items.takeFirst();
             items.push_front(m_guideline);
             createAlignment(ALIGN_CENTER, items);
         }
-        // Do we need m_canvas.getActions().clear(); ?
-        m_canvas->interrupt_graph_layout();
+        // Prompt the layout engine to respond.
+        //m_canvas->getActions().clear();
+        //m_canvas->interrupt_graph_layout();
     }
 }
-*/
+
 
 void DSBBranch::setGuideline()
 {

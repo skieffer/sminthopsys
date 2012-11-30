@@ -51,6 +51,7 @@ public:
     void setCanvas(Canvas *canvas);
     QRectF getBbox();
     DSBClone *getLeadClone();
+    DSBBranch *getMainBranch();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
