@@ -104,6 +104,12 @@ void DSBPathway::setFirstBranch(DSBBranch *branch)
     m_headNode = branch->nodes.first();
 }
 
+DSBBranch *DSBPathway::getMainBranch()
+{
+    assert(!m_branches.empty());
+    return m_branches.first();
+}
+
 void DSBPathway::addBranchNodes(DSBBranch *branch)
 {
     QList<DSBNode*> nodes = branch->getOwnNodes();

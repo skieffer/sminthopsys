@@ -25,6 +25,11 @@
 
 #include "pdunspecifiedepn.h"
 
+#include "libdsbpe/dsbcompartment.h"
+#include "libdsbpe/dsbbranch.h"
+#include "libdsbpe/dsbclone.h"
+#include "libdsbpe/dsbspecies.h"
+
 using namespace dunnart;
 
 QPainterPath UnspecifiedEPN::buildPainterPath(void)
@@ -60,16 +65,33 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
         menu.addSeparator();
     }
 
-    QAction* switchCloning = menu.addAction(tr("Switch cloning"));
+    //QAction* switchCloning = menu.addAction(tr("Switch cloning"));
+    QAction *flowForward = menu.addAction(QObject::tr("Flow forward"));
+    QAction *flowBackward = menu.addAction(QObject::tr("Flow backward"));
 
     QAction *action = ShapeObj::buildAndExecContextMenu(event, menu);
 
+    /*
     if (action == switchCloning) {
         cloned = (!cloned);
         setPainterPath(buildPainterPath());
         update();
     }
-
+    */
+    if (action == flowForward)
+    {
+        DSBCompartment *comp = m_clone->getSpecies()->getCompartment();
+        bool forward = true;
+        QList<DSBBranch*> branches = comp->findBranches(m_clone, forward);
+        foreach (DSBBranch *branch, branches)
+        {
+            branch->align();
+        }
+    }
+    else if (action == flowBackward)
+    {
+        //...
+    }
     return action;
 }
 // vim: filetype=cpp ts=4 sw=4 et tw=0 wm=0 cindent

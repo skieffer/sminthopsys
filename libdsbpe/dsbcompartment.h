@@ -81,8 +81,9 @@ public:
     void addReaction(DSBReaction *reac);
     void addCompartment(DSBCompartment *comp);
     void addCompartments(QList<DSBCompartment*> comps);
-    void findBranches(DSBClone *endpt, bool forward);
-    void findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
+    void addPathway(DSBPathway *pw);
+    QList<DSBBranch*> findBranches(DSBClone *endpt, bool forward);
+    QList<DSBBranch*> findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
     void buildConnectedPathways(void);
     void setTrivialCloning(void);
     void setDiscreteCloningsByName(QList<QString> names);
