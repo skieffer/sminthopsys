@@ -56,6 +56,7 @@ public:
     DSBPathway *getPathway();
     void setCanvas(Canvas *canvas);
     QRectF getBbox();
+    QList<DSBNode*> getOwnNodes();
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -67,6 +68,9 @@ public:
     QSizeF getSize();
     // Other methods
     QString toString();
+    void align(bool forward);
+    DSBBranch *computeChordfreeSubbranch(void);
+    // Friends
     friend class DSBFork;
 
 private:
@@ -78,7 +82,6 @@ private:
 
     DSBPathway *m_pathway;
 
-    QList<DSBNode*> getOwnNodes();
     void setMainConnections(QList<DSBNode*> own);
     //void connect(ShapeObj *shp1, ShapeObj *shp2);
     void connect(DSBNode *node1, DSBNode *node2);

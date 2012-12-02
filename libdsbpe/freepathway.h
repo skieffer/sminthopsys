@@ -1,5 +1,5 @@
 /*
- * DSBPE plugin - For editing Systems Biology pathways.
+ * Sminthopsys - Dunnart Systems Biology plugin
  *
  * Copyright (C) 2011-2012  Monash University
  *
@@ -22,36 +22,23 @@
  * Author(s): Steven Kieffer  <http://skieffer.info>
 */
 
-#ifndef DSBPATHWAY_H
-#define DSBPATHWAY_H
+#ifndef SMINTHOPSYSFREEPATHWAY_H
+#define SMINTHOPSYSFREEPATHWAY_H
 
 #include <QList>
-#include <QMap>
 
-#include "dsbreclayout.h"
-
-class QRectF;
+#include "dsbpathway.h"
 
 namespace dunnart {
 
-class DSBBranch;
-class DSBFork;
-class DSBNode;
 class DSBClone;
-class Canvas;
+class DSBReaction;
 
-class DSBPathway : public DSBRecLayout
+class FreePathway : public DSBPathway
 {
 public:
-    // Constructors
-    DSBPathway();
-    DSBPathway(DSBNode *head, QList<DSBBranch*> branches);
-    // Get and set
-    QList<DSBBranch*> getBranches();
-    void setCanvas(Canvas *canvas);
-    QRectF getBbox();
-    DSBClone *getLeadClone();
-    DSBBranch *getMainBranch();
+    // Constructor
+    FreePathway(QList<DSBClone*> clones, QList<DSBReaction*> reacs);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -59,23 +46,15 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
-    // Other
-    QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
-    void setFirstBranch(DSBBranch *branch);
-    void addBranch(DSBBranch *branch);
-
 private:
+    QList<DSBClone*> m_clones;
+    QList<DSBReaction*> m_reactions;
+
     QPointF m_relpt;
     QPointF m_basept;
     QSizeF m_size;
-    DSBNode *m_headNode;
-    Canvas *m_canvas;
-    QList<DSBBranch*> m_branches;
-    QList<DSBNode*> m_allNodes;
-
-    void addBranchNodes(DSBBranch *branch);
 };
 
 }
 
-#endif // DSBPATHWAY_H
+#endif // SMINTHOPSYSFREEPATHWAY_H

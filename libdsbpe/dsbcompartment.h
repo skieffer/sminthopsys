@@ -28,8 +28,18 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QObject>
+#include <QGraphicsItem>
 
 #include "dsbreclayout.h"
+
+class QRectF;
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
+class QGraphicsSceneMouseEvent;
+class QAction;
+class QMenu;
 
 namespace dunnart {
 
@@ -41,23 +51,45 @@ class DSBBranch;
 class DSBPathway;
 class Canvas;
 
-class DSBCompartment : public DSBRecLayout
-{
+class DSBCompartment;
 
+class CompartmentShape : public QGraphicsItem
+{
+public:
+    CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void resize(qreal w, qreal h);
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    QAction *buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu& menu);
+private:
+    DSBCompartment *m_compartment;
+    qreal m_width;
+    qreal m_height;
+    qreal m_penWidth;
+    qreal m_cornerRadius;
+};
+
+class DSBCompartment : public DSBRecLayout, public QObject
+{
 public:
     // Constructors
-    //DSBCompartment();
     DSBCompartment(QString compartmentName);
     // Building methods
     void addSpecies(DSBSpecies *spec);
     void addReaction(DSBReaction *reac);
     void addCompartment(DSBCompartment *comp);
     void addCompartments(QList<DSBCompartment*> comps);
-    void findBranches(DSBClone *endpt, bool forward);
-    void findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
-    void setTrivialCloning();
+    void addPathway(DSBPathway *pw);
+    QList<DSBBranch*> findBranches(DSBClone *endpt, bool forward);
+    QList<DSBBranch*> findBranches(DSBClone *endpt, bool forward, QList<QString> blacklist);
+    void buildConnectedPathways(void);
+    void setTrivialCloning(void);
+    void setDiscreteCloningsByName(QList<QString> names);
+    void cloneCurrencyMolecules(void);
     // Various layout methods
-    QSizeF rowLayout();
+    QSizeF rowLayout(void);
     QSizeF layoutSquareCloneArray(QList<DSBClone*> clones, int ulx, int uly);
     // RecLayout methods
     QSizeF layout();
@@ -66,13 +98,21 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
-    void redisplay();
+    void redisplay(void);
     // Misc get and set
-    QString getName();
+    QString getName(void);
     void setParent(DSBCompartment *comp);
     void setCanvas(Canvas *canvas);
+    Canvas *getCanvas(void);
+    void setBoundaryVisible(bool b);
+
+    void dumpPathwayNodePositions(void);
+    void dumpAllClonePositions(void);
 
     QList<QString> m_default_blacklist;
+
+public slots:
+    void jogPathways(void);
 
 private:
     QString m_compartmentName;
@@ -86,9 +126,12 @@ private:
     QList<DSBCompartment*> m_compartments;
     QList<DSBPathway*> m_pathways;
     bool m_show_reactions;
+    bool m_boundaryVisible;
+    CompartmentShape *m_boundaryShape;
 
-    QList<DSBClone*> getAllClones();
-    QList<DSBClone*> getLooseClones();
+    QList<DSBClone*> getAllClones(void);
+    QList<DSBClone*> getLooseClones(void);
+
 
 };
 

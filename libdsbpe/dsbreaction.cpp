@@ -141,6 +141,14 @@ bool DSBReaction::isIntercompartmental()
     return (comps.size() > 1);
 }
 
+bool DSBReaction::hasCloneAsInputOrOutput(DSBClone *cl)
+{
+    // Orbit should have been built before calling this!
+    return (m_inputBranchHeads.contains(cl) || m_outputBranchHeads.contains(cl) ||
+            m_inSatellites.contains(cl) || m_outSatellites.contains(cl) ||
+            m_mainInput == cl || m_mainOutput == cl);
+}
+
 /* Give this reaction links to all species involved in it,
    and give those species links to this reaction.
   */
@@ -311,9 +319,8 @@ void DSBReaction::buildOrbit()
     m_outSatellites.clear();
     m_modSatellites.clear();
     QList<DSBSpecies*> allSpecies = getAllSpecies();
-    for (int i = 0; i < allSpecies.size(); i++)
+    foreach (DSBSpecies *spec, allSpecies)
     {
-        DSBSpecies *spec = allSpecies.at(i);
         DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
         takeNonBranchHeads(cla->reactants, m_inSatellites);
         takeNonBranchHeads(cla->products, m_outSatellites);
@@ -366,6 +373,20 @@ QList<DSBClone*> DSBReaction::getAllSatellites()
     allSats.append(m_outSatellites);
     allSats.append(m_modSatellites);
     return allSats;
+}
+
+QList<DSBClone*> DSBReaction::getAllClones()
+{
+    QList<DSBClone*> clones;
+    QList<DSBSpecies*> species = getAllSpecies();
+    foreach (DSBSpecies *spec, species)
+    {
+        DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
+        clones.append(cla->reactants);
+        clones.append(cla->modifiers);
+        clones.append(cla->products);
+    }
+    return clones;
 }
 
 bool DSBReaction::isBranchHead(DSBClone *clone)
@@ -483,6 +504,11 @@ QSizeF DSBReaction::getSize()
     return m_size;
 }
 
+QPointF DSBReaction::getBasePt()
+{
+    return m_basept;
+}
+
 void DSBReaction::setRelPt(QPointF p)
 {
     m_relpt = p;
@@ -560,6 +586,26 @@ void DSBReaction::connectTo(DSBClone *cl)
 ShapeObj *DSBReaction::getShape()
 {
     return m_shape;
+}
+
+void DSBReaction::moveShape(qreal dx, qreal dy)
+{
+    if (m_shape)
+    {
+        m_shape->moveBy(dx,dy);
+    }
+}
+
+void DSBReaction::connectedComponent(QSet<DSBClone *> &ccClones, QSet<DSBReaction *> &ccReacs)
+{
+    ccReacs.insert(this); // add self to component
+    // ignore clones already seen
+    QSet<DSBClone*> cset = getAllClones().toSet().subtract(ccClones);
+    // ask remaining ones to add to the connected component
+    foreach (DSBClone *cl, cset)
+    {
+        cl->connectedComponent(ccClones, ccReacs);
+    }
 }
 
 }

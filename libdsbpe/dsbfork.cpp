@@ -30,10 +30,12 @@
 
 namespace dunnart {
 
-DSBFork::DSBFork(DSBClone *c)
-{
-    m_centre = c;
-}
+DSBFork::DSBFork(DSBClone *c) :
+    m_centre(c),
+    m_pathway(NULL),
+    m_mainInput(NULL),
+    m_mainOutput(NULL)
+{}
 
 void DSBFork::addUpstream(DSBReaction *reac)
 {
@@ -68,14 +70,13 @@ DSBPathway *DSBFork::getPathway()
 QSizeF DSBFork::layout()
 {
     // TODO: Write proper method.
-    // For now, we just set relpt of branches headed by off-main
-    // downstreamReacs.
+    // For now, we just set relpt of branches headed by off-main downstreamReacs.
     // We assume our centre clone has already been given a relpt within its branch,
-    // and that its branch has as well.
+    // and that its branch has as well, relative to its pathway.
     QPointF crel = m_centre->m_relpt;
-    DSBBranch *b = m_pathway->getBranch(m_centre);
+    DSBBranch *b = m_centre->getBranch();
     QPointF brel = b->m_relpt;
-    QPointF frel = brel + crel; // relpt of this fork within pathway,
+    QPointF frel = brel + crel; // relpt of this fork within its pathway,
                                 // where basept of fork is centre of centre clone
     qreal x = frel.x(); qreal y = frel.y();
     qreal jump = 250;
@@ -85,15 +86,12 @@ QSizeF DSBFork::layout()
     {
         DSBReaction *reac = m_downstreamReacs.at(i);
         if (reac == m_mainOutput) { continue; }
-        // FIXME: should this cast be necessary?
-        //DSBNode *n = dynamic_cast<DSBNode*>(reac);
-        DSBBranch *b = m_pathway->getBranch(reac);
+        DSBBranch *b = reac->getBranch();
         b->setRelPt(QPointF(x,y));
         // Prepare next x value.
         if (disp<0) { disp *= -1; }
         else { disp = -disp-jump; }
     }
-    //...
     m_size = QSizeF(0,0);
     return m_size;
 }
@@ -122,7 +120,6 @@ void DSBFork::redraw()
 void DSBFork::drawAt(QPointF r)
 {
     m_basept = r;
-    // TODO
 }
 
 

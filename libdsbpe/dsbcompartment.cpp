@@ -23,9 +23,19 @@
 */
 #include "dsbcompartment.h"
 
+#include <QObject>
 #include <QtGui>
 #include <QString>
 #include <QList>
+#include <QSet>
+#include <QRectF>
+#include <QPainter>
+#include <QPen>
+#include <QBrush>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
+#include <QTimer>
+#include <QThread>
 
 #include <math.h>
 #include <assert.h>
@@ -36,19 +46,118 @@
 #include "dsbnode.h"
 #include "dsbbranch.h"
 #include "dsbpathway.h"
+#include "freepathway.h"
 
 #include "libdunnartcanvas/canvas.h"
 
 //debugging:
 #include "libdunnartcanvas/graphlayout.h"
 #include "libdunnartcanvas/graphdata.h"
+#include "plugins/shapes/sbgn/pdepn.h"
 //
 
 namespace dunnart {
 
+CompartmentShape::CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+    m_compartment(comp),
+    m_penWidth(10),
+    m_cornerRadius(20)
+{
+    setX(x);
+    setY(y);
+    resize(w,h);
+}
+
+void CompartmentShape::resize(qreal w, qreal h)
+{
+    qreal cr2 = 2*m_cornerRadius;
+    m_width  = (w > cr2 ? w : cr2);
+    m_height = (h > cr2 ? h : cr2);
+    update();
+}
+
+QRectF CompartmentShape::boundingRect() const
+{
+    QRectF rect = QRectF(- m_penWidth/2, - m_penWidth/2,
+                  m_width + m_penWidth, m_height + m_penWidth);
+    return rect;
+}
+
+void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                             QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    QPen pen;
+    pen.setWidthF(m_penWidth);
+    painter->setPen(pen);
+    QBrush brush(Qt::white);
+    painter->setBrush(brush);
+    QPainterPath path;
+    QRectF rect = QRectF(0,0,m_width,m_height);
+    path.addRoundedRect(rect, m_cornerRadius, m_cornerRadius);
+    painter->drawPath(path);
+}
+
+void CompartmentShape::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (m_compartment->getCanvas() == NULL)
+    {
+        return;
+    }
+
+    if (event->button() == Qt::LeftButton)
+    {
+        QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+        // Drop through to parent handler.
+    }
+    else if (event->button() == Qt::RightButton)
+    {
+        QMenu menu;
+        QAction *action = buildAndExecContextMenu(event, menu);
+        if (action)
+        {
+            event->accept();
+        }
+    }
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu &menu)
+{
+    if (!menu.isEmpty())
+    {
+        menu.addSeparator();
+    }
+    // Add actions to menu.
+    QAction *cloneCurrencyMolecules = menu.addAction(QObject::tr("Clone currency molecules"));
+    QAction *showPathways = menu.addAction(QObject::tr("Show pathways"));
+
+    //
+
+    QApplication::restoreOverrideCursor();
+    QAction *action = menu.exec(event->screenPos());
+
+    if (action == cloneCurrencyMolecules)
+    {
+        m_compartment->cloneCurrencyMolecules();
+        m_compartment->redisplay();
+    }
+    else if (action == showPathways)
+    {
+        m_compartment->buildConnectedPathways();
+        m_compartment->redisplay();
+    }
+    return action;
+}
+
 DSBCompartment::DSBCompartment(QString compartmentName)
     : m_compartmentName(compartmentName),
-      m_parentCompartment(NULL)
+      m_parentCompartment(NULL),
+      m_show_reactions(false),
+      m_boundaryVisible(true),
+      m_boundaryShape(NULL)
 {
     m_default_blacklist <<
                            "ATP" <<
@@ -65,6 +174,11 @@ DSBCompartment::DSBCompartment(QString compartmentName)
                            "CO2" <<
                            "P" <<
                            "PP";
+}
+
+void DSBCompartment::setBoundaryVisible(bool b)
+{
+    m_boundaryVisible = b;
 }
 
 void DSBCompartment::addSpecies(DSBSpecies *spec)
@@ -105,6 +219,11 @@ void DSBCompartment::setParent(DSBCompartment *comp)
 void DSBCompartment::setCanvas(Canvas *canvas)
 {
     m_canvas = canvas;
+}
+
+Canvas *DSBCompartment::getCanvas()
+{
+    return m_canvas;
 }
 
 QList<DSBClone*> DSBCompartment::getAllClones()
@@ -149,19 +268,27 @@ QList<DSBClone*> DSBCompartment::getLooseClones()
 
 QSizeF DSBCompartment::rowLayout()
 {
-    int pad = 100;
-    int x = 0;
-    int maxHeight = 0;
+    int topPad=50, bottomPad=50, leftPad=50, rightPad=50;
+    int horizSpacer=100;
+    int x = leftPad;
+    int y = topPad;
+    int width = leftPad+rightPad;
+    int height = topPad+bottomPad;
+    int maxObjHeight = 0;
+    int objCount = 0;
 
     // Compartments
     for (int i = 0; i < m_compartments.size(); i++)
     {
         DSBCompartment *comp = m_compartments.at(i);
         QSizeF size = comp->layout();
-        comp->setRelPt(QPointF(x,0));
-        x += size.width() + pad;
+        if (objCount > 0) { x += horizSpacer; }
+        comp->setRelPt(QPointF(x,y));
+        x += size.width();
+        width += size.width();
         int h = size.height();
-        maxHeight = (h > maxHeight? h : maxHeight);
+        maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+        objCount++;
     }
 
     // Pathways
@@ -169,31 +296,66 @@ QSizeF DSBCompartment::rowLayout()
     {
         DSBPathway *pw = m_pathways.at(i);
         QSizeF size = pw->layout();
-        pw->setRelPt(QPointF(x,0));
-        x += size.width() + pad;
+        if (objCount > 0) { x += horizSpacer; }
+        pw->setRelPt(QPointF(x,y));
+        x += size.width();
+        width += size.width();
         int h = size.height();
-        maxHeight = (h > maxHeight? h : maxHeight);
+        maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+        objCount++;
     }
 
     // Loose clones
     QList<DSBClone*> loose = getLooseClones();
-    QSizeF size = layoutSquareCloneArray(loose, x, 0);
-    x += size.width() + pad;
+    if (objCount > 0) { x += horizSpacer; }
+    QSizeF size = layoutSquareCloneArray(loose, x, y);
+    x += size.width();
+    width += size.width();
     int h = size.height();
-    maxHeight = (h > maxHeight? h : maxHeight);
+    maxObjHeight = (h > maxObjHeight? h : maxObjHeight);
+    objCount++;
 
-    int width = (pad <= x ? x-pad : x);
-    m_size = QSizeF(width,maxHeight);
+    height += maxObjHeight;
+    m_size = QSizeF(width,height);
+
+    // KLUDGE:
+    if (!m_pathways.empty()) { m_size = QSizeF(2000,1500); }
+    //
+
     return m_size;
 }
 
+/* Set all clonings to trivial.
+  */
 void DSBCompartment::setTrivialCloning()
 {
-    // Set all clonings to trivial.
+    m_canvas->stop_graph_layout();
     for (int i = 0; i < m_species.size(); i++)
     {
         m_species.at(i)->setTrivialCloning();
     }
+    m_canvas->restart_graph_layout();
+}
+
+/* Set discrete clonings for all species named.
+  */
+void DSBCompartment::setDiscreteCloningsByName(QList<QString> names)
+{
+    m_canvas->stop_graph_layout();
+    foreach (DSBSpecies *spec, m_species)
+    {
+        QString name = spec->getName();
+        if (names.contains(name))
+        {
+            spec->setDiscreteCloning();
+        }
+    }
+    m_canvas->restart_graph_layout();
+}
+
+void DSBCompartment::cloneCurrencyMolecules()
+{
+    setDiscreteCloningsByName(m_default_blacklist);
 }
 
 QSizeF DSBCompartment::layoutSquareCloneArray(
@@ -218,31 +380,34 @@ QSizeF DSBCompartment::layoutSquareCloneArray(
     }
 
     int cols = ceil(sqrt(numClones)); // number of columns in array
-    int rows = ceil(numClones/cols); // number of rows
-    int u = 50; // unit of separation
-    int sepUnits = 2; // separation between adjacent nodes, in units u
-    int x0 = ulx, y0 = uly, x, y, col, row;
+    int rows = ceil(numClones/float(cols)); // number of rows
+    int horizSpacer = 30;
+    int vertSpacer  = 30;
+    int w = 70, h = 50;
+    int x0 = ulx + w/2, y0 = uly + h/2;
+    int x, y, col, row;
     for (int i = 0; i < numClones; i++)
     {
         col = i%cols;
         row = i/cols;
-        x = x0 + col*sepUnits*u;
-        y = y0 + row*sepUnits*u;
+        x = x0 + col*(w + horizSpacer);
+        y = y0 + row*(h + vertSpacer);
         clones.at(i)->setRelPt(QPointF(x,y));
     }
-    int width = cols*sepUnits*u + 70;
-    int height = rows*sepUnits*u + 50;
+    int width  = w + (cols - 1)*(w + horizSpacer);
+    int height = h + (rows - 1)*(h + vertSpacer);
     return QSizeF(width,height);
 }
 
-void DSBCompartment::findBranches(DSBClone *endpt, bool forward)
+QList<DSBBranch*> DSBCompartment::findBranches(DSBClone *endpt, bool forward)
 {
-    findBranches(endpt, forward, m_default_blacklist);
+    return findBranches(endpt, forward, m_default_blacklist);
 }
 
-void DSBCompartment::findBranches(
+QList<DSBBranch*> DSBCompartment::findBranches(
         DSBClone *endpt, bool forward, QList<QString> blacklist)
 {
+    /*
     // Set discrete clonings for all blacklisted species, with
     // the exception that if the selected endpoint clone is of a
     // blacklisted species, then we do not change its cloning.
@@ -258,6 +423,7 @@ void DSBCompartment::findBranches(
         }
     }
     m_canvas->restart_graph_layout();
+    */
 
     // Find branches.
     bool extended = true; // Throw away branches of length 1.
@@ -265,13 +431,12 @@ void DSBCompartment::findBranches(
     for (int i = 0; i < branches.size(); i++) {
         qDebug() << branches.at(i)->toString();
     }
-    // Build pathway.
-    if (branches.size()>0)
-    {
-        DSBPathway *pathway = new DSBPathway(endpt, branches);
-        pathway->setCanvas(m_canvas);
-        m_pathways.append(pathway);
-    }
+    return branches;
+}
+
+void DSBCompartment::addPathway(DSBPathway *pw)
+{
+    m_pathways.append(pw);
 }
 
 void DSBCompartment::setRelPt(QPointF p)
@@ -293,8 +458,24 @@ void DSBCompartment::redraw()
 void DSBCompartment::drawAt(QPointF r)
 {
     m_basept = r;
+    //qDebug() << "=====================================================================";
+    //qDebug() << m_compartmentName << " basept: " << m_basept.x() << ", " << m_basept.y();
+
     // Compartment boundary
-    //   (TODO)
+    if (m_boundaryVisible)
+    {
+        if (!m_boundaryShape)
+        {
+            m_boundaryShape = new CompartmentShape(this, m_basept.x(), m_basept.y(),
+                                                          m_size.width(), m_size.height());
+            m_canvas->addItem(m_boundaryShape);
+        }
+        else
+        {
+            m_boundaryShape->setPos(m_basept.x(), m_basept.y());
+            m_boundaryShape->resize(m_size.width(), m_size.height());
+        }
+    }
 
     // Loose reactions:
     if (m_show_reactions)
@@ -323,6 +504,11 @@ void DSBCompartment::drawAt(QPointF r)
         DSBClone *cl = clones.at(i);
         cl->drawRelTo(m_basept);
     }
+
+    //debug:
+    //dumpAllClonePositions();
+    //dumpPathwayNodePositions();
+    //
 }
 
 void DSBCompartment::redisplay()
@@ -335,19 +521,134 @@ void DSBCompartment::redisplay()
     {
         layout();
         redraw();
-        //debugging:
-        /*
-        qDebug() << "Flag1";
-        qDebug() << "canvas is at: " << m_canvas;
-        GraphLayout *gl = m_canvas->getGraphLayout();
-        GraphData *gd = gl->getGraphData();
-        qDebug() << "Graph Data =================================";
-        qDebug() << "  Node count: " << gd->getNodeCount();
-        qDebug() << "  Edge count: " << gd->getEdgeCount();
-        qDebug() << "  Constraint count: " << gd->ccs.size();
-        */
-        //
+        // The following two commands are necessary in order to get
+        // the layout to respond. Neither one alone is sufficient.
+        m_canvas->getActions().clear();
+        m_canvas->restart_graph_layout();
     }
 }
 
+// TODO This function was for debugging and can be removed.
+void DSBCompartment::jogPathways()
+{
+    foreach (DSBPathway *pw, m_pathways)
+    {
+        //Try to jog the canvas to get layout to take effect!
+        DSBClone *cl = pw->getLeadClone();
+        if (cl)
+        {
+            //ShapeObj *shape = cl->getShape();
+            //m_canvas->restart_graph_layout();
+            //m_canvas->restart_graph_layout();
+            //m_canvas->processResponseTasks();
+            //m_canvas->processResponseTasks();
+            m_canvas->getActions().clear();
+            m_canvas->restart_graph_layout();
+
+            /*
+            Actions& actions = m_canvas->getActions();
+            //
+            actions.moveList.push_back(shape);
+            cl->moveShape(1,1);
+            m_canvas->interrupt_graph_layout();
+            //
+            actions.moveList.push_back(shape);
+            cl->moveShape(1,1);
+            m_canvas->interrupt_graph_layout();
+            */
+        }
+    }
+    foreach (DSBCompartment *comp, m_compartments)
+    {
+        comp->jogPathways();
+    }
 }
+
+/* For debugging output.
+  */
+void DSBCompartment::dumpPathwayNodePositions()
+{
+    foreach(DSBPathway *pw, m_pathways)
+    {
+        foreach(DSBBranch *br, pw->getBranches())
+        {
+            foreach(DSBNode *nd, br->nodes)
+            {
+                ShapeObj *shape = nd->getShape();
+                DSBClone *cl = dynamic_cast<DSBClone*>(nd);
+                DSBReaction *re = dynamic_cast<DSBReaction*>(nd);
+                if (cl)
+                {
+                    if (shape) {
+                        qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
+                    } else {
+                        qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
+                    }
+                }
+                else if (re)
+                {
+                    if (shape) {
+                        qDebug() << re->getName() << " " << re->getBasePt() << " " << shape->pos();
+                    } else {
+                        qDebug() << re->getName() << " " << re->getBasePt() << " no shape";
+                    }
+                }
+            }
+        }
+    }
+}
+
+// More debugging output
+void DSBCompartment::dumpAllClonePositions()
+{
+    QList<DSBClone*> clones = getAllClones();
+    foreach (DSBClone *cl, clones)
+    {
+        ShapeObj *shape = cl->getShape();
+        if (shape) {
+            qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " " << shape->pos();
+        } else {
+            qDebug() << cl->getSpecies()->getName() << " " << cl->getCloneId() << " " << cl->getBasePt() << " no shape";
+        }
+    }
+}
+
+/* Build one pathway (FreePathway class) for each connected component made
+   up by the reactions and the current clones.
+  */
+void DSBCompartment::buildConnectedPathways()
+{
+    QSet<DSBClone*> clones = getAllClones().toSet();
+    while (!clones.empty())
+    {
+        DSBClone *cl = clones.toList().first();
+        QSet<DSBClone*> ccClones; // connected component clones
+        QSet<DSBReaction*> ccReacs; // connected component reactions
+        cl->connectedComponent(ccClones, ccReacs);
+        FreePathway *pw = new FreePathway(ccClones.toList(), ccReacs.toList());
+        m_pathways.append(pw);
+        clones.subtract(ccClones);
+    }
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

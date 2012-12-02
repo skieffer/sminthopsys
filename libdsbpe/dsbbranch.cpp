@@ -40,13 +40,15 @@
 #include "libdunnartcanvas/canvasitem.h"
 #include "libdunnartcanvas/shape.h"
 #include "libdunnartcanvas/guideline.h"
+#include "libdunnartcanvas/separation.h"
+#include "libdunnartcanvas/distribution.h"
 #include "libdunnartcanvas/relationship.h"
 
 namespace dunnart {
 
 DSBNode *DSBBranch::getPredecessor(DSBNode *node)
 {
-    DSBNode *pred = 0;
+    DSBNode *pred = NULL;
     int i = nodes.indexOf(node);
     if (i>0)
     {
@@ -57,7 +59,7 @@ DSBNode *DSBBranch::getPredecessor(DSBNode *node)
 
 DSBNode *DSBBranch::getSuccessor(DSBNode *node)
 {
-    DSBNode *succ = 0;
+    DSBNode *succ = NULL;
     int i = nodes.indexOf(node);
     if (i>=0 && i+1 < nodes.size())
     {
@@ -140,21 +142,21 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
             if (n)
             {
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
+                assert(c);
                 reac->setMainInput(c);
             }
-            //else { reac->setMainInput(NULL); }
             // successor
             n = getSuccessor(reac);
             if (n)
             {
                 DSBClone *c = dynamic_cast<DSBClone*>(n);
+                assert(c);
                 reac->setMainOutput(c);
             }
-            //else { reac->setMainOutput(NULL); }
         }
         else if (cl)
         {
-            DSBFork *fork = m_pathway->getFork(cl);
+            DSBFork *fork = cl->getFork();
             if (fork)
             {
                 // predecessor
@@ -162,22 +164,22 @@ void DSBBranch::setMainConnections(QList<DSBNode*> own)
                 if (n)
                 {
                     DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    assert(r);
                     fork->setMainInput(r);
                 }
-                else { fork->setMainInput(NULL); }
                 // successor
                 n = getSuccessor(cl);
                 if (n)
                 {
                     DSBReaction *r = dynamic_cast<DSBReaction*>(n);
+                    assert(r);
                     fork->setMainOutput(r);
                 }
-                else { fork->setMainOutput(NULL); }
             }
         }
         else
         {
-            // TODO: report error
+            qDebug() << "ERROR: Found Node which was neither Clone nor Reaction: " << n;
         }
     }
 }
@@ -234,6 +236,95 @@ void DSBBranch::drawAt(QPointF r)
     }
 }
 
+DSBBranch *DSBBranch::computeChordfreeSubbranch()
+{
+    if (cycle) {return this;}
+    if (nodes.size() < 3) {return this;}
+    DSBBranch *cfsb = new DSBBranch;
+    cfsb->parent = parent;
+    int i = 0;
+    DSBNode *node = nodes.at(i);
+    cfsb->nodes.append(node);
+    while (i+1 < nodes.size())
+    {
+        int j = nodes.size();
+        bool connected = false;
+        while (!connected && j > i+1)
+        {
+            j--;
+            connected = node->isConnectedTo(nodes.at(j));
+        }
+        i = j;
+        node = nodes.at(i);
+        cfsb->nodes.append(node);
+    }
+    return cfsb;
+}
+
+void DSBBranch::align(bool forward)
+{
+    if (cycle) { return; } // Shouldn't align cycles.
+    if (nodes.size() < 2) { return; } // Can't align fewer than 2 nodes.
+    m_guideline = NULL;
+    /*
+    for (int i = 0; i+1 < nodes.size(); i++)
+    {
+        ShapeObj *shape1 = nodes.at(i)->getShape();
+        ShapeObj *shape2 = nodes.at(i+1)->getShape();
+        CanvasItemList items;
+        items.append(shape1);
+        items.append(shape2);
+
+        // Create separation constraint.
+        double sep = 50;
+        dtype type = SEP_VERTICAL;
+        createSeparation(NULL, type, items, sep);
+
+        // If guideline has not yet been created...
+        if (!m_guideline)
+        {
+            // ...create it.
+            m_guideline = createAlignment(ALIGN_CENTER, items);
+        }
+        else
+        {
+            // ...otherwise simply align the next node to the guideline.
+            items.takeFirst();
+            items.push_front(m_guideline);
+            createAlignment(ALIGN_CENTER, items);
+        }
+        // Prompt the layout engine to respond.
+        //m_canvas->getActions().clear();
+        //m_canvas->interrupt_graph_layout();
+    }
+    */
+    CanvasItemList items;
+    if (forward)
+    {
+        foreach (DSBNode *node, nodes)
+        {
+            ShapeObj *shape = node->getShape();
+            items.append(shape);
+        }
+    }
+    else
+    {
+        for (int i = nodes.size()-1; i >= 0; i--)
+        {
+            DSBNode *node = nodes.at(i);
+            ShapeObj *shape = node->getShape();
+            items.append(shape);
+        }
+    }
+    dtype type = DIST_MIDDLE;
+    bool preserveOrder = true;
+    Distribution *dist = createDistribution(NULL, type, items, preserveOrder);
+    dist->setSeparation(50);
+
+    m_guideline = createAlignment(ALIGN_CENTER, items);
+}
+
+
 void DSBBranch::setGuideline()
 {
     CanvasItemList shapes;
@@ -245,6 +336,13 @@ void DSBBranch::setGuideline()
         shapes.append(shape);
     }
     m_guideline = createAlignment(ALIGN_CENTER, shapes);
+    // Make sure position is set correctly.
+    DSBNode *first = own.first();
+    QPointF pt = first->getBasePt();
+    double x0 = (double) pt.x();
+    m_guideline->setPosition(x0);
+    // Finally, reinitialize the GraphData object, so that the layout thread knows this
+    // guideline is there.
     m_canvas->interrupt_graph_layout();
 }
 
@@ -291,8 +389,8 @@ void DSBBranch::connect(DSBNode *node1, DSBNode *node2)
 {
     DSBReaction *reac1 = dynamic_cast<DSBReaction*>(node1);
     DSBReaction *reac2 = dynamic_cast<DSBReaction*>(node2);
-    DSBReaction *reac = 0;
-    DSBClone *cl = 0;
+    DSBReaction *reac = NULL;
+    DSBClone *cl = NULL;
     if (reac1)
     {
         reac = reac1;

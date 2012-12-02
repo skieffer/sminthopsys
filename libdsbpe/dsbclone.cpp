@@ -40,7 +40,8 @@ namespace dunnart {
 DSBClone::DSBClone(DSBSpecies *dsbspec) :
     DSBNode(),
     m_dsbspec(dsbspec),
-    m_epn(NULL)
+    m_epn(NULL),
+    m_fork(NULL)
 {}
 
 void DSBClone::setCloneNum(int num)
@@ -200,6 +201,29 @@ ShapeObj *DSBClone::getShape()
     return m_epn;
 }
 
+void DSBClone::setFork(DSBFork *fork)
+{
+    m_fork = fork;
+}
+
+DSBFork *DSBClone::getFork()
+{
+    return m_fork;
+}
+
+void DSBClone::moveShape(qreal dx, qreal dy)
+{
+    if (m_epn)
+    {
+        m_epn->moveBy(dx,dy);
+    }
+}
+
+QPointF DSBClone::getBasePt()
+{
+    return m_basept;
+}
+
 /* Both reactions entered, and reversible reactions exited, are
   enterable. Compute list of all those.
   */
@@ -219,7 +243,7 @@ QList<DSBReaction*> DSBClone::computeEnterableReactions()
         // We can only use it if it is reversible.
         if (reac->isReversible()) { enterable.insert(reac); }
     }
-    return QList<DSBReaction*>::fromSet(enterable);
+    return enterable.toList();
 }
 
 /* Both reactions exited, and reversible reactions entered, are
@@ -241,7 +265,7 @@ QList<DSBReaction*> DSBClone::computeExitableReactions()
         // We can only use it if it is reversible.
         if (reac->isReversible()) { exitable.insert(reac); }
     }
-    return QList<DSBReaction*>::fromSet(exitable);
+    return exitable.toList();
 }
 
 QList<DSBBranch*> DSBClone::findBranchesRec(
@@ -284,6 +308,29 @@ QList<DSBBranch*> DSBClone::findBranchesRec(
         }
     }
     return mergeSelfWithBranches(branches, blacklist);
+}
+
+QList<DSBReaction*> DSBClone::getAllReactions()
+{
+    QList<DSBReaction*> all;
+    all.append(m_reactionsEntered);
+    all.append(m_reactionsExited);
+    all.append(m_reactionsModified);
+    return all;
+}
+
+void DSBClone::connectedComponent(QSet<DSBClone *> &ccClones, QSet<DSBReaction *> &ccReacs)
+{
+    ccClones.insert(this); // add self to component
+    // ignore reactions already seen
+    QSet<DSBReaction*> rset = getAllReactions().toSet().subtract(ccReacs);
+    // ask remaining ones to add to the connected component
+    foreach (DSBReaction *reac, rset)
+    {
+        // skip intercompartmental reactions
+        if (reac->isIntercompartmental()) { continue; }
+        reac->connectedComponent(ccClones, ccReacs);
+    }
 }
 
 }

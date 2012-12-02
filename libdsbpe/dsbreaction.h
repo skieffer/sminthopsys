@@ -62,6 +62,7 @@ public:
     // Check properties
     bool isIntercompartmental();
     bool isReversible();
+    bool hasCloneAsInputOrOutput(DSBClone *cl);
     // RecLayout methods
     QSizeF layout();
     void setRelPt(QPointF p);
@@ -79,8 +80,11 @@ public:
     void setMainOutput(DSBClone *mo);
     enum ReacSide {ABOVE, BELOW, LEFT, RIGHT};
     ShapeObj *getShape();
+    void moveShape(qreal dx, qreal dy);
+    QPointF getBasePt();
     QRectF getBbox();
     void connectTo(DSBClone *cl);
+    void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
 
 private:
     Reaction *m_sbmlReaction;
@@ -116,6 +120,7 @@ private:
     void buildOrbit();
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
+    QList<DSBClone*> getAllClones();
     QList<DSBClone*> getAllSatellites();
     void takeNonBranchHeads(QList<DSBClone*>& src, QList<DSBClone*>& dst);
 

@@ -1242,6 +1242,7 @@ void Canvas::setOptAutomaticGraphLayout(const bool value)
     if (m_opt_automatic_graph_layout)
     {
         m_router->SimpleRouting = m_simple_paths_during_layout;
+        setLayoutSuspended(false);
     }
     else
     {
@@ -1742,9 +1743,10 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
         }
     }
 
+    // Do we need to deselectAll? This is a vestige from when this code
+    // belonged to the deleteSelection method.
     this->deselectAll();
-
-    qDebug() << "Deleting: FLAG1";
+    //
 
     // Do distro's first, in case they have guidelines and distros selected.
     for (QList<CanvasItem *>::iterator sh = items.begin();
@@ -1759,8 +1761,6 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
             (*sh)->deactivateAll(selSet);
         }
     }
-
-    qDebug() << "Deleting: FLAG2";
 
     for (QList<CanvasItem *>::iterator sh = items.begin();
             sh != items.end(); ++sh)
@@ -1778,8 +1778,6 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
             sel_shapes.push_back(shape); 
         }
     }
-
-    qDebug() << "Deleting: FLAG3";
     
     // Remove containment relationships.
     QList<CanvasItem *> canvas_items = this->items();
@@ -1792,17 +1790,12 @@ void Canvas::deleteItems(QList<CanvasItem*> items)
         }
     }
 
-    qDebug() << "Deleting: FLAG4";
-
     for (QList<CanvasItem *>::iterator sh = items.begin();
             sh != items.end(); ++sh)
     {
-        qDebug() << "removing item: " << *sh;
         QUndoCommand *cmd = new CmdCanvasSceneRemoveItem(this, *sh);
         undoMacro->addCommand(cmd);
     }
-
-    qDebug() << "Deleting: FLAG5";
 
     //restart_graph_layout();
 }

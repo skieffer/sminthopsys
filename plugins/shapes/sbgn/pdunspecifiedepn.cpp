@@ -25,6 +25,13 @@
 
 #include "pdunspecifiedepn.h"
 
+#include "libdunnartcanvas/canvas.h"
+
+#include "libdsbpe/dsbcompartment.h"
+#include "libdsbpe/dsbbranch.h"
+#include "libdsbpe/dsbclone.h"
+#include "libdsbpe/dsbspecies.h"
+
 using namespace dunnart;
 
 QPainterPath UnspecifiedEPN::buildPainterPath(void)
@@ -60,16 +67,39 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
         menu.addSeparator();
     }
 
-    QAction* switchCloning = menu.addAction(tr("Switch cloning"));
+    //QAction* switchCloning = menu.addAction(tr("Switch cloning"));
+    QAction *flowForward = menu.addAction(QObject::tr("Flow forward"));
+    QAction *flowBackward = menu.addAction(QObject::tr("Flow backward"));
 
     QAction *action = ShapeObj::buildAndExecContextMenu(event, menu);
 
+    /*
     if (action == switchCloning) {
         cloned = (!cloned);
         setPainterPath(buildPainterPath());
         update();
     }
-
+    */
+    if (action == flowForward || action == flowBackward)
+    {
+        DSBCompartment *comp = m_clone->getSpecies()->getCompartment();
+        bool forward = (action == flowForward);
+        QList<DSBBranch*> branches = comp->findBranches(m_clone, forward);
+        foreach (DSBBranch *branch, branches)
+        {
+            // if only want principal branch:
+            if (branch->nodes.first() != m_clone) {continue;}
+            //
+            // if want chord-free subbranch:
+            branch = branch->computeChordfreeSubbranch();
+            //
+            branch->align(forward);
+            Canvas *canvas = comp->getCanvas();
+            canvas->stop_graph_layout();
+            canvas->getActions().clear();
+            canvas->restart_graph_layout();
+        }
+    }
     return action;
 }
 // vim: filetype=cpp ts=4 sw=4 et tw=0 wm=0 cindent

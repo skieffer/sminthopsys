@@ -48,7 +48,7 @@ class Distribution: public Indicator
 {
     public:
         Distribution(GuidelineList *guides, int xp = DISTRO_DEFAULT_XPOS,
-                int yp = DISTRO_DEFAULT_YPOS);
+                int yp = DISTRO_DEFAULT_YPOS, bool preserveOrder = false);
         Distribution(const QDomElement& node, const QString& ns);
         QDomElement to_QDomElement(const unsigned int subset, 
                 QDomDocument& doc);
@@ -103,7 +103,7 @@ class Distribution: public Indicator
 typedef std::list<Distribution *> DistributionList;
 
 extern Distribution *createDistribution(QWidget *window, const dtype type,
-        CanvasItemList& objList);
+        CanvasItemList& objList, bool preserveOrder=false);
 
 
 }

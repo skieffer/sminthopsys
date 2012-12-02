@@ -148,7 +148,7 @@ class DistributionHandle : public Handle {
 };
 
 
-Distribution::Distribution(GuidelineList *guides, int xp, int yp)
+Distribution::Distribution(GuidelineList *guides, int xp, int yp, bool preserveOrder)
         : Indicator(ZORD_Distribution),
           draggedGuidelineN(0),
           lockedGuidelineN(0)
@@ -157,8 +157,11 @@ Distribution::Distribution(GuidelineList *guides, int xp, int yp)
     
     setItemType(x_distribution);
 
-    // Order guides:
-    guides->sort(guideCompare);
+    if (!preserveOrder)
+    {
+        // Order guides:
+        guides->sort(guideCompare);
+    }
     // Remove duplicates
     guides->unique();
 
@@ -896,7 +899,7 @@ void Distribution::Resize(Guideline *guide, const double newx, const double newy
 
 
 Distribution *createDistribution(QWidget *window, const dtype type,
-        CanvasItemList& objList)
+        CanvasItemList& objList, bool preserveOrder)
 {
     Distribution *distro = NULL;
     Guideline *guide = NULL;
@@ -945,8 +948,11 @@ Distribution *createDistribution(QWidget *window, const dtype type,
         }
     }
 
-    // Order guides:
-    guideList.sort(guideCompare);
+    if (!preserveOrder)
+    {
+        // Order guides:
+        guideList.sort(guideCompare);
+    }
     // Remove duplicates
     guideList.unique();
 
@@ -970,7 +976,7 @@ Distribution *createDistribution(QWidget *window, const dtype type,
     }
     else
     {
-        distro = new Distribution(&guideList);
+        distro = new Distribution(&guideList,0,0,preserveOrder);
         guide->canvas()->addItem(distro);
         // UNDO if (recUndo) add_undo_record(DELTA_ADD, distro);
     }

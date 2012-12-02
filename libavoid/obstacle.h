@@ -93,6 +93,8 @@ class Obstacle
         Polygon routingPolygon(void) const;
         ConnRefList attachedConnectors(void) const;
 
+        bool isActive(void) const;
+
     private:
         friend class Router;
         friend class ConnEnd;
@@ -107,7 +109,7 @@ class Obstacle
         virtual void outputCode(FILE *fp) const = 0;
         void makeActive(void);
         void makeInactive(void);
-        bool isActive(void) const;
+
         void updatePinPolyLineVisibility(void);
         void removeFromGraph(void);
         Point shapeCentre(void);
