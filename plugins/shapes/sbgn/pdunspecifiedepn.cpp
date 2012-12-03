@@ -70,6 +70,8 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
     //QAction* switchCloning = menu.addAction(tr("Switch cloning"));
     QAction *flowForward = menu.addAction(QObject::tr("Flow forward"));
     QAction *flowBackward = menu.addAction(QObject::tr("Flow backward"));
+    menu.addSeparator();
+    QAction *fullCloning = menu.addAction(QObject::tr("Full cloning"));
 
     QAction *action = ShapeObj::buildAndExecContextMenu(event, menu);
 
@@ -99,6 +101,13 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
             canvas->getActions().clear();
             canvas->restart_graph_layout();
         }
+    }
+    else if (action == fullCloning)
+    {
+        DSBSpecies *spec = m_clone->getSpecies();
+        DSBCompartment *comp = spec->getCompartment();
+        spec->setDiscreteCloningUsingExistingClones();
+        comp->redisplay();
     }
     return action;
 }

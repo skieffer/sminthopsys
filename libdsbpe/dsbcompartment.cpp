@@ -133,7 +133,6 @@ QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *eve
     // Add actions to menu.
     QAction *cloneCurrencyMolecules = menu.addAction(QObject::tr("Clone currency molecules"));
     QAction *showPathways = menu.addAction(QObject::tr("Show pathways"));
-
     //
 
     QApplication::restoreOverrideCursor();

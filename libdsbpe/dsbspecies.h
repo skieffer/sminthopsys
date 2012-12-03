@@ -45,6 +45,15 @@ struct DSBCloneAssignment
     QList<DSBClone*> modifiers;
 };
 
+enum RoleType {ENTERING, EXITING, MODIFYING};
+
+struct Role
+{
+    Role(RoleType t, DSBReaction *r) : type(t), reaction(r) {}
+    RoleType type;
+    DSBReaction *reaction;
+};
+
 class DSBSpecies
 {
 
@@ -63,6 +72,7 @@ public:
     DSBCompartment *getCompartment();
     void setTrivialCloning();
     void setDiscreteCloning();
+    void setDiscreteCloningUsingExistingClones();
     QList<DSBClone*> getClones();
     DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
 
@@ -81,6 +91,7 @@ private:
     QMap<QString, DSBCloneAssignment*> m_cloneAssignmentsByReactionId;
 
     void deleteClonesAndAssignments();
+    void deleteAssignments();
     void setCloneMarkers();
     DSBClone *makeNewClone();
 };
