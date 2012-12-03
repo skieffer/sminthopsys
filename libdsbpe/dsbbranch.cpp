@@ -319,7 +319,7 @@ void DSBBranch::align(bool forward)
     dtype type = DIST_MIDDLE;
     bool preserveOrder = true;
     Distribution *dist = createDistribution(NULL, type, items, preserveOrder);
-    dist->setSeparation(50);
+    dist->setSeparation(100);
 
     m_guideline = createAlignment(ALIGN_CENTER, items);
 }

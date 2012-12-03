@@ -433,6 +433,8 @@ QPointF DSBReaction::satPos(int num, int outOf, ReacSide side)
 
 QSizeF DSBReaction::layout()
 {
+    qDebug() << "reaction id: " << m_id;
+    qDebug() << (m_id=="reaction_35_1");
     buildOrbit();
     // Layout all satellites.
     QList<DSBClone*> allSats = getAllSatellites();
@@ -447,6 +449,11 @@ QSizeF DSBReaction::layout()
     {
         DSBClone *sat = m_inSatellites.at(i);
         QPointF p = satPos(i+1,numAbove,ABOVE);
+        QString foo = m_id;
+        if (m_id=="reaction_35_1") {
+            qDebug() << "foo"; // for breakpoint
+            qDebug() << "bar";
+        }
         sat->setRelPt(p);
     }
     // Relpts for satellites below
@@ -455,6 +462,9 @@ QSizeF DSBReaction::layout()
     {
         DSBClone *sat = m_outSatellites.at(i);
         QPointF p = satPos(i+1,numBelow,BELOW);
+        if (m_id=="reaction_35_1") {
+            qDebug() << "bar"; // for breakpoint
+        }
         sat->setRelPt(p);
     }
 
