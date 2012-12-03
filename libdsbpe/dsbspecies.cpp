@@ -124,6 +124,21 @@ void DSBSpecies::deleteClonesAndAssignments()
         m_clones.at(i)->deleteShape();
     }
 
+    // Delete the clone assignments.
+    deleteAssignments();
+
+    // Clear the list of clones, and delete the DSBClone objects themselves.
+    while (!m_clones.isEmpty())
+    {
+        DSBClone *cl = m_clones.takeFirst(); // removes it from the list
+        delete cl;
+    }
+    // Reset nextCloneId to 0.
+    m_nextCloneId = 0;
+}
+
+void DSBSpecies::deleteAssignments()
+{
     // Clear the clone assignment map, and delete the DSBCloneAssignment
     // structs themselves.
     QList<QString> reacIds = m_cloneAssignmentsByReactionId.keys();
@@ -134,14 +149,6 @@ void DSBSpecies::deleteClonesAndAssignments()
         m_cloneAssignmentsByReactionId.remove(id);
         delete ca;
     }
-    // Clear the list of clones, and delete the DSBClone objects themselves.
-    while (!m_clones.isEmpty())
-    {
-        DSBClone *cl = m_clones.takeFirst(); // removes it from the list
-        delete cl;
-    }
-    // Reset nextCloneId to 0.
-    m_nextCloneId = 0;
 }
 
 /*  Allocate a new DSBClone object, cloning this species,
@@ -253,6 +260,47 @@ void DSBSpecies::setDiscreteCloning()
         m_cloneAssignmentsByReactionId.insert(rid,ca);
     }
 
+    setCloneMarkers();
+}
+
+void DSBSpecies::setDiscreteCloningUsingExistingClones()
+{
+    // We assume every reaction in which this species participates already
+    // has at least one clone of this species assigned to it.
+
+    // Clear out the clone assignments.
+    deleteAssignments();
+
+    // Get copy of clone list, since it will be modified.
+    QList<DSBClone*> clones = m_clones;
+    foreach (DSBClone *cl, clones)
+    {
+        // How many roles does this clone play?
+        int numEntered = cl->m_reactionsEntered.size();
+        int numExited = cl->m_reactionsExited.size();
+        int numModified = cl->m_reactionsModified.size();
+        int numRoles = numEntered + numExited + numModified;
+        // If not more than one, then there's nothing to do.
+        if (numRoles < 2) { continue; }
+        // If more than one role, then must split up the roles.
+        QList<Role> roles;
+        foreach(DSBReaction *r,cl->m_reactionsEntered){roles.append(Role(ENTERING,r));}
+        foreach(DSBReaction *r,cl->m_reactionsExited){roles.append(Role(EXITING,r));}
+        foreach(DSBReaction *r,cl->m_reactionsModified){roles.append(Role(MODIFYING,r));}
+        //
+        int rolesLeft = numRoles;
+        foreach (DSBReaction *reac, cl->m_reactionsEntered)
+        {
+            DSBClone *c = NULL;
+            if (rolesLeft==1) { c = cl; }
+            else
+            {
+                c = makeNewClone();
+                //...
+            }
+
+        }
+    }
     setCloneMarkers();
 }
 
