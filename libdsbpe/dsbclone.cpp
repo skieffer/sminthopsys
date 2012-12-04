@@ -110,6 +110,15 @@ void DSBClone::deleteShape()
     //m_epn->setSelected(true);
 }
 
+QList<Role> DSBClone::getAllRoles()
+{
+    QList<Role> roles;
+    foreach(DSBReaction *r,m_reactionsEntered){roles.append(Role(ENTERING,r));}
+    foreach(DSBReaction *r,m_reactionsExited){roles.append(Role(EXITING,r));}
+    foreach(DSBReaction *r,m_reactionsModified){roles.append(Role(MODIFYING,r));}
+    return roles;
+}
+
 void DSBClone::clearRoles()
 {
     m_reactionsEntered.clear();

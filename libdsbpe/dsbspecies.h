@@ -76,6 +76,7 @@ public:
     QList<DSBClone*> getClones();
     DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
     QList<DSBReaction*> getAllReactions(void);
+    void mergeClones(DSBClone *clone, QList<DSBClone*> clones);
 
 private:
     int m_nextCloneId;
@@ -94,6 +95,7 @@ private:
     void deleteClonesAndAssignments();
     void deleteAssignments();
     void assign(Role r, DSBClone *cl);
+    void reassign(Role r, DSBClone *old, DSBClone *replacement);
     void setCloneMarkers();
     DSBClone *makeNewClone();
 };

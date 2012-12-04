@@ -76,6 +76,7 @@ public:
     DSBFork *getFork();
     void setFork(DSBFork *fork);
     void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
+    QList<Role> getAllRoles();
 
 private:
     QString m_cloneId;
