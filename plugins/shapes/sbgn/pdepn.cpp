@@ -25,14 +25,19 @@
 
 // See pdepn.h for comments on this class.
 
+#include "pdepn.h"
+
 #include <QtGui>
+#include <QPainter>
+#include <QFontDatabase>
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/shape.h"
 
-#include "pdepn.h"
-#include <QPainter>
-#include <QFontDatabase>
+#include "libdsbpe/dsbclone.h"
+#include "libdsbpe/dsbspecies.h"
+#include "libdsbpe/dsbcompartment.h"
+
 
 using namespace dunnart;
 
@@ -116,8 +121,33 @@ void PDEPN::set_is_cloned(bool b)
 
 void PDEPN::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "Dropping PDEPN=============================";
-    qDebug() << "  position: " << centrePos();
+    //qDebug() << "Dropping PDEPN=============================";
+    //qDebug() << "  position: " << centrePos();
+
+    DSBSpecies *spec = m_clone->getSpecies();
+    QList<DSBClone*> clones = spec->getClones();
+    QList<DSBClone*> overlapping;
+    foreach (DSBClone *cl, clones)
+    {
+        if (cl==m_clone) { continue; }
+        ShapeObj *other = cl->getShape();
+        if (other && collidesWithItem(other))
+        {
+            overlapping.append(cl);
+        }
+    }
+    if (overlapping.size() > 0)
+    {
+        Canvas *canvas = spec->canvas();
+        canvas->stop_graph_layout();
+        DSBCompartment *comp = spec->getCompartment();
+        comp->acceptCanvasBaseAndRelPts(QPointF(0,0));
+        spec->mergeClones(m_clone, overlapping);
+        bool reLayout = false;
+        comp->redisplay(reLayout);
+    }
+
+    // Forward call to other handlers.
     ShapeObj::mouseReleaseEvent(event);
 }
 

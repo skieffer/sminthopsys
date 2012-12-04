@@ -263,6 +263,31 @@ void DSBSpecies::setDiscreteCloning()
     setCloneMarkers();
 }
 
+void DSBSpecies::mergeClones(DSBClone *clone, QList<DSBClone *> clones)
+{
+    // Merge each clone in the list into the singleton.
+    foreach (DSBClone *cl, clones)
+    {
+        QList<Role> roles = cl->getAllRoles();
+        foreach (Role role, roles)
+        {
+            reassign(role,cl,clone);
+        }
+        m_clones.removeAll(cl);
+        cl->deleteShape();
+        delete cl;
+    }
+    setCloneMarkers();
+    // Ask the reactions with which this species interacts to clear their connectors,
+    // and recompute their orbits.
+    QList<DSBReaction*> reacs = getAllReactions();
+    foreach (DSBReaction *reac, reacs)
+    {
+        reac->clearConnectors();
+        reac->buildOrbit();
+    }
+}
+
 void DSBSpecies::setDiscreteCloningUsingExistingClones()
 {
     // We assume every reaction in which this species participates already
@@ -276,10 +301,15 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
     foreach (DSBClone *cl, clones)
     {
         // Make list of all roles.
+
+        QList<Role> roles = cl->getAllRoles();
+        /*
         QList<Role> roles;
         foreach(DSBReaction *r,cl->m_reactionsEntered){roles.append(Role(ENTERING,r));}
         foreach(DSBReaction *r,cl->m_reactionsExited){roles.append(Role(EXITING,r));}
         foreach(DSBReaction *r,cl->m_reactionsModified){roles.append(Role(MODIFYING,r));}
+        */
+
         // Clear roles in existing clone, then assign it just the first one.
         cl->clearRoles();
         assign(roles.first(),cl);
@@ -337,6 +367,33 @@ void DSBSpecies::assign(Role r, DSBClone *cl)
         cla->modifiers.append(cl);
         break;
     }
+    m_cloneAssignmentsByReactionId.insert(rid,cla);
+}
+
+void DSBSpecies::reassign(Role r, DSBClone *old, DSBClone *replacement)
+{
+    QString rid = r.reaction->getReactionId();
+    DSBCloneAssignment *cla = m_cloneAssignmentsByReactionId.value(
+                rid, new DSBCloneAssignment() );
+    QList<DSBClone*> *cloneList;
+    switch(r.type)
+    {
+    case ENTERING:
+        replacement->m_reactionsEntered.append(r.reaction);
+        cloneList = &cla->reactants;
+        break;
+    case EXITING:
+        replacement->m_reactionsExited.append(r.reaction);
+        cloneList = &cla->products;
+        break;
+    case MODIFYING:
+        replacement->m_reactionsModified.append(r.reaction);
+        cloneList = &cla->modifiers;
+        break;
+    }
+    int i = (*cloneList).indexOf(old);
+    if (i < 0) { (*cloneList).append(replacement); }
+    else { (*cloneList).replace(i,replacement); }
     m_cloneAssignmentsByReactionId.insert(rid,cla);
 }
 
