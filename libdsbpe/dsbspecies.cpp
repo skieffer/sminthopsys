@@ -282,26 +282,47 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
         int numRoles = numEntered + numExited + numModified;
         // If not more than one, then there's nothing to do.
         if (numRoles < 2) { continue; }
-        // If more than one role, then must split up the roles.
+        // If more than one role, then must divvy them up.
+        // Make list of all roles.
         QList<Role> roles;
         foreach(DSBReaction *r,cl->m_reactionsEntered){roles.append(Role(ENTERING,r));}
         foreach(DSBReaction *r,cl->m_reactionsExited){roles.append(Role(EXITING,r));}
         foreach(DSBReaction *r,cl->m_reactionsModified){roles.append(Role(MODIFYING,r));}
-        //
-        int rolesLeft = numRoles;
-        foreach (DSBReaction *reac, cl->m_reactionsEntered)
+        // Clear roles in existing clone, then assign it just the first one.
+        cl->clearRoles();
+        assign(roles.first(),cl);
+        // Assign each remaining role to a new clone.
+        for (int i = 1; i < roles.size(); i++)
         {
-            DSBClone *c = NULL;
-            if (rolesLeft==1) { c = cl; }
-            else
-            {
-                c = makeNewClone();
-                //...
-            }
-
+            Role role = roles.at(i);
+            DSBClone *c = makeNewClone();
+            assign(role,c);
         }
     }
     setCloneMarkers();
+}
+
+void DSBSpecies::assign(Role r, DSBClone *cl)
+{
+    QString rid = r.reaction->getReactionId();
+    DSBCloneAssignment *cla = m_cloneAssignmentsByReactionId.value(
+                rid, new DSBCloneAssignment() );
+    switch(r.type)
+    {
+    case ENTERING:
+        cl->m_reactionsEntered.append(r.reaction);
+        cla->reactants.append(cl);
+        break;
+    case EXITING:
+        cl->m_reactionsExited.append(r.reaction);
+        cla->products.append(cl);
+        break;
+    case MODIFYING:
+        cl->m_reactionsModified.append(r.reaction);
+        cla->modifiers.append(cl);
+        break;
+    }
+    m_cloneAssignmentsByReactionId.insert(rid,cla);
 }
 
 void DSBSpecies::setCloneMarkers()
