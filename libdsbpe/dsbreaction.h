@@ -115,6 +115,7 @@ private:
     QList<DSBClone*> getOutputClones();
 
     QMap<DSBClone*,Connector*> m_connectors;
+    void clearConnectors(void);
 
     ShapeObj *m_shape;
     void buildOrbit();

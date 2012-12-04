@@ -110,6 +110,29 @@ void DSBClone::deleteShape()
     //m_epn->setSelected(true);
 }
 
+void DSBClone::clearRoles()
+{
+    m_reactionsEntered.clear();
+    m_reactionsExited.clear();
+    m_reactionsModified.clear();
+}
+
+void DSBClone::assign(Role r)
+{
+    switch(r.type)
+    {
+    case ENTERING:
+        m_reactionsEntered.append(r.reaction);
+        break;
+    case EXITING:
+        m_reactionsExited.append(r.reaction);
+        break;
+    case MODIFYING:
+        m_reactionsModified.append(r.reaction);
+        break;
+    }
+}
+
 DSBSpecies *DSBClone::getSpecies()
 {
     return m_dsbspec;

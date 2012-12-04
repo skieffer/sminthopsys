@@ -30,13 +30,13 @@
 
 #include "dsbreclayout.h"
 #include "dsbnode.h"
+#include "dsbspecies.h"
 
 class QRectF;
 
 namespace dunnart {
 
 class PDEPN;
-class DSBSpecies;
 class DSBReaction;
 class DSBBranch;
 class DSBFork;
@@ -92,6 +92,8 @@ private:
     QList<DSBReaction*> computeEnterableReactions();
     QList<DSBReaction*> computeExitableReactions();
     QList<DSBReaction*> getAllReactions();
+    void clearRoles(void);
+    void assign(Role r);
 };
 
 }

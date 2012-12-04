@@ -433,8 +433,7 @@ QPointF DSBReaction::satPos(int num, int outOf, ReacSide side)
 
 QSizeF DSBReaction::layout()
 {
-    qDebug() << "reaction id: " << m_id;
-    qDebug() << (m_id=="reaction_35_1");
+    clearConnectors();
     buildOrbit();
     // Layout all satellites.
     QList<DSBClone*> allSats = getAllSatellites();
@@ -450,10 +449,6 @@ QSizeF DSBReaction::layout()
         DSBClone *sat = m_inSatellites.at(i);
         QPointF p = satPos(i+1,numAbove,ABOVE);
         QString foo = m_id;
-        if (m_id=="reaction_35_1") {
-            qDebug() << "foo"; // for breakpoint
-            qDebug() << "bar";
-        }
         sat->setRelPt(p);
     }
     // Relpts for satellites below
@@ -462,9 +457,6 @@ QSizeF DSBReaction::layout()
     {
         DSBClone *sat = m_outSatellites.at(i);
         QPointF p = satPos(i+1,numBelow,BELOW);
-        if (m_id=="reaction_35_1") {
-            qDebug() << "bar"; // for breakpoint
-        }
         sat->setRelPt(p);
     }
 
@@ -581,6 +573,24 @@ void DSBReaction::connectTo(DSBClone *cl)
     m_connectors.insert(cl,conn);
     QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, conn);
     m_canvas->currentUndoMacro()->addCommand(cmd);
+}
+
+void DSBReaction::clearConnectors()
+{
+    m_canvas->stop_graph_layout();
+    QList<DSBClone*> clones = m_connectors.keys();
+    foreach (DSBClone *cl, clones)
+    {
+        Connector *conn = m_connectors.value(cl);
+        m_connectors.remove(cl);
+        //m_canvas->deleteItem(conn);
+        m_canvas->clearSelection();
+        conn->setSelected(true);
+        m_canvas->deleteSelection();
+        //
+        delete conn;
+    }
+    m_canvas->restart_graph_layout();
 }
 
 ShapeObj *DSBReaction::getShape()

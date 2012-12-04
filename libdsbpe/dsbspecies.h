@@ -92,6 +92,7 @@ private:
 
     void deleteClonesAndAssignments();
     void deleteAssignments();
+    void assign(Role r, DSBClone *cl);
     void setCloneMarkers();
     DSBClone *makeNewClone();
 };
