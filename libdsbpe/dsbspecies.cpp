@@ -275,6 +275,7 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
     QList<DSBClone*> clones = m_clones;
     foreach (DSBClone *cl, clones)
     {
+        /*
         // How many roles does this clone play?
         int numEntered = cl->m_reactionsEntered.size();
         int numExited = cl->m_reactionsExited.size();
@@ -283,6 +284,8 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
         // If not more than one, then there's nothing to do.
         if (numRoles < 2) { continue; }
         // If more than one role, then must divvy them up.
+        */
+
         // Make list of all roles.
         QList<Role> roles;
         foreach(DSBReaction *r,cl->m_reactionsEntered){roles.append(Role(ENTERING,r));}

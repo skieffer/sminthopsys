@@ -321,6 +321,9 @@ void DSBReaction::buildOrbit()
     QList<DSBSpecies*> allSpecies = getAllSpecies();
     foreach (DSBSpecies *spec, allSpecies)
     {
+        if (spec->getName()=="melibiose") {
+            qDebug()<<"foo";
+        }
         DSBCloneAssignment *cla = spec->getCloneAssignmentByReactionId(m_id);
         takeNonBranchHeads(cla->reactants, m_inSatellites);
         takeNonBranchHeads(cla->products, m_outSatellites);
