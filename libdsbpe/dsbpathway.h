@@ -59,6 +59,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
     // Other
     QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
     void setFirstBranch(DSBBranch *branch);

@@ -70,6 +70,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
     // other
     void doublyLink(QMap<QString,DSBSpecies*> map);
     QList<DSBBranch*> findBranchesRec(
@@ -85,6 +86,8 @@ public:
     QRectF getBbox();
     void connectTo(DSBClone *cl);
     void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
+    void clearConnectors(void);
+    void buildOrbit();
 
 private:
     Reaction *m_sbmlReaction;
@@ -115,10 +118,8 @@ private:
     QList<DSBClone*> getOutputClones();
 
     QMap<DSBClone*,Connector*> m_connectors;
-    void clearConnectors(void);
 
     ShapeObj *m_shape;
-    void buildOrbit();
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
     QList<DSBClone*> getAllClones();

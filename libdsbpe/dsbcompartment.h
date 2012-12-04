@@ -98,7 +98,8 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
-    void redisplay(void);
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
+    void redisplay(bool reLayout = true);
     // Misc get and set
     QString getName(void);
     void setParent(DSBCompartment *comp);

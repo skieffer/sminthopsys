@@ -55,6 +55,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
 
 private:
     DSBClone *m_centre;

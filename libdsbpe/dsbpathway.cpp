@@ -229,6 +229,11 @@ QSizeF DSBPathway::layout()
     return m_size;
 }
 
+void DSBPathway::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    // TODO
+}
+
 QRectF DSBPathway::getBbox()
 {
     // layout methods of all branches should have been called first

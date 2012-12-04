@@ -434,6 +434,20 @@ QPointF DSBReaction::satPos(int num, int outOf, ReacSide side)
     return QPointF(x,y);
 }
 
+void DSBReaction::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    if (m_shape)
+    {
+        m_basept = m_shape->centrePos();
+    }
+    m_relpt = m_basept - parentBasePt;
+    QList<DSBClone*> allSats = getAllSatellites();
+    foreach (DSBClone *cl, allSats)
+    {
+        cl->acceptCanvasBaseAndRelPts(m_basept);
+    }
+}
+
 QSizeF DSBReaction::layout()
 {
     clearConnectors();

@@ -46,6 +46,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
 private:
     QList<DSBClone*> m_clones;
     QList<DSBReaction*> m_reactions;

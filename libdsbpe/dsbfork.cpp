@@ -96,6 +96,11 @@ QSizeF DSBFork::layout()
     return m_size;
 }
 
+void DSBFork::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    // TODO
+}
+
 QSizeF DSBFork::getSize()
 {
     return m_size;

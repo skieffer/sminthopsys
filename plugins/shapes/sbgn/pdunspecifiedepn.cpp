@@ -22,6 +22,7 @@
  * Author(s): Sarah Boyd  <Sarah.Boyd@monash.edu>
 */
 
+#include <QtGui>
 
 #include "pdunspecifiedepn.h"
 
@@ -106,8 +107,17 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
     {
         DSBSpecies *spec = m_clone->getSpecies();
         DSBCompartment *comp = spec->getCompartment();
+        comp->acceptCanvasBaseAndRelPts(QPointF(0,0));
         spec->setDiscreteCloningUsingExistingClones();
-        comp->redisplay();
+        //qDebug() << "Before accepting canvas positions===============================================";
+        //comp->dumpAllClonePositions();
+
+        //qDebug() << "After accepting canvas positions===============================================";
+        //comp->dumpAllClonePositions();
+        bool reLayout = false;
+        comp->redisplay(reLayout);
+        //qDebug() << "After redisplaying===============================================";
+        //comp->dumpAllClonePositions();
     }
     return action;
 }
