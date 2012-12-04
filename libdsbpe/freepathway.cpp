@@ -59,7 +59,6 @@ QSizeF FreePathway::layout()
 {
     foreach (DSBReaction *reac, m_reactions)
     {
-        reac->setRelPt(QPointF(500,500));
         reac->layout();
     }
     m_size = QSizeF(1000,1000);
