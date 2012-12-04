@@ -265,6 +265,29 @@ QList<DSBClone*> DSBCompartment::getLooseClones()
     return loose;
 }
 
+void DSBCompartment::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    if (m_boundaryShape)
+    {
+        QRectF rect = m_boundaryShape->boundingRect();
+        m_basept = rect.topLeft();
+    }
+    m_relpt = m_basept - parentBasePt;
+    foreach (DSBCompartment *comp, m_compartments)
+    {
+        comp->acceptCanvasBaseAndRelPts(m_basept);
+    }
+    foreach (DSBPathway *pw, m_pathways)
+    {
+        pw->acceptCanvasBaseAndRelPts(m_basept);
+    }
+    QList<DSBClone*> loose = getLooseClones();
+    foreach (DSBClone *cl, loose)
+    {
+        cl->acceptCanvasBaseAndRelPts(m_basept);
+    }
+}
+
 QSizeF DSBCompartment::rowLayout()
 {
     int topPad=50, bottomPad=50, leftPad=50, rightPad=50;
@@ -510,15 +533,18 @@ void DSBCompartment::drawAt(QPointF r)
     //
 }
 
-void DSBCompartment::redisplay()
+void DSBCompartment::redisplay(bool reLayout)
 {
     if (m_parentCompartment)
     {
-        m_parentCompartment->redisplay();
+        m_parentCompartment->redisplay(reLayout);
     }
     else
     {
-        layout();
+        if (reLayout)
+        {
+            layout();
+        }
         redraw();
         // The following two commands are necessary in order to get
         // the layout to respond. Neither one alone is sufficient.

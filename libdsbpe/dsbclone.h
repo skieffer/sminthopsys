@@ -64,6 +64,7 @@ public:
     void drawAt(QPointF r);
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
     QPointF getBasePt();
     QList<DSBBranch*> findBranchesRec(
             QList<QString>& seen, QList<QString> blacklist, bool forward, DSBNode *last);

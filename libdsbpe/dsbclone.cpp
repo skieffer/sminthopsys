@@ -173,6 +173,15 @@ void DSBClone::redraw()
     drawAt(m_basept);
 }
 
+void DSBClone::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    if (m_epn)
+    {
+        m_basept = m_epn->centrePos();
+    }
+    m_relpt = m_basept - parentBasePt;
+}
+
 void DSBClone::drawAt(QPointF r)
 {
     m_basept = r;

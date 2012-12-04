@@ -645,7 +645,7 @@ struct PreIteration : cola::PreIteration {
         bool interrupt = gl.interruptFromDunnart | gl.freeShiftFromDunnart;
         gl.m_layout_signal_mutex.unlock();
         if (interrupt) { 
-            qDebug("User interrupt detected in PreIteration!");
+            //qDebug("User interrupt detected in PreIteration!");
             return false; 
         }
         gl.m_changed_list_mutex.lock();
@@ -745,7 +745,7 @@ public:
         }
         if (interrupt)
         {
-            qDebug("User interrupt detected in PostIteration!");
+            //qDebug("User interrupt detected in PostIteration!");
             gl.m_layout_signal_mutex.lock();
             gl.interruptFromDunnart = true;
             if (gl.freeShiftFromDunnart)
@@ -1228,7 +1228,7 @@ void GraphLayout::setOptimizationMethod(OptimizationMethod newOM)
 
 void GraphLayout::initialise(void)
 {
-    qDebug("GraphLayout::initialise: runlevel=%d",runLevel);
+    //qDebug("GraphLayout::initialise: runlevel=%d",runLevel);
     if (m_graph!=NULL)
     {
         delete m_graph;

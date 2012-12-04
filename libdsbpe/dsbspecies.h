@@ -75,6 +75,7 @@ public:
     void setDiscreteCloningUsingExistingClones();
     QList<DSBClone*> getClones();
     DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
+    QList<DSBReaction*> getAllReactions(void);
 
 private:
     int m_nextCloneId;

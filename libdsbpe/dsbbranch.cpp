@@ -109,6 +109,11 @@ QSizeF DSBBranch::layout()
     return m_size;
 }
 
+void DSBBranch::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    // TODO
+}
+
 QRectF DSBBranch::getBbox()
 {
     // layout should have already been called

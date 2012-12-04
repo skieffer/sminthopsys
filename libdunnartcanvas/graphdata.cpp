@@ -681,8 +681,10 @@ GraphData::GraphData(Canvas *canvas, bool ignoreEdges,
            (int) topologyRoutes.size());
 #endif
 
+    /*
     qDebug("GraphData ctor done: ccs=%d, rs=%d",
            (int) ccs.size(), (int) rs.size());
+    */
 }
 
 

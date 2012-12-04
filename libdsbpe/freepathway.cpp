@@ -65,6 +65,15 @@ QSizeF FreePathway::layout()
     return m_size;
 }
 
+void FreePathway::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
+{
+    m_relpt = m_basept - parentBasePt;
+    foreach (DSBReaction *reac, m_reactions)
+    {
+        reac->acceptCanvasBaseAndRelPts(m_basept);
+    }
+}
+
 void FreePathway::drawAt(QPointF r)
 {
     m_basept = r;

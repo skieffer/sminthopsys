@@ -66,6 +66,7 @@ public:
     void setGuideline();
     void redraw();
     QSizeF getSize();
+    void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
     // Other methods
     QString toString();
     void align(bool forward);

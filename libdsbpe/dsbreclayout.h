@@ -80,6 +80,8 @@ public:
     //! Retrieve the size, after layout has been called.
     virtual QSizeF getSize() = 0;
 
+    virtual void acceptCanvasBaseAndRelPts(QPointF parentBasePt) = 0;
+
 };
 
 }

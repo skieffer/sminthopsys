@@ -275,17 +275,6 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
     QList<DSBClone*> clones = m_clones;
     foreach (DSBClone *cl, clones)
     {
-        /*
-        // How many roles does this clone play?
-        int numEntered = cl->m_reactionsEntered.size();
-        int numExited = cl->m_reactionsExited.size();
-        int numModified = cl->m_reactionsModified.size();
-        int numRoles = numEntered + numExited + numModified;
-        // If not more than one, then there's nothing to do.
-        if (numRoles < 2) { continue; }
-        // If more than one role, then must divvy them up.
-        */
-
         // Make list of all roles.
         QList<Role> roles;
         foreach(DSBReaction *r,cl->m_reactionsEntered){roles.append(Role(ENTERING,r));}
@@ -295,14 +284,37 @@ void DSBSpecies::setDiscreteCloningUsingExistingClones()
         cl->clearRoles();
         assign(roles.first(),cl);
         // Assign each remaining role to a new clone.
+        // Also layout the new clones, and draw them at same place as primary one.
+        QPointF bp = cl->getBasePt();
+        QPointF rp = cl->m_relpt;
         for (int i = 1; i < roles.size(); i++)
         {
             Role role = roles.at(i);
             DSBClone *c = makeNewClone();
             assign(role,c);
+            c->layout();
+            c->m_relpt = rp;
+            c->drawAt(bp);
         }
     }
     setCloneMarkers();
+    // Ask the reactions with which this species interacts to clear their connectors,
+    // and recompute their orbits.
+    QList<DSBReaction*> reacs = getAllReactions();
+    foreach (DSBReaction *reac, reacs)
+    {
+        reac->clearConnectors();
+        reac->buildOrbit();
+    }
+}
+
+QList<DSBReaction*> DSBSpecies::getAllReactions()
+{
+    QList<DSBReaction*> all;
+    all.append(m_reactionsEntered);
+    all.append(m_reactionsExited);
+    all.append(m_reactionsModified);
+    return all;
 }
 
 void DSBSpecies::assign(Role r, DSBClone *cl)
