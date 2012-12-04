@@ -25,6 +25,7 @@
 
 // See pdepn.h for comments on this class.
 
+#include <QtGui>
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/shape.h"
@@ -113,6 +114,12 @@ void PDEPN::set_is_cloned(bool b)
     cloned = b;
 }
 
+void PDEPN::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << "Dropping PDEPN=============================";
+    qDebug() << "  position: " << centrePos();
+    ShapeObj::mouseReleaseEvent(event);
+}
 
 
 #if 0

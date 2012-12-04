@@ -98,6 +98,7 @@ public:
     void set_is_cloned(bool b);
 
 protected:
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     PDEPN(QString l, bool cb, QString cl, bool m);
 //    PDEPN(Label *l, bool cb, Label *cl, bool m);
 //    PDEPN(Label *l, float w, float h, bool cb, Label *cl, bool m);
