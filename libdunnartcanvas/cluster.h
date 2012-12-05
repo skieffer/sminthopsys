@@ -56,8 +56,11 @@ class Cluster: public ShapeObj
               psn(0)
         {
         }
-        Cluster(CanvasItemList& memberList, QString id);
+        Cluster(CanvasItemList& memberList, QString id, bool rect = false);
         Cluster(Canvas *canvas, const QDomElement& node, const QString& ns);
+
+        void addItem(CanvasItem *item);
+        void addItems(CanvasItemList items);
 
         QDomElement to_QDomElement(const unsigned int subset,
                 QDomDocument& doc);
