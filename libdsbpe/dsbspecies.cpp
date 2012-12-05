@@ -288,6 +288,39 @@ void DSBSpecies::mergeClones(DSBClone *clone, QList<DSBClone *> clones)
     }
 }
 
+void DSBSpecies::fullyClone(DSBClone *cl)
+{
+    // Save clone's list of reactions now, before it gets changed.
+    QList<DSBReaction*> reacs = cl->getAllReactions();
+    // Get its list of roles.
+    QList<Role> roles = cl->getAllRoles();
+    // Clear roles in existing clone, then assign it just the first one.
+    cl->clearRoles();
+    Role firstRole = roles.first();
+    reassign(firstRole,cl,cl);
+    // Assign each remaining role to a new clone.
+    // Also layout the new clones, and draw them at same place as primary one.
+    QPointF bp = cl->getBasePt();
+    QPointF rp = cl->m_relpt;
+    for (int i = 1; i < roles.size(); i++)
+    {
+        Role role = roles.at(i);
+        DSBClone *c = makeNewClone();
+        reassign(role,cl,c);
+        c->layout();
+        c->m_relpt = rp;
+        c->drawAt(bp);
+    }
+    setCloneMarkers();
+    // Ask the reactions with which this clone interacts to clear their connectors,
+    // and recompute their orbits.
+    foreach (DSBReaction *reac, reacs)
+    {
+        reac->clearConnectors();
+        reac->buildOrbit();
+    }
+}
+
 void DSBSpecies::setDiscreteCloningUsingExistingClones()
 {
     // We assume every reaction in which this species participates already

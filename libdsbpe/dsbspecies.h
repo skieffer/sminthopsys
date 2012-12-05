@@ -73,6 +73,7 @@ public:
     void setTrivialCloning();
     void setDiscreteCloning();
     void setDiscreteCloningUsingExistingClones();
+    void fullyClone(DSBClone *cl);
     QList<DSBClone*> getClones();
     DSBCloneAssignment *getCloneAssignmentByReactionId(QString rid);
     QList<DSBReaction*> getAllReactions(void);
