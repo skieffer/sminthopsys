@@ -108,7 +108,10 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
         DSBSpecies *spec = m_clone->getSpecies();
         DSBCompartment *comp = spec->getCompartment();
         comp->acceptCanvasBaseAndRelPts(QPointF(0,0));
-        spec->setDiscreteCloningUsingExistingClones();
+
+        //spec->setDiscreteCloningUsingExistingClones();
+        spec->fullyClone(m_clone);
+
         //qDebug() << "Before accepting canvas positions===============================================";
         //comp->dumpAllClonePositions();
 
