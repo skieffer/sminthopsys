@@ -133,10 +133,10 @@ Cluster::Cluster(Canvas *canvas, const QDomElement& node, const QString& ns)
 }
 
 
-Cluster::Cluster(CanvasItemList& memberList, QString id)
+Cluster::Cluster(CanvasItemList& memberList, QString id, bool rect)
     : ShapeObj(x_cluster),
       avoidClusterRef(NULL),
-      rectangular(false)
+      rectangular(rect)
 {
     m_string_id = id;
     m_stroke_colour = m_fill_colour = clusterFillCol;
@@ -157,6 +157,27 @@ Cluster::Cluster(CanvasItemList& memberList, QString id)
     calculateBoundary();
 
     setPainterPath(buildPainterPath());
+}
+
+void Cluster::addItem(CanvasItem *item)
+{
+    CanvasItemList items;
+    items.append(item);
+    addItems(items);
+}
+
+void Cluster::addItems(CanvasItemList items)
+{
+    for (CanvasItemList::iterator curr = items.begin();
+            curr != items.end(); ++curr)
+    {
+        ShapeObj *shape = dynamic_cast<ShapeObj *> (*curr);
+        if (shape && (shape->canvasItemFlags() & CanvasItem::ItemIsClusterable))
+        {
+            members.push_back(shape);
+        }
+    }
+    recomputeBoundary();
 }
 
 

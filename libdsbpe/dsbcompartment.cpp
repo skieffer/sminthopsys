@@ -500,14 +500,15 @@ void DSBCompartment::drawAt(QPointF r)
             m_boundaryShape->setPos(m_basept.x(), m_basept.y());
             m_boundaryShape->resize(m_size.width(), m_size.height());
         }
-
+#if 0
         // Bounding cluster
         if (!m_cluster)
         {
             CanvasItemList cil;
             QString id = m_compartmentName + "_cluster";
-            m_cluster = new Cluster(cil,id);
-            m_cluster->rectangular = true;
+            bool rectangular = true;
+            m_cluster = new Cluster(cil,id,rectangular);
+            //m_cluster->rectangular = true;
             qreal cx = m_basept.x() + m_size.width()/2.0;
             qreal cy = m_basept.y() + m_size.height()/2.0;
             m_cluster->setCentrePos(QPointF(cx,cy));
@@ -521,6 +522,7 @@ void DSBCompartment::drawAt(QPointF r)
             m_cluster->setCentrePos(QPointF(cx,cy));
             m_cluster->setSize(m_size);
         }
+#endif
     }
 
     // Loose reactions:
