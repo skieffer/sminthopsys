@@ -8,7 +8,6 @@ SUBDIRS = \
         libtopology \
         libogdf \
 	libdunnartcanvas \
-        libdsbpe \
 	plugins \
 	editor
 

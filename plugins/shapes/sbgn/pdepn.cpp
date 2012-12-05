@@ -34,9 +34,9 @@
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/shape.h"
 
-#include "libdsbpe/dsbclone.h"
-#include "libdsbpe/dsbspecies.h"
-#include "libdsbpe/dsbcompartment.h"
+#include "plugins/application/sminthopsys/dsbclone.h"
+#include "plugins/application/sminthopsys/dsbspecies.h"
+#include "plugins/application/sminthopsys/dsbcompartment.h"
 
 
 using namespace dunnart;

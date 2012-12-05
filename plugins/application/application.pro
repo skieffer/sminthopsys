@@ -2,6 +2,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = garuda dsbpe
+SUBDIRS = garuda sminthopsys
 
 CONFIG += ordered
