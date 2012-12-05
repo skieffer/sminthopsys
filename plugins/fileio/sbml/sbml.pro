@@ -11,7 +11,7 @@ INCLUDEPATH += ../../..
 include(../../../common_options.qmake)
 include(../fileio_plugin_options.pri)
 
-LIBS         += -L$$DUNNARTBASE/build -ldsbpe
+LIBS         += -L$$DUNNARTBASE/build/plugins -lapplication_sminthopsys
 LIBS         += -L$$DUNNARTBASE/build/plugins -lshapes_sbgn
 
 HEADERS       =
