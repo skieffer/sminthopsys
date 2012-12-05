@@ -48,9 +48,9 @@
 #include "libdunnartcanvas/pluginshapefactory.h"
 #include "libdunnartcanvas/shape.h"
 
-#include "libdsbpe/dsbspecies.h"
-#include "libdsbpe/dsbreaction.h"
-#include "libdsbpe/dsbcompartment.h"
+#include "plugins/application/sminthopsys/dsbspecies.h"
+#include "plugins/application/sminthopsys/dsbreaction.h"
+#include "plugins/application/sminthopsys/dsbcompartment.h"
 
 #include "plugins/shapes/sbgn/pdepn.h"
 

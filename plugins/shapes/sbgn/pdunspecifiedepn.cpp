@@ -20,6 +20,7 @@
  *
  * 
  * Author(s): Sarah Boyd  <Sarah.Boyd@monash.edu>
+ *            Steve Kieffer <http://skieffer.info>
 */
 
 #include <QtGui>
@@ -28,10 +29,10 @@
 
 #include "libdunnartcanvas/canvas.h"
 
-#include "libdsbpe/dsbcompartment.h"
-#include "libdsbpe/dsbbranch.h"
-#include "libdsbpe/dsbclone.h"
-#include "libdsbpe/dsbspecies.h"
+#include "plugins/application/sminthopsys/dsbcompartment.h"
+#include "plugins/application/sminthopsys/dsbbranch.h"
+#include "plugins/application/sminthopsys/dsbclone.h"
+#include "plugins/application/sminthopsys/dsbspecies.h"
 
 using namespace dunnart;
 
