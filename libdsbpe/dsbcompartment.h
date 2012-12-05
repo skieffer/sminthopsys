@@ -50,6 +50,7 @@ class DSBNode;
 class DSBBranch;
 class DSBPathway;
 class Canvas;
+class Cluster;
 
 class DSBCompartment;
 
@@ -129,6 +130,7 @@ private:
     bool m_show_reactions;
     bool m_boundaryVisible;
     CompartmentShape *m_boundaryShape;
+    Cluster *m_cluster;
 
     QList<DSBClone*> getAllClones(void);
     QList<DSBClone*> getLooseClones(void);

@@ -49,6 +49,7 @@
 #include "freepathway.h"
 
 #include "libdunnartcanvas/canvas.h"
+#include "libdunnartcanvas/cluster.h"
 
 //debugging:
 #include "libdunnartcanvas/graphlayout.h"
@@ -156,7 +157,8 @@ DSBCompartment::DSBCompartment(QString compartmentName)
       m_parentCompartment(NULL),
       m_show_reactions(false),
       m_boundaryVisible(true),
-      m_boundaryShape(NULL)
+      m_boundaryShape(NULL),
+      m_cluster(NULL)
 {
     m_default_blacklist <<
                            "ATP" <<
@@ -486,6 +488,7 @@ void DSBCompartment::drawAt(QPointF r)
     // Compartment boundary
     if (m_boundaryVisible)
     {
+        // Boundary shape
         if (!m_boundaryShape)
         {
             m_boundaryShape = new CompartmentShape(this, m_basept.x(), m_basept.y(),
@@ -496,6 +499,27 @@ void DSBCompartment::drawAt(QPointF r)
         {
             m_boundaryShape->setPos(m_basept.x(), m_basept.y());
             m_boundaryShape->resize(m_size.width(), m_size.height());
+        }
+
+        // Bounding cluster
+        if (!m_cluster)
+        {
+            CanvasItemList cil;
+            QString id = m_compartmentName + "_cluster";
+            m_cluster = new Cluster(cil,id);
+            m_cluster->rectangular = true;
+            qreal cx = m_basept.x() + m_size.width()/2.0;
+            qreal cy = m_basept.y() + m_size.height()/2.0;
+            m_cluster->setCentrePos(QPointF(cx,cy));
+            m_cluster->setSize(m_size);
+            m_canvas->addItem(m_cluster);
+        }
+        else
+        {
+            qreal cx = m_basept.x() + m_size.width()/2.0;
+            qreal cy = m_basept.y() + m_size.height()/2.0;
+            m_cluster->setCentrePos(QPointF(cx,cy));
+            m_cluster->setSize(m_size);
         }
     }
 
