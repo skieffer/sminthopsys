@@ -31,16 +31,16 @@
 
 using namespace dunnart;
 
-#include "pdepn.h"
-#include "pdunspecifiedepn.h"
-#include "pdsimplechemepn.h"
-#include "pdmacromolepn.h"
-#include "pdnucleicepn.h"
-#include "pdperturbingepn.h"
-#include "pdsourcesink.h"
-#include "pdcomplexepn.h"
-#include "pdprocessnode.h"
-#include "pdphenotypeprocessnode.h"
+#include "plugins/application/sminthopsys/pdepn.h"
+#include "plugins/application/sminthopsys/pdunspecifiedepn.h"
+#include "plugins/application/sminthopsys/pdsimplechemepn.h"
+#include "plugins/application/sminthopsys/pdmacromolepn.h"
+#include "plugins/application/sminthopsys/pdnucleicepn.h"
+#include "plugins/application/sminthopsys/pdperturbingepn.h"
+#include "plugins/application/sminthopsys/pdsourcesink.h"
+#include "plugins/application/sminthopsys/pdcomplexepn.h"
+#include "plugins/application/sminthopsys/pdprocessnode.h"
+#include "plugins/application/sminthopsys/pdphenotypeprocessnode.h"
 
 class SBGNShapesPlugin : public QObject, public ShapePluginInterface
 {

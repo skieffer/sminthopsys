@@ -30,10 +30,10 @@
 #include "dsbspecies.h"
 #include "dsbreaction.h"
 #include "dsbbranch.h"
+#include "pdepn.h"
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/pluginshapefactory.h"
-#include "plugins/shapes/sbgn/pdepn.h"
 
 namespace dunnart {
 

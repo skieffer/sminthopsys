@@ -54,7 +54,7 @@
 //debugging:
 #include "libdunnartcanvas/graphlayout.h"
 #include "libdunnartcanvas/graphdata.h"
-#include "plugins/shapes/sbgn/pdepn.h"
+#include "pdepn.h"
 //
 
 namespace dunnart {
