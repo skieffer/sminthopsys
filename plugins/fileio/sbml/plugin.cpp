@@ -52,7 +52,7 @@
 #include "plugins/application/sminthopsys/dsbreaction.h"
 #include "plugins/application/sminthopsys/dsbcompartment.h"
 
-#include "plugins/shapes/sbgn/pdepn.h"
+//#include "plugins/shapes/sbgn/pdepn.h"
 
 using namespace dunnart;
 

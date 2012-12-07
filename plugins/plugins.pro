@@ -2,7 +2,7 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = shapes fileio application
+SUBDIRS = application shapes fileio
 
 CONFIG += ordered
 

@@ -35,7 +35,7 @@
 #include "libdunnartcanvas/canvasitem.h"
 #include "libdunnartcanvas/shape.h"
 
-#include "plugins/shapes/sbgn/pdepn.h"
+#include "pdepn.h"
 #include "dsbclone.h"
 #include "dsbspecies.h"
 #include "dsbcompartment.h"
