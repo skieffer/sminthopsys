@@ -251,8 +251,8 @@ void Router::deleteShape(ShapeRef *shape)
     // There shouldn't be add events events for the same shape already 
     // in the action list.
     // XXX: Possibly we could handle this by ordering them intelligently.
-    COLA_ASSERT(find(actionList.begin(), actionList.end(), 
-                ActionInfo(ShapeAdd, shape)) == actionList.end());
+    //COLA_ASSERT(find(actionList.begin(), actionList.end(),
+    //            ActionInfo(ShapeAdd, shape)) == actionList.end());
 
     // Delete any ShapeMove entries for this shape in the action list.
     ActionInfoList::iterator found = find(actionList.begin(), 

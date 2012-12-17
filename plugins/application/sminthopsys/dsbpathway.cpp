@@ -69,6 +69,13 @@ DSBPathway::DSBPathway(DSBNode *head, QList<DSBBranch *> branches) :
 
 }
 
+QList<CanvasItem*> DSBPathway::getAllShapes()
+{
+    QList<CanvasItem*> items;
+    // TODO
+    return items;
+}
+
 QList<DSBBranch*> DSBPathway::getBranches()
 {
     return m_branches;

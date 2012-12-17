@@ -32,6 +32,9 @@
 #include <QGraphicsItem>
 
 #include "dsbreclayout.h"
+#include "libdunnartcanvas/shape.h"
+
+#define CONTAINEDSHAPES
 
 class QRectF;
 class QPainter;
@@ -51,9 +54,29 @@ class DSBBranch;
 class DSBPathway;
 class Canvas;
 class Cluster;
+class CanvasItem;
 
 class DSBCompartment;
 
+#ifdef CONTAINEDSHAPES
+class CompartmentShape : public ShapeObj
+{
+public:
+    CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void resize(qreal w, qreal h);
+protected:
+    //void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    QAction *buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu& menu);
+private:
+    DSBCompartment *m_compartment;
+    qreal m_width;
+    qreal m_height;
+    qreal m_penWidth;
+    qreal m_cornerRadius;
+};
+#else
 class CompartmentShape : public QGraphicsItem
 {
 public:
@@ -71,6 +94,7 @@ private:
     qreal m_penWidth;
     qreal m_cornerRadius;
 };
+#endif
 
 class DSBCompartment : public DSBRecLayout, public QObject
 {
@@ -134,6 +158,7 @@ private:
 
     QList<DSBClone*> getAllClones(void);
     QList<DSBClone*> getLooseClones(void);
+    QList<CanvasItem*> getAllShapes(void);
 
 
 };

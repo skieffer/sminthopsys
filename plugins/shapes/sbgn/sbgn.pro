@@ -8,6 +8,7 @@ include(../../../common_options.qmake)
 include(../shape_plugin_options.pri)
 
 LIBS         += -L$$DUNNARTBASE/build/plugins -lapplication_sminthopsys
+LIBS += -L/home/skieffer/workspace/dunnart/build/plugins -lapplication_sminthopsys
 
 INCLUDEPATH += ../../..
 INCLUDEPATH += . $$DUNNARTBASE

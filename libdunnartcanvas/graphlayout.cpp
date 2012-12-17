@@ -1306,7 +1306,8 @@ void GraphLayout::setOutputDebugFiles(const bool value)
 void GraphLayout::showUnsatisfiable(cola::UnsatisfiableConstraintInfo* i)
 {
     qWarning("Unsatisfiable constraint:");
-    qWarning("  left id=%d,right id=%d",i->vlid,i->vrid);
+    qWarning("  (id:%d) + %.3f <= (id:%d)",i->vlid,i->gap,i->vrid);
+    //qWarning("  left id=%d,right id=%d",i->vlid,i->vrid);
 
     ShapeObj *s1 = m_graph->getShape(i->vlid);
     ShapeObj *s2 = m_graph->getShape(i->vrid);

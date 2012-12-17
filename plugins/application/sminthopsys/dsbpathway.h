@@ -39,6 +39,7 @@ class DSBFork;
 class DSBNode;
 class DSBClone;
 class Canvas;
+class CanvasItem;
 
 class DSBPathway : public DSBRecLayout
 {
@@ -64,6 +65,7 @@ public:
     QMap<DSBNode*, DSBBranch*> countBranchPoints(QList<DSBBranch*> branches);
     void setFirstBranch(DSBBranch *branch);
     void addBranch(DSBBranch *branch);
+    virtual QList<CanvasItem*> getAllShapes();
 
 private:
     QPointF m_relpt;

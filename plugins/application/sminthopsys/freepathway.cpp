@@ -24,8 +24,13 @@
 
 #include "freepathway.h"
 #include "dsbreaction.h"
+#include "dsbclone.h"
+
+#include "libdunnartcanvas/shape.h"
 
 namespace dunnart{
+
+class ShapeObj;
 
 FreePathway::FreePathway(QList<DSBClone *> clones, QList<DSBReaction *> reacs) :
     m_clones(clones),
@@ -63,6 +68,23 @@ QSizeF FreePathway::layout()
     }
     m_size = QSizeF(1000,1000);
     return m_size;
+}
+
+QList<CanvasItem*> FreePathway::getAllShapes()
+{
+    QList<CanvasItem*> items;
+    ShapeObj *shape = NULL;
+    foreach (DSBClone *cl, m_clones)
+    {
+        shape = cl->getShape();
+        if (shape) { items.append(shape); }
+    }
+    foreach (DSBReaction *re, m_reactions)
+    {
+        shape = re->getShape();
+        if (shape) { items.append(shape); }
+    }
+    return items;
 }
 
 void FreePathway::acceptCanvasBaseAndRelPts(QPointF parentBasePt)

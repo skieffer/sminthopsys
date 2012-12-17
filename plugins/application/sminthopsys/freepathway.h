@@ -33,6 +33,7 @@ namespace dunnart {
 
 class DSBClone;
 class DSBReaction;
+class CanvasItem;
 
 class FreePathway : public DSBPathway
 {
@@ -47,6 +48,8 @@ public:
     void redraw();
     QSizeF getSize();
     void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
+    QList<CanvasItem*> getAllShapes();
+
 private:
     QList<DSBClone*> m_clones;
     QList<DSBReaction*> m_reactions;

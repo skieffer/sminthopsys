@@ -50,6 +50,8 @@
 
 #include "libdunnartcanvas/canvas.h"
 #include "libdunnartcanvas/cluster.h"
+#include "libdunnartcanvas/guideline.h"
+#include "libdunnartcanvas/separation.h"
 
 //debugging:
 #include "libdunnartcanvas/graphlayout.h"
@@ -57,9 +59,15 @@
 #include "pdepn.h"
 //
 
+#include "libdunnartcanvas/template-constraints.h"
+
+
 namespace dunnart {
 
-CompartmentShape::CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+#ifdef CONTAINEDSHAPES
+CompartmentShape::CompartmentShape(
+        DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+    ShapeObj("sbgn.Compartment"),
     m_compartment(comp),
     m_penWidth(10),
     m_cornerRadius(20)
@@ -68,6 +76,20 @@ CompartmentShape::CompartmentShape(DSBCompartment *comp, qreal x, qreal y, qreal
     setY(y);
     resize(w,h);
 }
+#else
+CompartmentShape::CompartmentShape(
+        DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+    m_compartment(comp),
+    m_penWidth(10),
+    m_cornerRadius(20)
+{
+    setX(x);
+    setY(y);
+    resize(w,h);
+}
+#endif
+
+
 
 void CompartmentShape::resize(qreal w, qreal h)
 {
@@ -100,6 +122,7 @@ void CompartmentShape::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->drawPath(path);
 }
 
+#ifndef CONTAINEDSHAPES
 void CompartmentShape::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (m_compartment->getCanvas() == NULL)
@@ -124,6 +147,7 @@ void CompartmentShape::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     QGraphicsItem::mousePressEvent(event);
 }
+#endif
 
 QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu &menu)
 {
@@ -136,8 +160,12 @@ QAction *CompartmentShape::buildAndExecContextMenu(QGraphicsSceneMouseEvent *eve
     QAction *showPathways = menu.addAction(QObject::tr("Show pathways"));
     //
 
+#ifndef CONTAINEDSHAPES
     QApplication::restoreOverrideCursor();
     QAction *action = menu.exec(event->screenPos());
+#else
+    QAction *action = ShapeObj::buildAndExecContextMenu(event, menu);
+#endif
 
     if (action == cloneCurrencyMolecules)
     {
@@ -497,32 +525,10 @@ void DSBCompartment::drawAt(QPointF r)
         }
         else
         {
-            m_boundaryShape->setPos(m_basept.x(), m_basept.y());
+            m_boundaryShape->setPos(QPointF(m_basept.x(), m_basept.y()));
+            //m_boundaryShape->setPos(m_basept.x(), m_basept.y());
             m_boundaryShape->resize(m_size.width(), m_size.height());
         }
-#if 0
-        // Bounding cluster
-        if (!m_cluster)
-        {
-            CanvasItemList cil;
-            QString id = m_compartmentName + "_cluster";
-            bool rectangular = true;
-            m_cluster = new Cluster(cil,id,rectangular);
-            //m_cluster->rectangular = true;
-            qreal cx = m_basept.x() + m_size.width()/2.0;
-            qreal cy = m_basept.y() + m_size.height()/2.0;
-            m_cluster->setCentrePos(QPointF(cx,cy));
-            m_cluster->setSize(m_size);
-            m_canvas->addItem(m_cluster);
-        }
-        else
-        {
-            qreal cx = m_basept.x() + m_size.width()/2.0;
-            qreal cy = m_basept.y() + m_size.height()/2.0;
-            m_cluster->setCentrePos(QPointF(cx,cy));
-            m_cluster->setSize(m_size);
-        }
-#endif
     }
 
     // Loose reactions:
@@ -553,10 +559,98 @@ void DSBCompartment::drawAt(QPointF r)
         cl->drawRelTo(m_basept);
     }
 
+#ifdef CONTAINEDSHAPES
+    if (m_boundaryVisible)
+    {
+        CanvasItemList items = getAllShapes();
+        QList<ShapeObj*> shapes;
+        foreach (CanvasItem *item, items)
+        {
+            ShapeObj *shape = dynamic_cast<ShapeObj*>(item);
+            shapes.append(shape);
+        }
+        m_boundaryShape->addContainedShapes(shapes);
+
+#if 0
+        // Bounding cluster
+        if (!m_cluster)
+        {
+            CanvasItemList items = getAllShapes();
+            QString id = m_compartmentName + "_cluster";
+            bool rectangular = true;
+            m_cluster = new Cluster(items,id,rectangular);
+            m_cluster->setAsCollapsed(true);
+            //m_cluster->rectangular = true;
+            qreal cx = m_basept.x() + m_size.width()/2.0;
+            qreal cy = m_basept.y() + m_size.height()/2.0;
+            //m_cluster->setCentrePos(QPointF(cx,cy));
+            m_cluster->setSize(m_size);
+            m_canvas->addItem(m_cluster);
+        }
+        else
+        {
+            qreal cx = m_basept.x() + m_size.width()/2.0;
+            qreal cy = m_basept.y() + m_size.height()/2.0;
+            //m_cluster->setCentrePos(QPointF(cx,cy));
+            m_cluster->setSize(m_size);
+        }
+#endif
+
+#if 0
+        // sep co
+        m_canvas->stop_graph_layout();
+        CanvasItemList items = getAllShapes();
+        CanvasItemList pair;
+        Guideline *top = new Guideline(GUIDE_TYPE_HORI,m_basept.y());
+        foreach (CanvasItem *item, items)
+        {
+            pair.clear(); pair.append(top); pair.append(item);
+            createSeparation(NULL, SEP_VERTICAL, pair, 0);
+        }
+        m_canvas->restart_graph_layout();
+#endif
+
+#if 0
+        // rect template
+        CanvasItemList items = getAllShapes();
+        std::vector<unsigned> idList;
+        foreach (CanvasItem *item, items)
+        {
+            idList.push_back( item->internalId() );
+        }
+        double x = m_basept.x(); double X = x + m_size.width();
+        double y = m_basept.y(); double Y = y + m_size.height();
+        RectangleConstraint *rc = new RectangleConstraint(x,X,y,Y,idList);
+        //m_canvas->addItem(rc);
+#endif
+    }
+#endif
+
     //debug:
     //dumpAllClonePositions();
     //dumpPathwayNodePositions();
     //
+}
+
+QList<CanvasItem*> DSBCompartment::getAllShapes()
+{
+    QList<CanvasItem*> items;
+    foreach (DSBCompartment *comp, m_compartments)
+    {
+        items.append(comp->getAllShapes());
+    }
+    foreach (DSBPathway *pw, m_pathways)
+    {
+        items.append(pw->getAllShapes());
+    }
+    QList<DSBClone*> clones = getLooseClones();
+    ShapeObj *shape = NULL;
+    foreach (DSBClone *cl, clones)
+    {
+        shape = cl->getShape();
+        if (shape) { items.append(shape); }
+    }
+    return items;
 }
 
 void DSBCompartment::redisplay(bool reLayout)
