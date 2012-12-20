@@ -28,6 +28,7 @@
 #include <iostream>
 #include "libdunnartcanvas/templates.h"
 #include "libdunnartcanvas/graphlayout.h"
+#include "libdunnartcanvas/pluginshapefactory.h"
 //
 
 #include "findBranchesDialog.h"
@@ -99,6 +100,18 @@ FindBranchesDialog::FindBranchesDialog(Canvas *canvas, QWidget *parent)
 }
 
 void FindBranchesDialog::test(){
+    PluginShapeFactory *factory = sharedPluginShapeFactory();
+    ShapeObj *r1 = factory->createShape("org.dunnart.shapes.rect");
+    ShapeObj *r2 = factory->createShape("org.dunnart.shapes.rect");
+    r1->setSize(QSizeF(100,200));
+    r2->setSize(QSizeF(25,25));
+    //r1->addContainedShape(r2);
+    m_canvas->stop_graph_layout();
+    m_canvas->addItem(r1);
+    m_canvas->addItem(r2);
+    r1->addContainedShape(r2);
+    m_canvas->interrupt_graph_layout();
+    /*
     if (m_endpointClone)
     {
         //DSBCompartment *comp = m_endpointClone->getSpecies()->getCompartment();
@@ -109,6 +122,7 @@ void FindBranchesDialog::test(){
         //m_canvas->m_graphlayout = new GraphLayout(m_canvas);
         //m_canvas->m_graphlayout->freeShiftFromDunnart = false;
     }
+    */
 }
 
 /* Respond to a change in the canvas selection.

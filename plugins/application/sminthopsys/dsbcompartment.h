@@ -38,6 +38,7 @@
 
 class QRectF;
 class QPainter;
+class QPainterPath;
 class QStyleOptionGraphicsItem;
 class QWidget;
 class QGraphicsSceneMouseEvent;
@@ -57,6 +58,19 @@ class Cluster;
 class CanvasItem;
 
 class DSBCompartment;
+
+class CompShape2 : public ShapeObj
+{
+public:
+    CompShape2(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+protected:
+    QAction *buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu& menu);
+private:
+    DSBCompartment *m_compartment;
+    qreal m_penWidth;
+    qreal m_cornerRadius;
+};
 
 #ifdef CONTAINEDSHAPES
 class CompartmentShape : public ShapeObj
@@ -153,7 +167,7 @@ private:
     QList<DSBPathway*> m_pathways;
     bool m_show_reactions;
     bool m_boundaryVisible;
-    CompartmentShape *m_boundaryShape;
+    CompShape2 *m_boundaryShape;
     Cluster *m_cluster;
 
     QList<DSBClone*> getAllClones(void);
