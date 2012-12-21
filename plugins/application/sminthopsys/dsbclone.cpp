@@ -41,6 +41,7 @@ DSBClone::DSBClone(DSBSpecies *dsbspec) :
     DSBNode(),
     m_dsbspec(dsbspec),
     m_epn(NULL),
+    shapeOnBoard(false),
     m_fork(NULL)
 {}
 
@@ -154,10 +155,17 @@ void DSBClone::set_is_cloned(bool b)
 
 QSizeF DSBClone::layout()
 {
-    // TODO: Figure out layout of label, and then base the size of
-    // the node on the result.
-    // For now:
-    m_size = QSizeF(70,50);
+    // Create shape if don't already have one.
+    if (!m_epn)
+    {
+        PluginShapeFactory *factory = sharedPluginShapeFactory();
+        QString type("org.sbgn.pd.00UnspecifiedEPN");
+        ShapeObj *shape = factory->createShape(type);
+        m_epn = dynamic_cast<PDEPN*>  (shape);
+        // Give the epn a pointer to the clone it represents.
+        m_epn->setClone(this);
+    }
+    m_size = m_epn->size();
     return m_size;
 }
 
@@ -194,19 +202,7 @@ void DSBClone::acceptCanvasBaseAndRelPts(QPointF parentBasePt)
 void DSBClone::drawAt(QPointF r)
 {
     m_basept = r;
-    // Create shape if don't already have one.
-    bool addToCanvas = false;
-    if (!m_epn)
-    {
-        addToCanvas = true;
-        PluginShapeFactory *factory = sharedPluginShapeFactory();
-        QString type("org.sbgn.pd.00UnspecifiedEPN");
-        ShapeObj *shape = factory->createShape(type);
-        m_epn = dynamic_cast<PDEPN*>  (shape);
-        // Give the epn a pointer to the clone it represents.
-        m_epn->setClone(this);
-    }
-    // Set its properties.
+    // Set shape's properties.
     // Clone marker state
     m_epn->set_is_cloned(m_is_cloned);
     // Size
@@ -216,10 +212,11 @@ void DSBClone::drawAt(QPointF r)
     // Label
     m_epn->setLabel(m_dsbspec->getName());
     // Add it to the canvas, if necessary.
-    if (addToCanvas)
+    if (!shapeOnBoard)
     {
         QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_dsbspec->canvas(), m_epn);
         m_dsbspec->canvas()->currentUndoMacro()->addCommand(cmd);
+        shapeOnBoard = true;
     } else {
         // Otherwise, recompute the layout, in case size or position
         // have changed.

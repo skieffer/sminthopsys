@@ -102,6 +102,7 @@ QAction *UnspecifiedEPN::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event
             canvas->stop_graph_layout();
             canvas->getActions().clear();
             canvas->restart_graph_layout();
+            comp->adjustSize(); // Really this should be done on a signal that the layout is done!
         }
     }
     else if (action == fullCloning)

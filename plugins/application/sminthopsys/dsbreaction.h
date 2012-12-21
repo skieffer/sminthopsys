@@ -88,6 +88,7 @@ public:
     void connectedComponent(QSet<DSBClone*> &ccClones, QSet<DSBReaction*> &ccReacs);
     void clearConnectors(void);
     void buildOrbit();
+    QList<DSBClone*> getAllSatellites();
 
 private:
     Reaction *m_sbmlReaction;
@@ -120,10 +121,10 @@ private:
     QMap<DSBClone*,Connector*> m_connectors;
 
     ShapeObj *m_shape;
+    bool shapeOnCanvas;
     bool isBranchHead(DSBClone *clone);
     QList<DSBSpecies*> getAllSpecies();
     QList<DSBClone*> getAllClones();
-    QList<DSBClone*> getAllSatellites();
     void takeNonBranchHeads(QList<DSBClone*>& src, QList<DSBClone*>& dst);
 
     QPointF satPos(int num, int outOf, ReacSide side);

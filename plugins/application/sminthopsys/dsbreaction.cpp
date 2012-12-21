@@ -48,7 +48,8 @@ DSBReaction::DSBReaction() :
     m_compartment(NULL),
     m_mainInput(NULL),
     m_mainOutput(NULL),
-    m_shape(NULL)
+    m_shape(NULL),
+    shapeOnCanvas(false)
 {}
 
 DSBReaction::DSBReaction(Reaction *reac) :
@@ -58,7 +59,8 @@ DSBReaction::DSBReaction(Reaction *reac) :
     m_compartment(NULL),
     m_mainInput(NULL),
     m_mainOutput(NULL),
-    m_shape(NULL)
+    m_shape(NULL),
+    shapeOnCanvas(false)
 {
     m_name = QString(reac->getName().c_str());
     m_id = QString(reac->getId().c_str());
@@ -452,6 +454,16 @@ QSizeF DSBReaction::layout()
 {
     clearConnectors();
     buildOrbit();
+    // Create a shape, if don't already have one.
+    if (!m_shape)
+    {
+        PluginShapeFactory *factory = sharedPluginShapeFactory();
+        QString type("org.sbgn.pd.ProcessNodeVertical");
+        ShapeObj *procNode = factory->createShape(type);
+        m_shape = procNode;
+        procNode->setCentrePos(m_basept);
+    }
+
     // Layout all satellites.
     QList<DSBClone*> allSats = getAllSatellites();
     for (int i = 0; i < allSats.size(); i++)
@@ -537,20 +549,13 @@ void DSBReaction::redraw()
 void DSBReaction::drawAt(QPointF r)
 {
     m_basept = r;
-
-    // Draw process node.
-    if (!m_shape)
+    // Add shape to the canvas if not already there.
+    if (!shapeOnCanvas)
     {
-        PluginShapeFactory *factory = sharedPluginShapeFactory();
-        QString type("org.sbgn.pd.ProcessNodeVertical");
-        ShapeObj *procNode = factory->createShape(type);
-        m_shape = procNode;
-        procNode->setCentrePos(m_basept);
-        // Add it to the canvas.
-        QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, procNode);
+        QUndoCommand *cmd = new CmdCanvasSceneAddItem(m_canvas, m_shape);
         m_canvas->currentUndoMacro()->addCommand(cmd);
+        shapeOnCanvas = true;
     }
-
     // Draw all satellites.
     QList<DSBClone*> allSats = getAllSatellites();
     for (int i = 0; i < allSats.size(); i++)

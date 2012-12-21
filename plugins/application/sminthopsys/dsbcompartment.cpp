@@ -438,7 +438,7 @@ QSizeF DSBCompartment::rowLayout()
     m_size = QSizeF(width,height);
 
     // KLUDGE:
-    if (!m_pathways.empty()) { m_size = QSizeF(2000,1500); }
+    //if (!m_pathways.empty()) { m_size = QSizeF(2000,1500); }
     //
 
     return m_size;
@@ -574,6 +574,21 @@ void DSBCompartment::redraw()
     drawAt(m_basept);
 }
 
+void DSBCompartment::adjustSize()
+{
+    qreal w = m_size.width();
+    qreal h = m_size.height();
+    qreal pad = 50;
+    foreach (DSBCompartment *comp, m_compartments)
+    {
+        QSizeF s = comp->getSize();
+        w = s.width() > w ? s.width() + pad : w;
+        h = s.height() > h ? s.height() + pad : h;
+    }
+    m_size = QSizeF(w,h);
+    if (m_boundaryVisible && m_boundaryShape) m_boundaryShape->setSize(m_size);
+}
+
 void DSBCompartment::drawAt(QPointF r)
 {
     m_basept = r;
@@ -598,7 +613,8 @@ void DSBCompartment::drawAt(QPointF r)
                                               m_basept.y()+m_size.height()/2.0));
             //m_boundaryShape->setPos(m_basept.x(), m_basept.y());
             //m_boundaryShape->resize(m_size.width(), m_size.height());
-            m_boundaryShape->setSize(QSizeF(m_size.width(), m_size.height()));
+            //m_boundaryShape->setSize(QSizeF(m_size.width(), m_size.height()));
+            m_boundaryShape->setSize(m_size);
         }
     }
 

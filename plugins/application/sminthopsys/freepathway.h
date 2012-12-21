@@ -26,14 +26,23 @@
 #define SMINTHOPSYSFREEPATHWAY_H
 
 #include <QList>
+#include <QMap>
+#include <QRectF>
 
 #include "dsbpathway.h"
+#include "libogdf/ogdf/basic/Graph_d.h"
 
+namespace ogdf {
+class GraphAttributes;
+}
 namespace dunnart {
 
+class DSBNode;
 class DSBClone;
 class DSBReaction;
 class CanvasItem;
+
+typedef QMap<DSBNode*,ogdf::node> nodemap;
 
 class FreePathway : public DSBPathway
 {
@@ -49,6 +58,11 @@ public:
     QSizeF getSize();
     void acceptCanvasBaseAndRelPts(QPointF parentBasePt);
     QList<CanvasItem*> getAllShapes();
+    ogdf::Graph *getOGDFGraph(nodemap& nodeMap);
+    void extractPosAndSize(nodemap& nodeMap, ogdf::GraphAttributes& GA);
+    void injectPositions(nodemap& nodeMap, ogdf::GraphAttributes& GA);
+    static void jog(double scale, nodemap& nodeMap);
+    static QRectF getBbox(nodemap& nodeMap);
 
 private:
     QList<DSBClone*> m_clones;

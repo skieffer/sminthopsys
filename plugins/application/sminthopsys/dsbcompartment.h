@@ -145,6 +145,7 @@ public:
     void setCanvas(Canvas *canvas);
     Canvas *getCanvas(void);
     void setBoundaryVisible(bool b);
+    void adjustSize(void);
 
     void dumpPathwayNodePositions(void);
     void dumpAllClonePositions(void);

@@ -85,6 +85,7 @@ private:
     QPointF m_basept;
     QSizeF m_size;
     PDEPN *m_epn;
+    bool shapeOnBoard;
     DSBFork *m_fork;
     bool m_is_cloned;
     QList<DSBReaction*> m_reactionsEntered;
