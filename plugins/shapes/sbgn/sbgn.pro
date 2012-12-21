@@ -7,11 +7,11 @@ TARGET        = $$qtLibraryTarget(shapes_sbgn)
 include(../../../common_options.qmake)
 include(../shape_plugin_options.pri)
 
-LIBS         += -L$$DUNNARTBASE/build/plugins -lapplication_sminthopsys
-LIBS += -L/home/skieffer/workspace/dunnart/build/plugins -lapplication_sminthopsys
+LIBS        += -Wl,--rpath -Wl,$$DUNNARTBASE/build/plugins
+LIBS        += -L$$DUNNARTBASE/build/plugins -lapplication_sminthopsys
 
-INCLUDEPATH += ../../..
-INCLUDEPATH += . $$DUNNARTBASE
+DEPENDPATH  += $$DUNNARTBASE/plugins/application/sminthopsys
+INCLUDEPATH += $$DUNNARTBASE/plugins/application/sminthopsys
 
 SOURCES       = plugin.cpp
 

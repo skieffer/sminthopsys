@@ -5,16 +5,14 @@ CONFIG       += qt plugin
 TARGET        = $$qtLibraryTarget(fileio_sbml)
 LIBS         += -L/usr/local/lib -lsbml
 
-DEPENDPATH += ../../.. .
-INCLUDEPATH += ../../..
-
 include(../../../common_options.qmake)
 include(../fileio_plugin_options.pri)
 
+LIBS        += -Wl,--rpath -Wl,$$DUNNARTBASE/build/plugins
 LIBS         += -L$$DUNNARTBASE/build/plugins -lapplication_sminthopsys
-LIBS += -L/home/skieffer/workspace/dunnart/build/plugins -lapplication_sminthopsys
 
-HEADERS       =
+DEPENDPATH  += $$DUNNARTBASE/plugins/application/sminthopsys
+INCLUDEPATH += $$DUNNARTBASE/plugins/application/sminthopsys
 
 SOURCES       = plugin.cpp
 
