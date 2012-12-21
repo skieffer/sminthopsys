@@ -64,6 +64,68 @@
 
 namespace dunnart {
 
+CompShape2::CompShape2(DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
+    ShapeObj("sbgn.Compartment"),
+    m_compartment(comp),
+    m_penWidth(10),
+    m_cornerRadius(20)
+{
+    qreal cr2 = 2*m_cornerRadius;
+    w = (w > cr2 ? w : cr2);
+    h = (h > cr2 ? h : cr2);
+    setCentrePos(QPointF(x+w/2.0,y+h/2.0));
+    setSize(QSizeF(w,h));
+}
+
+void CompShape2::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                             QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    QPen pen;
+    pen.setWidthF(m_penWidth);
+    painter->setPen(pen);
+    QBrush brush(Qt::white);
+    painter->setBrush(brush);
+    QPainterPath path;
+    QPointF c = centrePos();
+    QSizeF s = size();
+    //QRectF rect = QRectF(c.x()-s.width()/2.0, c.y()-s.height()/2.0,
+    //                     s.width(), s.height());
+    QRectF rect = QRectF(-s.width()/2.0, -s.height()/2.0,s.width(), s.height());
+    path.addRoundedRect(rect, m_cornerRadius, m_cornerRadius);
+    painter->drawPath(path);
+    //// Call parent method, to draw any selection highlights etc.
+    //ShapeObj::paint(painter, option, widget);
+}
+
+QAction *CompShape2::buildAndExecContextMenu(QGraphicsSceneMouseEvent *event, QMenu &menu)
+{
+    if (!menu.isEmpty())
+    {
+        menu.addSeparator();
+    }
+    // Add actions to menu.
+    QAction *cloneCurrencyMolecules = menu.addAction(QObject::tr("Clone currency molecules"));
+    QAction *showPathways = menu.addAction(QObject::tr("Show pathways"));
+    //
+
+    QAction *action = ShapeObj::buildAndExecContextMenu(event, menu);
+
+    if (action == cloneCurrencyMolecules)
+    {
+        m_compartment->cloneCurrencyMolecules();
+        m_compartment->redisplay();
+    }
+    else if (action == showPathways)
+    {
+        m_compartment->buildConnectedPathways();
+        m_compartment->redisplay();
+    }
+    return action;
+}
+
+
 #ifdef CONTAINEDSHAPES
 CompartmentShape::CompartmentShape(
         DSBCompartment *comp, qreal x, qreal y, qreal w, qreal h) :
@@ -74,7 +136,9 @@ CompartmentShape::CompartmentShape(
 {
     setX(x);
     setY(y);
+    //setCentrePos(QPointF(x,y));
     resize(w,h);
+    setFillColour(QColor(0,200,200));
 }
 #else
 CompartmentShape::CompartmentShape(
@@ -96,6 +160,9 @@ void CompartmentShape::resize(qreal w, qreal h)
     qreal cr2 = 2*m_cornerRadius;
     m_width  = (w > cr2 ? w : cr2);
     m_height = (h > cr2 ? h : cr2);
+#ifdef CONTAINEDSHAPES
+    setSize(QSizeF(m_width,m_height));
+#endif
     update();
 }
 
@@ -519,15 +586,19 @@ void DSBCompartment::drawAt(QPointF r)
         // Boundary shape
         if (!m_boundaryShape)
         {
-            m_boundaryShape = new CompartmentShape(this, m_basept.x(), m_basept.y(),
+            m_boundaryShape = new CompShape2(this, m_basept.x(), m_basept.y(),
                                                           m_size.width(), m_size.height());
             m_canvas->addItem(m_boundaryShape);
         }
         else
         {
-            m_boundaryShape->setPos(QPointF(m_basept.x(), m_basept.y()));
+            //m_boundaryShape->setPos(QPointF(m_basept.x(), m_basept.y()));
+            m_boundaryShape->setCentrePos(QPointF(
+                                              m_basept.x()+m_size.width()/2.0,
+                                              m_basept.y()+m_size.height()/2.0));
             //m_boundaryShape->setPos(m_basept.x(), m_basept.y());
-            m_boundaryShape->resize(m_size.width(), m_size.height());
+            //m_boundaryShape->resize(m_size.width(), m_size.height());
+            m_boundaryShape->setSize(QSizeF(m_size.width(), m_size.height()));
         }
     }
 
@@ -570,6 +641,7 @@ void DSBCompartment::drawAt(QPointF r)
             shapes.append(shape);
         }
         m_boundaryShape->addContainedShapes(shapes);
+        //m_boundaryShape->addContainedShape(shapes.first());
 
 #if 0
         // Bounding cluster
@@ -624,7 +696,7 @@ void DSBCompartment::drawAt(QPointF r)
         //m_canvas->addItem(rc);
 #endif
     }
-#endif
+#endif // CONTAINEDSHAPES
 
     //debug:
     //dumpAllClonePositions();
