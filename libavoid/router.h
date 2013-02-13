@@ -34,6 +34,7 @@
 #include <utility>
 #include <string>
 
+#include "libavoid/dllexport.h"
 #include "libavoid/connector.h"
 #include "libavoid/vertices.h"
 #include "libavoid/graph.h"
@@ -258,7 +259,7 @@ class TopologyAddonInterface
 //! Usually you would keep a separate Router instance for each diagram
 //! or layout you have open in your application.
 //
-class Router {
+class AVOID_EXPORT Router {
     public:
         //! @brief  Constructor for router instance.
         //!
@@ -595,6 +596,10 @@ class Router {
         //!
         void setSlowRoutingCallback(bool (*func)(unsigned int, double));
 
+        // Processes the actions list for the transaction.  You shouldn't
+        // need to cal this.  Instead use processTransaction().
+        void processActions(void);
+        
         void deleteCluster(ClusterRef *cluster);
         void attachedShapes(IntList &shapes, const unsigned int shapeId,
                 const unsigned int type);

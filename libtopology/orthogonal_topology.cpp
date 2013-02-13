@@ -735,7 +735,7 @@ static void processLayoutConstraintEvent(LayoutScanlineNodeSet& scanline,
                 if (CONSTRAIN_CHECKPOINTS && les->containsCheckpoint && 
                         beforeLes->containsCheckpoint)
                 {
-                    // Both segments are passing a checkpoint.a
+                    // Both segments are passing a checkpoint.
                     // Constrain them together.
                     double sepDist =  
                             (les->lowPoint()[les->dimension] - 
@@ -1012,15 +1012,16 @@ static void buildOrthogonalLayoutSegments(Router *router,
             continue;
         }
         Polygon& displayRoute = (*curr)->displayRoute();
+        bool routeHasCheckpointInfo = !displayRoute.checkpointsOnRoute.empty();
         // Determine all line segments that we are interested in shifting. 
         // We don't consider the first or last segment of a path.
         for (size_t i = 1; i < displayRoute.size(); ++i)
         {
             bool containsCheckpoint = false;
-            if (preserveCheckpointBends)
+            if (preserveCheckpointBends && routeHasCheckpointInfo)
             {
-                COLA_ASSERT(!displayRoute.segmentHasCheckpoint.empty());
-                containsCheckpoint = displayRoute.segmentHasCheckpoint[i - 1];
+                containsCheckpoint = 
+                        (displayRoute.checkpointOnSegment(i - 1).size() > 0);
             }
             
             if (displayRoute.ps[i - 1][dim] == displayRoute.ps[i][dim])

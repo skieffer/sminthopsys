@@ -173,6 +173,8 @@ Canvas::Canvas()
       m_undo_stack(NULL),
       m_current_undo_macro(NULL),
       m_hide_selection_handles(false),
+      m_overlay_router_raw_routes(false),
+      m_overlay_router_display_routes(false),
       m_overlay_router_obstacles(false),
       m_overlay_router_visgraph(false),
       m_overlay_router_orthogonal_visgraph(false),
@@ -211,6 +213,9 @@ Canvas::Canvas()
     m_opt_stuctural_editing_disabled = false;
     m_opt_flow_direction = FlowDown;
     m_opt_layered_alignment_position = ShapeMiddle;
+
+    // Set default canvas background colour.
+    m_opt_canvas_background_colour = QColor(189, 189, 223);
 
     // Default list of connector colors. Use only dark colors (and full
     // opacity) since connectors are drawn as thin lines so light
@@ -540,7 +545,6 @@ void Canvas::setExpandedPage(const QRectF newExpandedPage)
     }
 }
 
-
 void Canvas::drawBackground(QPainter *painter, const QRectF& rect)
 {
     if ( m_rendering_for_printing )
@@ -556,7 +560,7 @@ void Canvas::drawBackground(QPainter *painter, const QRectF& rect)
     }
 
     // Draws purple background and the white page (if it is set).
-    painter->fillRect(rect, QColor(189, 189, 223));
+    painter->fillRect(rect, m_opt_canvas_background_colour);
     painter->fillRect(m_expanded_page, QColor(200, 200, 200));
     painter->fillRect(m_page, QColor(255, 255, 255));
     painter->setPen(QColor(110, 110, 110));
@@ -690,6 +694,49 @@ void Canvas::drawForeground(QPainter *painter, const QRectF& rect)
             painter->setPen(pen);
             painter->drawPoint(pt1);
             painter->drawPoint(pt2);
+        }
+    }
+
+    const int routeWidth = 3;
+    if (m_overlay_router_raw_routes)
+    {
+        QColor colour(Qt::blue);
+        colour.setAlpha(50);
+        QPen pen(colour);
+        pen.setWidth(routeWidth);
+        pen.setCosmetic(true);
+        painter->setPen(pen);
+        for (Avoid::ConnRefList::const_iterator ci = router()->connRefs.begin();
+             ci != router()->connRefs.end(); ++ci)
+        {
+            Avoid::Polygon path = (*ci)->route();
+            QPolygonF points;
+            for (unsigned int i = 0; i < path.size(); ++i)
+            {
+                points << QPointF(path.ps[i].x, path.ps[i].y);
+            }
+            painter->drawPolyline(points);
+        }
+    }
+
+    if (m_overlay_router_display_routes)
+    {
+        QColor colour(Qt::blue);
+        colour.setAlpha(50);
+        QPen pen(colour);
+        pen.setWidth(routeWidth);
+        pen.setCosmetic(true);
+        painter->setPen(pen);
+        for (Avoid::ConnRefList::const_iterator ci = router()->connRefs.begin();
+                ci != router()->connRefs.end(); ++ci)
+        {
+            Avoid::Polygon path = (*ci)->displayRoute();
+            QPolygonF points;
+            for (unsigned int i = 0; i < path.size(); ++i)
+            {
+                points << QPointF(path.ps[i].x, path.ps[i].y);
+            }
+            painter->drawPolyline(points);
         }
     }
 
@@ -1221,6 +1268,12 @@ void Canvas::setDebugCOLAOutput(const bool value)
     m_graphlayout->setOutputDebugFiles(value);
 }
 
+QColor Canvas::optCanvasBackgroundColour(void) const
+{
+    return m_opt_canvas_background_colour;
+}
+
+
 int Canvas::optRoutingShapePadding(void) const
 {
     return (int) m_router->routingParameter(Avoid::shapeBufferDistance);
@@ -1424,9 +1477,16 @@ void Canvas::setOptFlowDirectionFromDial(const int value)
     setOptFlowDirection((FlowDirection) value);
 }
 
+void Canvas::setOptCanvasBackgroundColour(const QColor colour)
+{
+   m_opt_canvas_background_colour = colour;
+   emit canvasDrawingChanged();
+}
+
 bool Canvas::hasVisibleOverlays(void) const
 {
-    return m_overlay_router_obstacles || m_overlay_router_visgraph ||
+    return m_overlay_router_raw_routes|| m_overlay_router_display_routes ||
+            m_overlay_router_obstacles || m_overlay_router_visgraph ||
             m_overlay_router_orthogonal_visgraph;
 }
 
@@ -1450,6 +1510,32 @@ void Canvas::setOverlayRouterObstacles(const bool value)
 bool Canvas::overlayRouterObstacles(void) const
 {
     return m_overlay_router_obstacles;
+}
+
+void Canvas::setOverlayRouterRawRoutes(const bool value)
+{
+    m_overlay_router_raw_routes = value;
+    emit debugOverlayEnabled(hasVisibleOverlays());
+    this->update();
+}
+
+
+bool Canvas::overlayRouterRawRoutes(void) const
+{
+    return m_overlay_router_raw_routes;
+}
+
+void Canvas::setOverlayRouterDisplayRoutes(const bool value)
+{
+    m_overlay_router_display_routes = value;
+    emit debugOverlayEnabled(hasVisibleOverlays());
+    this->update();
+}
+
+
+bool Canvas::overlayRouterDisplayRoutes(void) const
+{
+    return m_overlay_router_display_routes;
 }
 
 void Canvas::setOverlayRouterVisGraph(const bool value)
