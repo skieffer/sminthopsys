@@ -26,19 +26,40 @@
 
 #include <QMessageBox>
 
-#include "garudagadget.h"
+#include "garudaclient.h"
 #include "qt-json/json.h"
 
 
 /**
- * inputFiles: an even-length list of strings, giving extension-format pairs.
+ * parent: a QObject, such as a QApplication object, which is to "own" this
+ *   client object. May be set to 0 if there is no obvious parent.
+ *
+ * gadgetName: the name of the gadget
+ *
+ * gadgetUUID: the UUID of the gadget
+ *
+ * providerName: the name and affiliation of the provider of the gadget
+ *
+ * description: a description of the gadget
+ *
+ * categoryList: a list of Garuda-approved category names, to which this
+ *   gadget belongs
+ *
+ * inputFiles: an even-length list of strings, giving extension-format pairs
+ *   for files that this gadget can open.
  *   For example, [ "xml", "sbml" ]. If you provide an odd number of strings,
  *   the final entry will simply be ignored.
- * outputFiles: same format as inputFiles.
+ *
+ * outputFiles: same format as inputFiles, this time specifying the kinds of
+ *   files that this gadget creates.
+ *
  * iconPath: absolute path to icon file
+ *
  * screenshotPaths: list of absolute paths to screenshot files
+ *
+ * launchCommand: the full command line string that launches the gadget
  */
-GarudaGadget::GarudaGadget(QObject *parent, QString gadgetName,
+GarudaClient::GarudaClient(QObject *parent, QString gadgetName,
                            QString gadgetUUID, QString providerName,
                            QString description, QList<QString> categoryList,
                            QList<QString> inputFiles, QList<QString> outputFiles,
@@ -63,7 +84,7 @@ GarudaGadget::GarudaGadget(QObject *parent, QString gadgetName,
     registerGadget();
 }
 
-void GarudaGadget::openSocket(void)
+void GarudaClient::openSocket(void)
 {
     if (m_tcp_socket == NULL)
     {
@@ -86,7 +107,7 @@ void GarudaGadget::openSocket(void)
     }
 }
 
-void GarudaGadget::closeSocket(void)
+void GarudaClient::closeSocket(void)
 {
     m_tcp_socket->disconnectFromHost();
     m_tcp_socket->waitForDisconnected();
@@ -94,13 +115,13 @@ void GarudaGadget::closeSocket(void)
     m_tcp_socket = NULL;
 }
 
-bool GarudaGadget::connectedToServer(void) const
+bool GarudaClient::connectedToServer(void) const
 {
     return (m_tcp_socket &&
             (m_tcp_socket->state() == QAbstractSocket::ConnectedState));
 }
 
-void GarudaGadget::sendData(const QString& string)
+void GarudaClient::sendData(const QString& string)
 {
     if (!connectedToServer())
     {
@@ -117,7 +138,7 @@ void GarudaGadget::sendData(const QString& string)
     m_tcp_socket->flush();
 }
 
-void GarudaGadget::readData(void)
+void GarudaClient::readData(void)
 {
     assert(m_tcp_socket);
     QByteArray in;
@@ -139,7 +160,7 @@ void GarudaGadget::readData(void)
     }
 }
 
-void GarudaGadget::parseMessage(const QString &message)
+void GarudaClient::parseMessage(const QString &message)
 {
     QVariant var = QtJson::Json::parse(message);
     QVariantMap data = var.toMap();
@@ -164,7 +185,7 @@ void GarudaGadget::parseMessage(const QString &message)
     }
 }
 
-void GarudaGadget::activateGadgetWithCore(void)
+void GarudaClient::activateGadgetWithCore(void)
 {
     QVariantMap header;
     header["id"] = "ActivateGadgetRequest";
@@ -183,16 +204,8 @@ void GarudaGadget::activateGadgetWithCore(void)
     sendData(QString(data));
 }
 
-void GarudaGadget::registerGadget(void)
+void GarudaClient::registerGadget(void)
 {
-    QDir pluginsDir = QDir(qApp->applicationDirPath());
-#if defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-    }
-    pluginsDir.cd("Resources");
-#endif
-
     QVariantMap header;
     header["id"] = "RegisterGadgetRequest";
     header["version"] = "0.1";
@@ -252,7 +265,7 @@ void GarudaGadget::registerGadget(void)
     sendData(QString(data));
 }
 
-void GarudaGadget::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareName,
+void GarudaClient::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareName,
         QString softwareUUID)
 {
     QVariantMap header;
@@ -275,7 +288,7 @@ void GarudaGadget::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareName
     sendData(QString(data));
 }
 
-void GarudaGadget::showCompatibleSoftwareFor(QString extension, QString format)
+void GarudaClient::showCompatibleSoftwareFor(QString extension, QString format)
 {
     QVariantMap header;
     header["id"] = "GetCompatibleGadgetListRequest";
@@ -297,7 +310,7 @@ void GarudaGadget::showCompatibleSoftwareFor(QString extension, QString format)
 }
 
 
-void GarudaGadget::displayError(QAbstractSocket::SocketError socketError)
+void GarudaClient::displayError(QAbstractSocket::SocketError socketError)
 {
     QWidget *widget = NULL;
     switch (socketError)

@@ -11,13 +11,13 @@ HEADERS       = \
     appgarudaclient.h \
     openincompatiblesoftwarewidget.h \
     qt-json/json.h \
-    garudagadget.h
+    garudaclient.h
 
 SOURCES       = plugin.cpp \
     appgarudaclient.cpp \
     openincompatiblesoftwarewidget.cpp \
     qt-json/json.cpp \
-    garudagadget.cpp
+    garudaclient.cpp
 
 FORMS += \
     openincompatiblesoftwarewidget.ui

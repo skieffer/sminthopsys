@@ -24,18 +24,18 @@
 
 
 
-#ifndef GARUDAGADGET_H
-#define GARUDAGADGET_H
+#ifndef GARUDACLIENT_H
+#define GARUDACLIENT_H
 
 #include <QtCore>
 #include <QtNetwork>
 
-class GarudaGadget : public QObject
+class GarudaClient : public QObject
 {
     Q_OBJECT
 
     public:
-        explicit GarudaGadget(QObject *parent, QString gadgetName,
+        explicit GarudaClient(QObject *parent, QString gadgetName,
                               QString gadgetUUID, QString providerName,
                               QString description, QList<QString> categoryList,
                               QList<QString> inputFiles, QList<QString> outputFiles,
@@ -72,6 +72,7 @@ class GarudaGadget : public QObject
         int m_socket_descriptor;
         quint16 m_block_size;
         QString m_current_data;
+
         QString m_gadget_name;
         QString m_gadget_uuid;
         QString m_provider_name;
@@ -85,5 +86,5 @@ class GarudaGadget : public QObject
 };
 
 
-#endif // GARUDAGADGET_H
+#endif // GARUDACLIENT_H
 // vim: filetype=cpp ts=4 sw=4 et tw=0 wm=0 cindent
