@@ -439,6 +439,7 @@ QSizeF DSBCompartment::rowLayout()
 
     // KLUDGE:
     //if (!m_pathways.empty()) { m_size = QSizeF(2000,1500); }
+    if (!m_species.empty()) { m_size = QSizeF(2000,4000); }
     //
 
     return m_size;

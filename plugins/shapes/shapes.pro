@@ -2,6 +2,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = pro-origami uml basic sbgn
+SUBDIRS = pro-origami uml basic
 
 CONFIG += ordered

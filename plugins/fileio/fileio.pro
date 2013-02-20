@@ -2,6 +2,6 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = builtinsvg builtingml builtinlayout sbml
+SUBDIRS = builtinsvg builtingml builtinlayout
 
 CONFIG += ordered

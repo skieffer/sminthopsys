@@ -10,12 +10,14 @@ include(../application_plugin_options.pri)
 HEADERS       = \
     appgarudaclient.h \
     openincompatiblesoftwarewidget.h \
-    qt-json/json.h
+    qt-json/json.h \
+    garudagadget.h
 
 SOURCES       = plugin.cpp \
     appgarudaclient.cpp \
     openincompatiblesoftwarewidget.cpp \
-    qt-json/json.cpp
+    qt-json/json.cpp \
+    garudagadget.cpp
 
 FORMS += \
     openincompatiblesoftwarewidget.ui

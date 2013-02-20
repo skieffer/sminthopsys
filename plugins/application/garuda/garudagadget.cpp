@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA  02110-1301, USA.
  *
- * 
+ *
  * Author: Michael Wybrow <mjwybrow@users.sourceforge.net>
 */
 
@@ -26,22 +26,44 @@
 
 #include <QMessageBox>
 
-#include "appgarudaclient.h"
+#include "garudagadget.h"
 #include "qt-json/json.h"
 
 
-AppGarudaClient::AppGarudaClient(QObject *parent) :
+/**
+ * inputFiles: an even-length list of strings, giving extension-format pairs.
+ *   For example, [ "xml", "sbml" ]. If you provide an odd number of strings,
+ *   the final entry will simply be ignored.
+ * outputFiles: same format as inputFiles.
+ * iconPath: absolute path to icon file
+ * screenshotPaths: list of absolute paths to screenshot files
+ */
+GarudaGadget::GarudaGadget(QObject *parent, QString gadgetName,
+                           QString gadgetUUID, QString providerName,
+                           QString description, QList<QString> categoryList,
+                           QList<QString> inputFiles, QList<QString> outputFiles,
+                           QString iconPath, QList<QString> screenshotPaths,
+                           QString launchCommand) :
     QObject(parent),
     m_tcp_socket(NULL),
-    m_app_uuid("593387e0-7183-11e2-bcfd-0800200c9a66")
+    m_gadget_name(gadgetName),
+    m_gadget_uuid(gadgetUUID),
+    m_provider_name(providerName),
+    m_description(description),
+    m_categoryList(categoryList),
+    m_inputFiles(inputFiles),
+    m_outputFiles(outputFiles),
+    m_iconPath(iconPath),
+    m_screenshotPaths(screenshotPaths),
+    m_launchCommand(launchCommand)
 {
     openSocket();
 
-    activateDunnartWithCore();
-    registerDunnart();
+    activateGadgetWithCore();
+    registerGadget();
 }
 
-void AppGarudaClient::openSocket(void)
+void GarudaGadget::openSocket(void)
 {
     if (m_tcp_socket == NULL)
     {
@@ -64,7 +86,7 @@ void AppGarudaClient::openSocket(void)
     }
 }
 
-void AppGarudaClient::closeSocket(void)
+void GarudaGadget::closeSocket(void)
 {
     m_tcp_socket->disconnectFromHost();
     m_tcp_socket->waitForDisconnected();
@@ -72,13 +94,13 @@ void AppGarudaClient::closeSocket(void)
     m_tcp_socket = NULL;
 }
 
-bool AppGarudaClient::connectedToServer(void) const
+bool GarudaGadget::connectedToServer(void) const
 {
     return (m_tcp_socket &&
             (m_tcp_socket->state() == QAbstractSocket::ConnectedState));
 }
 
-void AppGarudaClient::sendData(const QString& string)
+void GarudaGadget::sendData(const QString& string)
 {
     if (!connectedToServer())
     {
@@ -95,7 +117,7 @@ void AppGarudaClient::sendData(const QString& string)
     m_tcp_socket->flush();
 }
 
-void AppGarudaClient::readData(void)
+void GarudaGadget::readData(void)
 {
     assert(m_tcp_socket);
     QByteArray in;
@@ -117,7 +139,7 @@ void AppGarudaClient::readData(void)
     }
 }
 
-void AppGarudaClient::parseMessage(const QString &message)
+void GarudaGadget::parseMessage(const QString &message)
 {
     QVariant var = QtJson::Json::parse(message);
     QVariantMap data = var.toMap();
@@ -142,15 +164,15 @@ void AppGarudaClient::parseMessage(const QString &message)
     }
 }
 
-void AppGarudaClient::activateDunnartWithCore(void)
+void GarudaGadget::activateGadgetWithCore(void)
 {
     QVariantMap header;
     header["id"] = "ActivateGadgetRequest";
     header["version"] = "0.1";
 
     QVariantMap body;
-    body["gadgetName"] = "Dunnart";
-    body["gadgetUUID"] = m_app_uuid;
+    body["gadgetName"] = m_gadget_name;
+    body["gadgetUUID"] = m_gadget_uuid;
 
     QVariantMap root;
     root["header"] = header;
@@ -161,7 +183,7 @@ void AppGarudaClient::activateDunnartWithCore(void)
     sendData(QString(data));
 }
 
-void AppGarudaClient::registerDunnart(void)
+void GarudaGadget::registerGadget(void)
 {
     QDir pluginsDir = QDir(qApp->applicationDirPath());
 #if defined(Q_OS_MAC)
@@ -176,35 +198,50 @@ void AppGarudaClient::registerDunnart(void)
     header["version"] = "0.1";
 
     QVariantList categoryList;
-    categoryList.append(QVariant("Layout"));
+    foreach (QString category, m_categoryList)
+    {
+        categoryList.append(QVariant(category));
+    }
 
     QVariantList screenshots;
-    screenshots.append(pluginsDir.absoluteFilePath("DunnartScreen.png"));
+    foreach (QString screenshotPath, m_screenshotPaths)
+    {
+        screenshots.append(screenshotPath);
+    }
 
-    QVariantMap layoutFormat;
-    layoutFormat["fileExtension"] = "svg";
-    layoutFormat["fileFormat"] = "txt";
+    QVariantList inputFileFormats;
+    // If length of list m_inputFiles is odd, last entry is simply ignored.
+    int numInputPairs = (m_inputFiles.length() - m_inputFiles.length()%2)/2;
+    for (int i = 0; i < numInputPairs; i++)
+    {
+        QVariantMap format;
+        format["fileExtension"] = m_inputFiles.at(2*i);
+        format["fileFormat"] = m_inputFiles.at(2*i+1);
+        inputFileFormats.append(format);
+    }
 
-    QVariantMap sbmlFormat;
-    sbmlFormat["fileExtension"] = "xml";
-    sbmlFormat["fileFormat"] = "sbml";
-
-    QVariantList fileFormats;
-    fileFormats.append(layoutFormat);
-    fileFormats.append(sbmlFormat);
+    QVariantList outputFileFormats;
+    // If length of list m_outputFiles is odd, last entry is simply ignored.
+    int numOutputPairs = (m_outputFiles.length() - m_outputFiles.length()%2)/2;
+    for (int i = 0; i < numOutputPairs; i++)
+    {
+        QVariantMap format;
+        format["fileExtension"] = m_outputFiles.at(2*i);
+        format["fileFormat"] = m_outputFiles.at(2*i+1);
+        outputFileFormats.append(format);
+    }
 
     QVariantMap body;
     body["categoryList"] = categoryList;
-    body["description"] = "Dunnart is a prototype constraint-based diagram editor. It includes standard diagram editing capabilities, as well as advanced features such as constraint-based geometric placement tools (alignment, distribution, separation, non-overlap, and page containment), automatic object-avoiding poly-line connector routing, and continuous network layout.";
-    body["gadgetUUID"] = m_app_uuid;
-    body["iconPath"] = pluginsDir.absoluteFilePath("DunnartIcon.png");
-    body["inputFileFormats"] = fileFormats;
-    body["outputFileFormats"] = fileFormats;
-    body["launchCommand"] = "open " + QCoreApplication::applicationFilePath();
-    body["name"] = "Dunnart";
-    body["provider"] = "MArVL, Monash University";
+    body["description"] = m_description;
+    body["gadgetUUID"] = m_gadget_uuid;
+    body["iconPath"] = m_iconPath;
+    body["inputFileFormats"] = inputFileFormats;
+    body["outputFileFormats"] = outputFileFormats;
+    body["launchCommand"] = m_launchCommand;
+    body["name"] = m_gadget_name;
+    body["provider"] = m_provider_name;
     body["screenshots"] = screenshots;
-    //body["version"] = "2.0";
 
     QVariantMap root;
     root["header"] = header;
@@ -215,28 +252,7 @@ void AppGarudaClient::registerDunnart(void)
     sendData(QString(data));
 }
 
-void AppGarudaClient::deregisterWithCore(void)
-{
-/*
-    QVariantMap header;
-    header["id"] = "DeregisterFromGarudaRequest";
-    header["version"] = "0.1";
-
-    QVariantMap body;
-    body["softwareId"] = "Dunnart";
-    body["version"] = "2.0";
-
-    QVariantMap root;
-    root["header"] = header;
-    root["body"] = body;
-
-    QByteArray data = QtJson::Json::serialize(root);
-
-    sendData(QString(data));
-*/
-}
-
-void AppGarudaClient::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareName,
+void GarudaGadget::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareName,
         QString softwareUUID)
 {
     QVariantMap header;
@@ -245,8 +261,8 @@ void AppGarudaClient::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareN
 
     QVariantMap body;
     body["data"] = fileInfo.absoluteFilePath();
-    body["gadgetName"] = "Dunnart";
-    body["gadgetUUID"] = m_app_uuid;
+    body["gadgetName"] = m_gadget_name;
+    body["gadgetUUID"] = m_gadget_uuid;
     body["targetGadgetName"] = softwareName;
     body["targetGadgetUUID"] = softwareUUID;
 
@@ -259,15 +275,15 @@ void AppGarudaClient::loadFileIntoSoftware(QFileInfo fileInfo, QString softwareN
     sendData(QString(data));
 }
 
-void AppGarudaClient::showCompatibleSoftwareFor(QString extension, QString format)
+void GarudaGadget::showCompatibleSoftwareFor(QString extension, QString format)
 {
     QVariantMap header;
     header["id"] = "GetCompatibleGadgetListRequest";
     header["version"] = "0.1";
 
     QVariantMap body;
-    body["gadgetName"] = "Dunnart";
-    body["gadgetUUID"] = m_app_uuid;
+    body["gadgetName"] = m_gadget_name;
+    body["gadgetUUID"] = m_gadget_uuid;
     body["fileExtension"] = extension;
     body["fileType"] = format;
 
@@ -281,26 +297,26 @@ void AppGarudaClient::showCompatibleSoftwareFor(QString extension, QString forma
 }
 
 
-void AppGarudaClient::displayError(QAbstractSocket::SocketError socketError)
+void GarudaGadget::displayError(QAbstractSocket::SocketError socketError)
 {
     QWidget *widget = NULL;
     switch (socketError)
     {
         case QAbstractSocket::HostNotFoundError:
-            QMessageBox::information(widget, tr("Garuda Plugin: Network Error"),
+            QMessageBox::information(widget, tr("Garuda Gadget: Network Error"),
                                  tr("The host was not found. Please check the "
                                     "host name and port settings."));
             break;
         case QAbstractSocket::SocketTimeoutError:
         case QAbstractSocket::ConnectionRefusedError:
             return;
-            QMessageBox::information(widget, tr("Garuda Plugin: Network Error"),
+            QMessageBox::information(widget, tr("Garuda Gadget: Network Error"),
                                  tr("Cannot connect to the Garuda core "
                                     "server.  Please check your network "
                                     "connection and try again later."));
             break;
         default:
-            QMessageBox::information(widget, tr("Garuda Plugin: Network Error"),
+            QMessageBox::information(widget, tr("Garuda Gadget: Network Error"),
                                      tr("The following error occurred: %1.")
                                      .arg(m_tcp_socket->errorString()));
     }

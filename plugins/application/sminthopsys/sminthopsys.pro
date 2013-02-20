@@ -1,9 +1,9 @@
 
 QT           += xml svg
 TEMPLATE      = lib
-CONFIG       += qt plugin
+CONFIG       += qt plugin link_pkgconfig
+
 TARGET        = $$qtLibraryTarget(application_sminthopsys)
-LIBS         += -L/usr/local/lib -lsbml
 
 DEPENDPATH += ../../.. ../../../libogdf .
 INCLUDEPATH += ../../.. ../../../libogdf .
@@ -11,6 +11,9 @@ INCLUDEPATH += ../../.. ../../../libogdf .
 include(../../../common_options.qmake)
 include(../application_plugin_options.pri)
 
+PKGCONFIG += libsbml
+
+LIBS += -lOGDF
 
 HEADERS += findBranchesDialog.h \
            freepathway.h \
@@ -33,7 +36,8 @@ HEADERS += findBranchesDialog.h \
            pdperturbingepn.h \
            pdphenotypeprocessnode.h \
            pdlogicaloperators.h \
-           pdprocessnode.h
+           pdprocessnode.h \
+           cdSpeciesAlias.h
 
 SOURCES += plugin.cpp \
            findBranchesDialog.cpp \
@@ -56,5 +60,7 @@ SOURCES += plugin.cpp \
            pdperturbingepn.cpp \
            pdphenotypeprocessnode.cpp \
            pdlogicaloperators.cpp \
-           pdprocessnode.cpp
+           pdprocessnode.cpp \
+           cdSpeciesAlias.cpp
+
 
