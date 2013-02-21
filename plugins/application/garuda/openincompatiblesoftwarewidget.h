@@ -28,7 +28,8 @@
 #define OPENINCOMPATIBLESOFTWAREWIDGET_H
 
 #include <QDockWidget>
-#include "appgarudaclient.h"
+//#include "appgarudaclient.h"
+#include "garudaclient.h"
 
 namespace dunnart {
 class Canvas;
@@ -50,14 +51,14 @@ class OpenInCompatibleSoftwareWidget : public QDockWidget
         ~OpenInCompatibleSoftwareWidget();
 
         void setContentsForResponse(const QVariantMap& response);
-        void setAppGarudaClient(AppGarudaClient *appGarudaClient);
+        void setGarudaClient(GarudaClient *garudaClient);
     public slots:
         void changeCanvas(Canvas *canvas);
     private slots:
         void cellWasDoubleClicked(int row, int column);
     private:
         Ui::OpenInCompatibleSoftwareWidget *ui;
-        AppGarudaClient *m_app_garuda_client;
+        GarudaClient *m_garuda_client;
         Canvas *m_canvas;
 };
 

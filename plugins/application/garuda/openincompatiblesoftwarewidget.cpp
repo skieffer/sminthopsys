@@ -33,7 +33,7 @@ OpenInCompatibleSoftwareWidget::OpenInCompatibleSoftwareWidget(
         dunnart::Canvas *canvas, QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::OpenInCompatibleSoftwareWidget),
-    m_app_garuda_client(NULL),
+    m_garuda_client(NULL),
     m_canvas(NULL)
 {
     ui->setupUi(this);
@@ -52,10 +52,10 @@ OpenInCompatibleSoftwareWidget::~OpenInCompatibleSoftwareWidget()
     delete ui;
 }
 
-void OpenInCompatibleSoftwareWidget::setAppGarudaClient(
-        AppGarudaClient *appGarudaClient)
+void OpenInCompatibleSoftwareWidget::setGarudaClient(
+        GarudaClient *garudaClient)
 {
-    m_app_garuda_client = appGarudaClient;
+    m_garuda_client = garudaClient;
 }
 
 void OpenInCompatibleSoftwareWidget::setContentsForResponse(const QVariantMap& response)
@@ -92,7 +92,7 @@ void OpenInCompatibleSoftwareWidget::cellWasDoubleClicked(int row, int column)
 
     QTableWidget *tableWidget = ui->tableWidget;
 
-    m_app_garuda_client->loadFileIntoSoftware(
+    m_garuda_client->loadFileIntoSoftware(
                 QFileInfo(m_canvas->filename()),
                 tableWidget->item(row, 0)->text(),
                 tableWidget->item(row, 1)->text());
