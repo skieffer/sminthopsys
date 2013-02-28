@@ -19,7 +19,8 @@
  * MA  02110-1301, USA.
  *
  *
- * Author: Michael Wybrow <mjwybrow@users.sourceforge.net>
+ * Authors: Michael Wybrow <mjwybrow@users.sourceforge.net>
+ *          Steve Kieffer <http://skieffer.info>
 */
 
 
@@ -29,6 +30,16 @@
 
 #include <QtCore>
 #include <QtNetwork>
+
+class Gadget
+{
+    // TODO
+};
+
+class FileFormat
+{
+    // TODO
+};
 
 class GarudaClient : public QObject
 {

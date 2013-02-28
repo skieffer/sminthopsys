@@ -19,7 +19,8 @@
  * MA  02110-1301, USA.
  *
  *
- * Author: Michael Wybrow <mjwybrow@users.sourceforge.net>
+ * Authors: Michael Wybrow <mjwybrow@users.sourceforge.net>
+ *          Steve Kieffer <http://skieffer.info>
 */
 
 #include <cassert>
@@ -79,7 +80,6 @@ GarudaClient::GarudaClient(QObject *parent, QString gadgetName,
     m_launchCommand(launchCommand)
 {
     openSocket();
-
     activateGadgetWithCore();
     registerGadget();
 }

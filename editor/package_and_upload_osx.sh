@@ -1,7 +1,7 @@
 #!/bin/sh -x
 
-MACPORTS=/opt/local-macports-with-a-really-very-quite-long-directory-name
-QT=/usr/local/Qt4.7
+MACPORTS=/opt/local
+QT=/usr/local/Qt4.8
 
 export PATH=$QT/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
 
@@ -24,7 +24,7 @@ rm -rf dunnart-osx.tar.gz
 
 tar zcf dunnart-osx.tar.gz Dunnart.app examples
 
-scp dunnart-osx.tar.gz mwybrow@bruce.infotech.monash.edu.au:./WWW/dunnart/nightlies/
+scp dunnart-osx.tar.gz skieffer@marvl.infotech.monash.edu.au:./Sites/dunnart/binaries/
 
 rm -rf Dunnart.app
 )
