@@ -26,3 +26,8 @@ diff
 
 #ignore backup files
 *~
+
+#ignore doc files
+html/
+latex/
+
