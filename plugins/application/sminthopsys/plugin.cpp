@@ -193,7 +193,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
         }
 
         // --------------------------------------------------------
-        // SBML FileIO
+        // SBML / SBGN-ML FileIO
 
         QStringList saveableFileExtensions(void) const
         {
@@ -206,6 +206,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             QStringList fileTypes;
             fileTypes << "xml";
             fileTypes << "sbml";
+            fileTypes << "sbgn";
             return fileTypes;
         }
         QString fileExtensionDescription(const QString& extension) const
@@ -217,6 +218,10 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             else if (extension == "xml")
             {
                 return "Systems Biology Markup Language (xml)";
+            }
+            else if (extension == "sbgn")
+            {
+                return "Systems Biology Graphical Notation Markup Language";
             }
             return QString();
         }
@@ -290,6 +295,76 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
         bool loadDiagramFromFile(Canvas *canvas, const QFileInfo& fileInfo,
                 QString& errorMessage)
         {
+            QString ext = fileInfo.suffix();
+            if (ext == "sbml" || ext == "xml")
+            {
+                return loadDiagramFromSBML(canvas, fileInfo, errorMessage);
+            }
+            else if (ext == "sbgn")
+            {
+                return loadDiagramFromSBGN(canvas, fileInfo, errorMessage);
+            }
+            else
+            {
+                errorMessage = tr("File does not have recognized extension.");
+                return false;
+            }
+        }
+
+        bool loadDiagramFromSBGN(Canvas *canvas, const QFileInfo& fileInfo,
+                QString& errorMessage)
+        {
+            QString filename = fileInfo.absoluteFilePath();
+            QDomDocument dom(filename);
+            QFile file(filename);
+
+            if (!file.open(QIODevice::ReadOnly))
+            {
+                errorMessage = tr("File could not be opened for reading.");
+                return false;
+            }
+
+            QString parsingError;
+            int errorLine;
+            int errorColumn;
+            if (!dom.setContent(&file, true, &parsingError, &errorLine, &errorColumn))
+            {
+                file.close();
+                errorMessage = tr("Error reading SBGN: %1:%2: %3").arg(errorLine).
+                        arg(errorColumn).arg(parsingError);
+                return false;
+            }
+            file.close();
+
+            QDomElement sbgnTag = dom.documentElement();
+            QDomNode mapTag = sbgnTag.firstChild();
+
+            QList<QDomNode> glyphNodes;
+            QList<QDomNode> arcNodes;
+
+            QDomNode child = mapTag.firstChild();
+            while(!child.isNull() && child.nodeName() == "glyph")
+            {
+                glyphNodes.append(child);
+                child = child.nextSibling();
+            }
+            while(!child.isNull() && child.nodeName() == "arc")
+            {
+                arcNodes.append(child);
+                child = child.nextSibling();
+            }
+            // test:
+            qDebug() << "number of glyph nodes: " << glyphNodes.length();
+            qDebug() << "number of arc nodes: " << arcNodes.length();
+
+            // TODO
+
+            return true;
+        }
+
+        bool loadDiagramFromSBML(Canvas *canvas, const QFileInfo& fileInfo,
+                QString& errorMessage)
+        {
             QString filename = fileInfo.absoluteFilePath();
             SBMLDocument *doc = readSBML(filename.toStdString().c_str());
 
@@ -311,7 +386,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             if (!dom.setContent(&file, true, &parsingError, &errorLine, &errorColumn))
             {
                 file.close();
-                errorMessage = tr("Error reading SVG: %1:%2: %3").arg(errorLine).
+                errorMessage = tr("Error reading SBML: %1:%2: %3").arg(errorLine).
                         arg(errorColumn).arg(parsingError);
                 return false;
             }
