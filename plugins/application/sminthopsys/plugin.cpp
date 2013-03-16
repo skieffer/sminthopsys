@@ -70,6 +70,7 @@ using namespace dunnart;
 #include "pdprocessnode.h"
 #include "pdphenotypeprocessnode.h"
 #include "sbgnGlyph.h"
+#include "sbgnArc.h"
 
 //! @brief  Plugin that provides methods for manipulating biological pathways
 //! in systems biology diagrams.
@@ -343,6 +344,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             //QList<QDomNode> glyphNodes;
             QList<SBGNGlyph*> sbgnGlyphs;
             QList<QDomNode> arcNodes;
+            QList<SBGNArc*> sbgnArcs;
 
             QDomNode child = mapTag.firstChild();
             while(!child.isNull() && child.nodeName() == "glyph")
@@ -356,6 +358,9 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             while(!child.isNull() && child.nodeName() == "arc")
             {
                 arcNodes.append(child);
+                SBGNArc *arc = new SBGNArc(child);
+                qDebug() << arc->toString() << "\n";
+                sbgnArcs.append(arc);
                 child = child.nextSibling();
             }
             // test:

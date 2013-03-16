@@ -38,7 +38,8 @@ HEADERS += findBranchesDialog.h \
            pdlogicaloperators.h \
            pdprocessnode.h \
            cdSpeciesAlias.h \
-           sbgnGlyph.h
+           sbgnGlyph.h \
+           sbgnArc.h
 
 SOURCES += plugin.cpp \
            findBranchesDialog.cpp \
@@ -63,6 +64,6 @@ SOURCES += plugin.cpp \
            pdlogicaloperators.cpp \
            pdprocessnode.cpp \
            cdSpeciesAlias.cpp \
-           sbgnGlyph.cpp
-
+           sbgnGlyph.cpp \
+           sbgnArc.cpp
 
