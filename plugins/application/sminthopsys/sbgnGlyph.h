@@ -49,6 +49,9 @@ public:
     SBGNGlyph(QDomNode node);
     QString toString(void);
     ShapeObj *shape(void);
+    QString id(void);
+    qreal cx(void);
+    qreal cy(void);
 
 private:
     void makeShape(void);

@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QtGui>
 #include <QtCore>
+#include <QtAlgorithms>
 #include <QFileInfo>
 #include <QDomDocument>
 #include <QSvgGenerator>
@@ -50,6 +51,9 @@
 #include "libdunnartcanvas/shapeplugininterface.h"
 #include "libdunnartcanvas/shape.h"
 #include "libdunnartcanvas/fileioplugininterface.h"
+#include "libdunnartcanvas/connector.h"
+#include "libdunnartcanvas/distribution.h"
+#include "libdunnartcanvas/guideline.h"
 
 #include "dsbspecies.h"
 #include "dsbreaction.h"
@@ -341,21 +345,22 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             QDomElement sbgnTag = dom.documentElement();
             QDomNode mapTag = sbgnTag.firstChild();
 
-            QList<SBGNGlyph*> sbgnGlyphs;
+            //QList<SBGNGlyph*> sbgnGlyphs;
+            QMap<QString, SBGNGlyph*> sbgnGlyphs;
             QList<SBGNArc*> sbgnArcs;
 
             QDomNode child = mapTag.firstChild();
             while(!child.isNull() && child.nodeName() == "glyph")
             {
                 SBGNGlyph *glyph = new SBGNGlyph(child);
-                qDebug() << glyph->toString() << "\n";
-                sbgnGlyphs.append(glyph);
+                //qDebug() << glyph->toString() << "\n";
+                sbgnGlyphs.insert(glyph->id(), glyph);
                 child = child.nextSibling();
             }
             while(!child.isNull() && child.nodeName() == "arc")
             {
                 SBGNArc *arc = new SBGNArc(child);
-                qDebug() << arc->toString() << "\n";
+                //qDebug() << arc->toString() << "\n";
                 sbgnArcs.append(arc);
                 child = child.nextSibling();
             }
@@ -366,7 +371,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             // Now add shapes and connectors to the canvas.
 
             // Shapes
-            foreach(SBGNGlyph *glyph, sbgnGlyphs)
+            foreach(SBGNGlyph *glyph, sbgnGlyphs.values())
             {
                 ShapeObj *shape = glyph->shape();
                 if (shape != NULL) {
@@ -377,10 +382,81 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             // Connectors
             foreach(SBGNArc *arc, sbgnArcs)
             {
-                // TODO
+                QString srcId = arc->srcId();
+                // Chop off .1 or .2
+                if (srcId.right(2).left(1) == ".") {
+                    srcId = srcId.left(srcId.length() - 2);
+                }
+                QString tgtId = arc->tgtId();
+                // Chop off .1 or .2
+                if (tgtId.right(2).left(1) == ".") {
+                    tgtId = tgtId.left(tgtId.length() - 2);
+                }
+                SBGNGlyph *src = sbgnGlyphs.value(srcId);
+                SBGNGlyph *tgt = sbgnGlyphs.value(tgtId);
+                Connector *conn = new Connector();
+                conn->initWithConnection(src->shape(), tgt->shape());
+                canvas->addItem(conn);
             }
 
+            // Vertical alignments
+            // Sort by x-coord
+
+            //QList<SBGNGlyph*> glyphs = sbgnGlyphs.values();
+            //qSort(glyphs.begin(), glyphs.end(), xcoordOrder);
+            QMap<qreal,SBGNGlyph*> xmap;
+            foreach(SBGNGlyph *g, sbgnGlyphs)
+            {
+                xmap.insertMulti(g->cx(),g);
+            }
+            // Partition into equivalence classes by x-coord
+            qreal eps = 1; // tolerance
+            QList< QList<SBGNGlyph*> > classes;
+            QList<qreal> keys = xmap.keys();
+            int N = keys.length();
+            QList<SBGNGlyph*> curr;
+            qreal k = keys.at(0);
+            curr.append(xmap.values(k));
+            qreal lastKey = k;
+            for (int i = 1; i < N; i++)
+            {
+                qreal k = keys.at(i);
+                if (k - lastKey >= eps) {
+                    // The current key is not within tolerance of the previous one.
+                    // So record the current class, and then start a new one.
+                    classes.append(curr);
+                    curr.clear();
+                }
+                curr.append(xmap.values(k));
+                if (i == N - 1) {
+                    classes.append(curr);
+                }
+            }
+            // Now apply a constraint to each list.
+            foreach (QList<SBGNGlyph*> list, classes)
+            {
+                CanvasItemList items;
+                foreach (SBGNGlyph *glyph, list) {
+                    items.append(glyph->shape());
+                }
+                createAlignment(ALIGN_CENTER, items);
+            }
+
+
+            // Turn on automatic graph layout.
+            //canvas->setOptAutomaticGraphLayout(true);
+
             return true;
+        }
+
+        bool xcoordOrder(SBGNGlyph *g1, SBGNGlyph *g2)
+        {
+            return g1->cx() < g2->cx();
+        }
+
+        bool ycoordOrder(SBGNGlyph *g1, SBGNGlyph *g2)
+        {
+            return g1->cy() < g2->cy();
         }
 
         bool loadDiagramFromSBML(Canvas *canvas, const QFileInfo& fileInfo,

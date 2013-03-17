@@ -104,6 +104,13 @@ SBGNGlyph::SBGNGlyph(QDomNode node) : m_shape(NULL), m_orient(HORIZ)
     float h = bboxAttrs.namedItem("h").toAttr().value().toFloat();
     m_Bbox = QRectF(x,y,w,h);
 
+    // Make the shape.
+    makeShape();
+}
+
+QString SBGNGlyph::id()
+{
+    return m_id;
 }
 
 void SBGNGlyph::makeShape()
@@ -139,6 +146,7 @@ void SBGNGlyph::makeShape()
     PluginShapeFactory *factory = sharedPluginShapeFactory();
     m_shape = factory->createShape(type);
 
+    //qDebug() << "centre: " << m_Bbox.center().x() << "," << m_Bbox.center().y();
     m_shape->setCentrePos(m_Bbox.center());
     m_shape->setSize(m_Bbox.size());
 
@@ -157,6 +165,18 @@ void SBGNGlyph::addPort(QDomNode port)
 {
     SBGNPort *p = new SBGNPort(port);
     m_ports.append(p);
+}
+
+qreal SBGNGlyph::cx()
+{
+    QPointF c = m_Bbox.center();
+    return c.x();
+}
+
+qreal SBGNGlyph::cy()
+{
+    QPointF c = m_Bbox.center();
+    return c.y();
 }
 
 QString SBGNGlyph::toString()

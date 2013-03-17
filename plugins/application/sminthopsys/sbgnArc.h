@@ -35,6 +35,8 @@ class SBGNArc
 public:
     SBGNArc(QDomNode node);
     QString toString(void);
+    QString srcId(void);
+    QString tgtId(void);
 
 private:
     QString m_srcId;

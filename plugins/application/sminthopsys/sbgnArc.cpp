@@ -47,6 +47,16 @@ SBGNArc::SBGNArc(QDomNode node)
 
 }
 
+QString SBGNArc::srcId()
+{
+    return m_srcId;
+}
+
+QString SBGNArc::tgtId()
+{
+    return m_tgtId;
+}
+
 QString SBGNArc::toString()
 {
     QString s = "";

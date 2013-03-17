@@ -96,7 +96,9 @@ void PDEPN::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
 }
 
 // Extension of the labelled glyph, creates the centred label, and sets a boolean to keep track of whether the glyph is cloned.
-PDEPN::PDEPN(QString l, bool cb, QString cl, bool m) : ShapeObj("sbgn.NucleicAcidEPN"), cloned(cb), cloneLabel(cl), multimer(m)
+PDEPN::PDEPN(QString l, bool cb, QString cl, bool m) :
+    ShapeObj("sbgn.NucleicAcidEPN"), cloned(cb),
+    cloneLabel(cl), multimer(m), m_clone(NULL)
 {
     ShapeObj::setLabel(l);
 }
@@ -123,6 +125,8 @@ void PDEPN::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     //qDebug() << "Dropping PDEPN=============================";
     //qDebug() << "  position: " << centrePos();
+
+    if (m_clone == NULL) { return; }
 
     DSBSpecies *spec = m_clone->getSpecies();
     QList<DSBClone*> clones = spec->getClones();
