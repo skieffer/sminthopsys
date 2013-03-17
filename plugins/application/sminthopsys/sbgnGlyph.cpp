@@ -42,7 +42,8 @@ SBGNPort::SBGNPort(QDomNode node)
 }
 
 
-SBGNGlyph::SBGNGlyph(QDomNode node) : m_shape(NULL), m_orient(HORIZ)
+SBGNGlyph::SBGNGlyph(QDomNode node) :
+    m_shape(NULL), m_orient(HORIZ)
 {
     QDomNamedNodeMap attrs = node.attributes();
     m_id = attrs.namedItem("id").toAttr().value();
@@ -106,6 +107,28 @@ SBGNGlyph::SBGNGlyph(QDomNode node) : m_shape(NULL), m_orient(HORIZ)
 
     // Make the shape.
     makeShape();
+}
+
+void SBGNGlyph::addNeighbour(SBGNGlyph *nbr)
+{
+    m_nbrs.append(nbr);
+}
+
+/* Build the set C of SBGNGlyphs which (a) are connected to this one, and
+   (b) are in the passed set R.
+  */
+void SBGNGlyph::getRestrConnComp(QSet<SBGNGlyph*> &R, QSet<SBGNGlyph*> &C)
+{
+    // Add self to component.
+    C.insert(this);
+    // Compute set of eligible neighbours.
+    QSet<SBGNGlyph*> N = m_nbrs.toSet().intersect(R);
+    // Recurse on those neighbours which are not already in the set C.
+    foreach (SBGNGlyph *n, N) {
+        if (!C.contains(n)) {
+            n->getRestrConnComp(R,C);
+        }
+    }
 }
 
 QString SBGNGlyph::id()

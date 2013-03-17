@@ -394,6 +394,10 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
                 }
                 SBGNGlyph *src = sbgnGlyphs.value(srcId);
                 SBGNGlyph *tgt = sbgnGlyphs.value(tgtId);
+                // Tell the glyphs that they are neighbours.
+                src->addNeighbour(tgt);
+                tgt->addNeighbour(src);
+                // Create a connector.
                 Connector *conn = new Connector();
                 conn->initWithConnection(src->shape(), tgt->shape());
                 canvas->addItem(conn);
@@ -401,9 +405,6 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
 
             // Vertical alignments
             // Sort by x-coord
-
-            //QList<SBGNGlyph*> glyphs = sbgnGlyphs.values();
-            //qSort(glyphs.begin(), glyphs.end(), xcoordOrder);
             QMap<qreal,SBGNGlyph*> xmap;
             foreach(SBGNGlyph *g, sbgnGlyphs)
             {
@@ -412,7 +413,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             // Partition into equivalence classes by x-coord
             qreal eps = 1; // tolerance
             QList< QList<SBGNGlyph*> > classes;
-            QList<qreal> keys = xmap.keys();
+            QList<qreal> keys = xmap.uniqueKeys();
             int N = keys.length();
             QList<SBGNGlyph*> curr;
             qreal k = keys.at(0);
@@ -421,10 +422,14 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             for (int i = 1; i < N; i++)
             {
                 qreal k = keys.at(i);
+                qDebug() << "next x value: " << k;
                 if (k - lastKey >= eps) {
                     // The current key is not within tolerance of the previous one.
                     // So record the current class, and then start a new one.
+                    //qDebug() << "number of classes so far: " << classes.length();
+                    //qDebug() << "number of x values in current component: " << curr.length();
                     classes.append(curr);
+                    //qDebug() << "number of classes after appending new one: " << classes.length();
                     curr.clear();
                 }
                 curr.append(xmap.values(k));
@@ -435,11 +440,61 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             // Now apply a constraint to each list.
             foreach (QList<SBGNGlyph*> list, classes)
             {
+                //DEBUG
+                QString s = "";
+                s += "Elements of list:\n  ";
+                foreach (SBGNGlyph *g, list) {
+                    s += g->id() + ", ";
+                }
+                qDebug() << s;
+                //
+
+                // Align, if at least 2 in class
+                if (list.length() < 2) { continue; }
                 CanvasItemList items;
                 foreach (SBGNGlyph *glyph, list) {
                     items.append(glyph->shape());
                 }
                 createAlignment(ALIGN_CENTER, items);
+
+                qDebug() << "number of aligned glyphs: " << list.length();
+
+                // Partition into connected components.
+                QList< QSet<SBGNGlyph*> > ccs;
+                QSet<SBGNGlyph*> S = list.toSet();
+                QSet<SBGNGlyph*> R = list.toSet();
+                while (!S.isEmpty()) {
+                    SBGNGlyph *glyph = S.toList().first();
+                    QSet<SBGNGlyph*> C;
+                    glyph->getRestrConnComp(R,C);
+                    ccs.append(C);
+                    S = S.subtract(C);
+                }
+                qDebug() << "number of connected components: " << ccs.size();
+                // Create a distribution constraint for CCs of 3 or more elements.
+                foreach (QSet<SBGNGlyph*> cc, ccs)
+                {
+                    if (cc.size() < 3) { continue; }
+                    // Sort by y-coord and compute average separation in y-dimension.
+                    QMap<qreal,SBGNGlyph*> ymap;
+                    foreach(SBGNGlyph *g, cc)
+                    {
+                        ymap.insert(g->cy(),g);
+                    }
+                    QList<qreal> yVals = ymap.keys();
+                    int M = yVals.length();
+                    qreal dyAvg = ( yVals.at(M-1) - yVals.at(0) ) / (M-1);
+                    // Create distribution.
+                    CanvasItemList items;
+                    foreach (SBGNGlyph *g, cc)
+                    {
+                        items.append(g->shape());
+                    }
+                    dtype type = DIST_MIDDLE;
+                    bool preserveOrder = false;
+                    Distribution *dist = createDistribution(NULL, type, items, preserveOrder);
+                    dist->setSeparation(dyAvg);
+                }
             }
 
 

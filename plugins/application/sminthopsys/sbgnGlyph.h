@@ -26,6 +26,7 @@
 #define SBGNGLYPH_H
 
 #include <QList>
+#include <QSet>
 #include <QDomNode>
 #include <QRectF>
 #include <QPointF>
@@ -52,6 +53,8 @@ public:
     QString id(void);
     qreal cx(void);
     qreal cy(void);
+    void addNeighbour(SBGNGlyph* nbr);
+    void getRestrConnComp(QSet<SBGNGlyph *> &R, QSet<SBGNGlyph *> &C);
 
 private:
     void makeShape(void);
@@ -66,6 +69,7 @@ private:
     ShapeObj *m_shape;
     ProcOrient m_orient;
     QList<SBGNPort*> m_ports;
+    QList<SBGNGlyph*> m_nbrs;
 };
 
 }
