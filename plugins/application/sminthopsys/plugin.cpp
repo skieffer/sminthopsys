@@ -341,15 +341,12 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             QDomElement sbgnTag = dom.documentElement();
             QDomNode mapTag = sbgnTag.firstChild();
 
-            //QList<QDomNode> glyphNodes;
             QList<SBGNGlyph*> sbgnGlyphs;
-            QList<QDomNode> arcNodes;
             QList<SBGNArc*> sbgnArcs;
 
             QDomNode child = mapTag.firstChild();
             while(!child.isNull() && child.nodeName() == "glyph")
             {
-                //glyphNodes.append(child);
                 SBGNGlyph *glyph = new SBGNGlyph(child);
                 qDebug() << glyph->toString() << "\n";
                 sbgnGlyphs.append(glyph);
@@ -357,17 +354,31 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
             }
             while(!child.isNull() && child.nodeName() == "arc")
             {
-                arcNodes.append(child);
                 SBGNArc *arc = new SBGNArc(child);
                 qDebug() << arc->toString() << "\n";
                 sbgnArcs.append(arc);
                 child = child.nextSibling();
             }
             // test:
-            qDebug() << "number of glyph nodes: " << sbgnGlyphs.length();
-            qDebug() << "number of arc nodes: " << arcNodes.length();
+            //qDebug() << "number of glyph nodes: " << sbgnGlyphs.length();
+            //qDebug() << "number of arc nodes: " << sbgnArcs.length();
 
-            // TODO
+            // Now add shapes and connectors to the canvas.
+
+            // Shapes
+            foreach(SBGNGlyph *glyph, sbgnGlyphs)
+            {
+                ShapeObj *shape = glyph->shape();
+                if (shape != NULL) {
+                    canvas->addItem(shape);
+                }
+            }
+
+            // Connectors
+            foreach(SBGNArc *arc, sbgnArcs)
+            {
+                // TODO
+            }
 
             return true;
         }

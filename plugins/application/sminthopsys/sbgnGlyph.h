@@ -25,24 +25,44 @@
 #ifndef SBGNGLYPH_H
 #define SBGNGLYPH_H
 
+#include <QList>
 #include <QDomNode>
 #include <QRectF>
+#include <QPointF>
 
 namespace dunnart {
+
+class ShapeObj;
+
+struct SBGNPort
+{
+    SBGNPort(QDomNode node);
+    QString m_id;
+    QPointF m_pos;
+};
+
+enum ProcOrient { VERT, HORIZ };
 
 class SBGNGlyph
 {
 public:
     SBGNGlyph(QDomNode node);
     QString toString(void);
+    ShapeObj *shape(void);
 
 private:
+    void makeShape(void);
+    void addPort(QDomNode port);
+
     QString m_id;
     QString m_class;
     bool m_isCloned;
     QString m_labelText;
     QRectF m_labelBbox;
     QRectF m_Bbox;
+    ShapeObj *m_shape;
+    ProcOrient m_orient;
+    QList<SBGNPort*> m_ports;
 };
 
 }
