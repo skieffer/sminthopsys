@@ -436,6 +436,7 @@ class SminthopsysPlugin : public QObject, public ApplicationPluginInterface,
                 if (i == N - 1) {
                     classes.append(curr);
                 }
+                lastKey = k;
             }
             // Now apply a constraint to each list.
             foreach (QList<SBGNGlyph*> list, classes)
