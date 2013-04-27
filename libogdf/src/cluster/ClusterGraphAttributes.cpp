@@ -47,7 +47,7 @@
  * \see  http://www.gnu.org/copyleft/gpl.html
  ***************************************************************/
 
-
+#include <ostream>
 #include <ogdf/cluster/ClusterGraphAttributes.h>
 #include <ogdf/cluster/ClusterArray.h>
 #include <ogdf/fileformats/GmlParser.h>
