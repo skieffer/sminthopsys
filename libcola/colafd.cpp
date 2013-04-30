@@ -111,7 +111,8 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
       //  4: inverted quadratic (has long-range forces)
       //  5: quartic
       //  6: smooth V-stress
-      m_snapStressFunction(6)
+      //  8: quadraic U-stress
+      m_snapStressFunction(8)
 {
     //FILELog::ReportingLevel() = logDEBUG1;
     FILELog::ReportingLevel() = logERROR;
@@ -186,6 +187,10 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
         m_snapStressSigma = 25.0;
         m_snapStressRho = 1;
         break;
+    case 8:
+        // Quadratic U-stress
+        m_snapStressBeta = 100.0;
+        m_snapStressSigma = 50.0;
     }
 }
 
@@ -1057,7 +1062,7 @@ void ConstrainedFDLayout::computeForces(
         valarray<double> &g) {
     if(n==1) return;
     g=0;
-#define BASICSTRESS
+//#define BASICSTRESS
 #ifdef  BASICSTRESS
     // for each node:
     for(unsigned u=0;u<n;u++) {
@@ -1124,6 +1129,30 @@ void ConstrainedFDLayout::computeSnapForces(const vpsc::Dim dim, SparseMap &H, s
     case 6:
         smoothVForces(dim,H,g);
         break;
+    case 8:
+        quadUForces(dim,H,g);
+        break;
+    }
+}
+
+// Quadratic U-stress forces:
+void ConstrainedFDLayout::quadUForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g) {
+    double b = m_snapStressBeta;
+    double sig = m_snapStressSigma;
+    double k = b/(sig*sig);
+    for(unsigned u=0;u<n;u++) {
+        for(unsigned v=0;v<n;v++) {
+            if(u==v) continue;
+            unsigned short p = G[u][v];
+            // no forces between disconnected parts of the graph
+            if(p==0) continue;
+            double d=dim==vpsc::HORIZONTAL?X[u]-X[v]:Y[u]-Y[v];
+            if (-sig <= d && d <= sig) {
+                g[u]+=k*d;
+                H(u,v)-=k;
+                H(u,u)+=k;
+            }
+        }
     }
 }
 
@@ -1356,7 +1385,10 @@ double ConstrainedFDLayout::computeStress() const {
             double l=sqrt(rx*rx+ry*ry);
             double d=D[u][v];
             //qDebug() << "d=" << d;
-            if(l>d && p>1) continue; // no attractive forces required
+            if(l>d && p>1) continue; // no repulsive forces required
+            // We add stress for node pair (u,v) only if l <= d, i.e.
+            // only if u and v are "too close". Thus, our stress function
+            // is such that "nodes repel".
             double d2=d*d;
             double rl=d-l;
             double s=rl*rl/d2;
@@ -1365,11 +1397,11 @@ double ConstrainedFDLayout::computeStress() const {
         }
     }
 #endif
-    qDebug() << "stress: " << stress;
+    //qDebug() << "stress: " << stress;
     if(m_addSnapStress) {
         stress += computeSnapStress();
     }
-    qDebug() << "plus snap stress: " << stress;
+    //qDebug() << "plus snap stress: " << stress;
     if(preIteration) {
         if ((*preIteration)()) {
             for(vector<Lock>::iterator l=preIteration->locks.begin();
@@ -1407,7 +1439,46 @@ double ConstrainedFDLayout::computeSnapStress() const {
         return quarticStress();
     case 6:
         return smoothVStress();
+    case 8:
+        return quadUStress();
     }
+}
+
+// Quadratic U-stress:
+double ConstrainedFDLayout::quadUStress() const {
+    double stress=0;
+    double sig = m_snapStressSigma;
+    double sig2 = sig*sig;
+    double c=0.0; // the constant stress -- experiment with 0 and 1 here!
+    for(unsigned u=0;(u + 1)<n;u++) {
+        for(unsigned v=u+1;v<n;v++) {
+            unsigned short p=G[u][v];
+            // no forces between disconnected parts of the graph
+            if(p==0) continue;
+            double dx=X[u]-X[v], dy=Y[u]-Y[v];
+
+            double sx = 0;
+            if (dx < -sig) {
+                sx = c;
+            } else if (-sig <= dx && dx <= sig) {
+                sx = dx*dx/sig2;
+            } else { // sig < dx
+                sx = c;
+            }
+
+            double sy = 0;
+            if (dy < -sig) {
+                sy = c;
+            } else if (-sig <= dy && dy <= sig) {
+                sy = dy*dy/sig2;
+            } else { // sig < dy
+                sy = c;
+            }
+
+            stress+=sx+sy;
+        }
+    }
+    return m_snapStressBeta*stress;
 }
 
 // Smooth V-stress:

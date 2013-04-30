@@ -626,6 +626,7 @@ private:
     double m_snapStressSigma;
     int m_snapStressRho;
     double computeSnapStress() const;
+    double quadUStress() const;
     double smoothVStress() const;
     double smoothMStress() const;
     double linearMStress() const;
@@ -633,6 +634,7 @@ private:
     double invertedQuadraticStress() const;
     double quarticStress() const;
     void computeSnapForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g);
+    void quadUForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g);
     void smoothVForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g);
     void smoothMForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g);
     void linearMForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g);
