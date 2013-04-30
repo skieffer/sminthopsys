@@ -198,6 +198,7 @@ class Canvas : public QGraphicsScene
         
         bool optAutomaticGraphLayout(void) const;
         bool optPreventOverlaps(void) const;
+        bool optSnapTo(void) const;
         bool optPreserveTopology(void) const;
         bool optRubberBandRouting(void) const;
         bool optFitWithinPage(void) const;
@@ -275,6 +276,7 @@ class Canvas : public QGraphicsScene
         void setDebugCOLAOutput(const bool value);
         void setOptAutomaticGraphLayout(const bool value);
         void setOptPreventOverlaps(const bool value);
+        void setOptSnapTo(const bool value);
         void setOptPreserveTopology(const bool value);
         void setOptRubberBandRouting(const bool value);
         void setOptFitWithinPage(const bool value);
@@ -319,6 +321,7 @@ class Canvas : public QGraphicsScene
         void optChangedAutomaticLayout(bool checked);
         void optChangedPreserveTopology(bool checked);
         void optChangedPreventOverlaps(bool checked);
+        void optChangedSnapTo(bool checked);
         void optChangedRubberBandRouting(bool checked);
         void optChangedFitWithinPage(bool checked);
         void optChangedStructuralEditingDisabled(bool checked);
@@ -395,6 +398,7 @@ class Canvas : public QGraphicsScene
         int  m_opt_connector_rounding_distance;
         bool m_opt_automatic_graph_layout;
         bool m_opt_prevent_overlaps;
+        bool m_opt_snap_to;
         bool m_opt_preserve_topology;
         bool m_opt_rubber_band_routing;
         bool m_opt_fit_within_page;

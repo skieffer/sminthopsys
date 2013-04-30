@@ -507,6 +507,7 @@ public:
         const std::vector<cola::Edge>& es,
         const double idealLength,
         const bool preventOverlaps,
+        const bool snapTo,
         const double* eLengths=NULL,
         TestConvergence& done=defaultTest,
         PreIteration* preIteration=NULL);

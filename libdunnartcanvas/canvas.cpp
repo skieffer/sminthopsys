@@ -205,6 +205,7 @@ Canvas::Canvas()
     // Options for controlling behaviour of Constraint-based layout:
     m_opt_automatic_graph_layout = false;
     m_opt_prevent_overlaps       = false;
+    m_opt_snap_to                = false;
     m_opt_preserve_topology      = false;
     m_opt_rubber_band_routing    = false;
     m_opt_fit_within_page        = false;
@@ -1243,6 +1244,11 @@ bool Canvas::optPreventOverlaps(void) const
     return m_opt_prevent_overlaps;
 }
 
+bool Canvas::optSnapTo(void) const
+{
+    return m_opt_snap_to;
+}
+
 bool Canvas::optPreserveTopology(void) const
 {
     return m_opt_preserve_topology;
@@ -1394,6 +1400,14 @@ void Canvas::setOptPreventOverlaps(const bool value)
 {
     m_opt_prevent_overlaps = value;
     emit optChangedPreventOverlaps(m_opt_prevent_overlaps);
+    fully_restart_graph_layout();
+}
+
+
+void Canvas::setOptSnapTo(const bool value)
+{
+    m_opt_snap_to = value;
+    emit optChangedSnapTo(m_opt_snap_to);
     fully_restart_graph_layout();
 }
 

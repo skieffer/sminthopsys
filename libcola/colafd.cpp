@@ -89,7 +89,8 @@ void dumpSquareMatrix(unsigned n, T** L) {
 
 ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
         const std::vector< Edge >& es, const double idealLength,
-        const bool preventOverlaps, const double* eLengths, 
+        const bool preventOverlaps, const bool snapTo,
+        const double* eLengths,
         TestConvergence& done, PreIteration* preIteration) 
     : n(rs.size()),
       X(valarray<double>(n)),
@@ -103,7 +104,7 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
       rectClusterBuffer(0),
       m_idealEdgeLength(idealLength),
       m_generateNonOverlapConstraints(preventOverlaps),
-      m_addSnapStress(true),
+      m_addSnapStress(snapTo),
       // snap stress functions:
       //  1: smooth M-stress
       //  2: piecewise linear M-stress
@@ -189,8 +190,8 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
         break;
     case 8:
         // Quadratic U-stress
-        m_snapStressBeta = 100.0;
-        m_snapStressSigma = 50.0;
+        m_snapStressBeta = 60.0;
+        m_snapStressSigma = 30.0;
     }
 }
 
@@ -1062,7 +1063,7 @@ void ConstrainedFDLayout::computeForces(
         valarray<double> &g) {
     if(n==1) return;
     g=0;
-//#define BASICSTRESS
+#define BASICSTRESS
 #ifdef  BASICSTRESS
     // for each node:
     for(unsigned u=0;u<n;u++) {
@@ -1108,8 +1109,6 @@ void ConstrainedFDLayout::computeForces(
 
 // Force chooser:
 void ConstrainedFDLayout::computeSnapForces(const vpsc::Dim dim, SparseMap &H, std::valarray<double> &g) {
-    dualQuadraticForces(dim,H,g);
-    return;
     switch (m_snapStressFunction) {
     case 1:
         smoothMForces(dim,H,g);
@@ -1152,6 +1151,8 @@ void ConstrainedFDLayout::quadUForces(const vpsc::Dim dim, SparseMap &H, std::va
                 H(u,v)-=k;
                 H(u,u)+=k;
             }
+            //qDebug() << "H(u,v) -= " << k;
+            //qDebug() << "g[u] += " << k*d;
         }
     }
 }

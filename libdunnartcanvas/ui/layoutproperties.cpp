@@ -69,6 +69,11 @@ LayoutPropertiesDialog::LayoutPropertiesDialog(Canvas *canvas, QWidget *parent)
     connect(this, SIGNAL(optChangedPreventOverlaps(bool) ),
             preventOverlapsCheckBox2, SLOT(setChecked(bool)));
 
+    connect(snapToCheckBox, SIGNAL(clicked(bool)),
+            this, SIGNAL(setOptSnapTo(bool)));
+    connect(this, SIGNAL(optChangedSnapTo(bool)),
+            snapToCheckBox, SLOT(setChecked(bool)));
+
     connect(preserveTopologyCheckBox, SIGNAL(clicked(bool) ),
             this, SIGNAL(setOptPreserveTopology(bool)));
     connect(this, SIGNAL(optChangedPreserveTopology(bool) ),
@@ -138,6 +143,11 @@ void LayoutPropertiesDialog::changeCanvas(Canvas *canvas)
     connect(m_canvas, SIGNAL(optChangedPreventOverlaps(bool) ),
             this, SIGNAL(optChangedPreventOverlaps(bool)));
 
+    connect(this, SIGNAL(setOptSnapTo(bool)),
+            m_canvas, SLOT(setOptSnapTo(bool)));
+    connect(m_canvas, SIGNAL(optChangedSnapTo(bool)),
+            this, SIGNAL(optChangedSnapTo(bool)));
+
     connect(this, SIGNAL(setOptPreserveTopology(bool) ),
             m_canvas, SLOT(setOptPreserveTopology(bool) ));
     connect(m_canvas, SIGNAL(optChangedPreserveTopology(bool) ),
@@ -182,6 +192,8 @@ void LayoutPropertiesDialog::changeCanvas(Canvas *canvas)
     preventOverlapsCheckBox->setChecked(value);
     preventOverlapsCheckBox2->setChecked(value);
     preserveTopologyCheckBox->setEnabled(value);
+
+    snapToCheckBox->setChecked(m_canvas->optSnapTo());
 
     flowDirectionDial->setSliderPosition(m_canvas->optFlowDirection());
 

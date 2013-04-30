@@ -45,6 +45,7 @@ class LayoutPropertiesDialog : public QDockWidget, private Ui::LayoutProperties
         void optChangedAutomaticLayout(bool checked);
         void optChangedPreserveTopology(bool checked);
         void optChangedPreventOverlaps(bool checked);
+        void optChangedSnapTo(bool checked);
         void optChangedRubberBandRouting(bool checked);
         void optChangedFitWithinPage(bool checked);
         void optChangedShapeNonoverlapPadding(int value);
@@ -53,6 +54,7 @@ class LayoutPropertiesDialog : public QDockWidget, private Ui::LayoutProperties
         // canvas to widgets in this dialog.
         void setOptAutomaticGraphLayout(const bool value);
         void setOptPreventOverlaps(const bool value);
+        void setOptSnapTo(const bool value);
         void setOptPreserveTopology(const bool value);
         void setOptRubberBandRouting(const bool value);
         void setOptFitWithinPage(const bool value);
