@@ -392,10 +392,10 @@ Manual layout</string>
                <number>200</number>
               </property>
               <property name="singleStep">
-               <number>25</number>
+               <number>1</number>
               </property>
               <property name="pageStep">
-               <number>25</number>
+               <number>10</number>
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>

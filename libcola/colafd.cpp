@@ -89,7 +89,8 @@ void dumpSquareMatrix(unsigned n, T** L) {
 
 ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
         const std::vector< Edge >& es, const double idealLength,
-        const bool preventOverlaps, const bool snapTo,
+        const bool preventOverlaps,
+        const bool snapTo, const double snapDistance,
         const double* eLengths,
         TestConvergence& done, PreIteration* preIteration) 
     : n(rs.size()),
@@ -105,6 +106,7 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
       m_idealEdgeLength(idealLength),
       m_generateNonOverlapConstraints(preventOverlaps),
       m_addSnapStress(snapTo),
+      m_snap_distance(snapDistance),
       // snap stress functions:
       //  1: smooth M-stress
       //  2: piecewise linear M-stress
@@ -190,8 +192,10 @@ ConstrainedFDLayout::ConstrainedFDLayout(const vpsc::Rectangles& rs,
         break;
     case 8:
         // Quadratic U-stress
-        m_snapStressBeta = 60.0;
-        m_snapStressSigma = 30.0;
+        //m_snapStressBeta = 60.0;
+        //m_snapStressSigma = 30.0;
+        m_snapStressSigma = m_snap_distance;
+        m_snapStressBeta = 2*m_snapStressSigma;
     }
 }
 

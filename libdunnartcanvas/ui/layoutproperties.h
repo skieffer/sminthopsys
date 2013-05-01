@@ -66,6 +66,7 @@ class LayoutPropertiesDialog : public QDockWidget, private Ui::LayoutProperties
         void changeCanvas(Canvas *canvas);
         void changeDirectedEdgeSeparationModifier(double value);
         void changeIdealEdgeLength(double value);
+        void changeSnapDistance(double value);
     private:
         Canvas *m_canvas;
         QSignalMapper *m_mode_signal_mapper;

@@ -123,6 +123,7 @@ void LayoutPropertiesDialog::changeCanvas(Canvas *canvas)
         disconnect(m_canvas, 0, this, 0);
         disconnect(this, 0, m_canvas, 0);
         disconnect(idealLengthSlider, 0, m_canvas, 0);
+        disconnect(snapDistanceSlider, 0, m_canvas, 0);
         disconnect(flowSeparationSlider, 0, m_canvas, 0);
         disconnect(flowDirectionDial, 0, m_canvas, 0);
     }
@@ -168,6 +169,11 @@ void LayoutPropertiesDialog::changeCanvas(Canvas *canvas)
     connect(m_canvas, SIGNAL(optChangedIdealEdgeLengthModifier(double)),
             this, SLOT(changeIdealEdgeLength(double)));
 
+    connect(snapDistanceSlider, SIGNAL(sliderMoved(int)),
+            m_canvas, SLOT(setOptSnapDistanceModifierFromSlider(int)));
+    connect(m_canvas, SIGNAL(optChangedSnapDistanceModifier(double)),
+            this, SLOT(changeSnapDistance(double)));
+
     connect(flowSeparationSlider, SIGNAL(sliderMoved(int)),
             m_canvas, SLOT(setOptFlowSeparationModifierFromSlider(int)));
     connect(m_canvas, SIGNAL(optChangedDirectedEdgeSeparationModifier(double)),
@@ -186,6 +192,8 @@ void LayoutPropertiesDialog::changeCanvas(Canvas *canvas)
     // Set initial control values.
     idealLengthSlider->setSliderPosition(
             m_canvas->optIdealEdgeLengthModifier() * 100);
+    snapDistanceSlider->setSliderPosition(
+            m_canvas->optSnapDistanceModifier() * 100);
     flowSeparationSlider->setSliderPosition(
             m_canvas->optFlowSeparationModifier() * 100);
     bool value = m_canvas->optPreventOverlaps();
@@ -271,6 +279,11 @@ void LayoutPropertiesDialog::changeDirectedEdgeSeparationModifier(double value)
 void LayoutPropertiesDialog::changeIdealEdgeLength(double value)
 {
     idealLengthSlider->setSliderPosition(value * 100);
+}
+
+void LayoutPropertiesDialog::changeSnapDistance(double value)
+{
+    snapDistanceSlider->setSliderPosition(value * 100);
 }
 
 }

@@ -508,6 +508,7 @@ public:
         const double idealLength,
         const bool preventOverlaps,
         const bool snapTo,
+        const double snapDistance,
         const double* eLengths=NULL,
         TestConvergence& done=defaultTest,
         PreIteration* preIteration=NULL);
@@ -621,6 +622,7 @@ private:
     // Snap Stress
     bool m_addSnapStress;
     int m_snapStressFunction;
+    double m_snap_distance;
     double m_snapStressAlpha;
     double m_snapStressBeta;
     double m_snapStressGamma;

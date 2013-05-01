@@ -1451,11 +1451,23 @@ void Canvas::setOptIdealEdgeLengthModifierFromSlider(int int_modifier)
     setOptIdealEdgeLengthModifier(double_modifier);
 }
 
-
 void Canvas::setOptIdealEdgeLengthModifier(double modifier)
 {
     m_opt_ideal_edge_length_modifier = modifier;
     emit optChangedIdealEdgeLengthModifier(modifier);
+    interrupt_graph_layout();
+}
+
+void Canvas::setOptSnapDistanceModifierFromSlider(int int_modifier)
+{
+    double double_modifier = int_modifier / 100.0;
+    setOptSnapDistanceModifier(double_modifier);
+}
+
+void Canvas::setOptSnapDistanceModifier(double modifier)
+{
+    m_opt_snap_distance_modifier = modifier;
+    emit optChangedSnapDistanceModifier(modifier);
     interrupt_graph_layout();
 }
 
@@ -1583,6 +1595,12 @@ bool Canvas::overlayRouterOrthogonalVisGraph(void) const
 double Canvas::optIdealEdgeLengthModifier(void) const
 {
     return m_opt_ideal_edge_length_modifier;
+}
+
+
+double Canvas::optSnapDistanceModifier(void) const
+{
+    return m_opt_snap_distance_modifier;
 }
 
 

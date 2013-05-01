@@ -205,6 +205,7 @@ class Canvas : public QGraphicsScene
         bool optColourInterferingConnectors(void) const;
         bool optStructuralEditingDisabled(void) const;
         double optIdealEdgeLengthModifier(void) const;
+        double optSnapDistanceModifier(void) const;
         int optConnectorRoundingDistance(void) const;
         int optRoutingPenaltySegment(void) const;
         int optRoutingShapePadding(void) const;
@@ -272,6 +273,8 @@ class Canvas : public QGraphicsScene
         void customEvent(QEvent *event);
         void setOptIdealEdgeLengthModifierFromSlider(int int_modifier);
         void setOptIdealEdgeLengthModifier(double modifier);
+        void setOptSnapDistanceModifierFromSlider(int int_modifier);
+        void setOptSnapDistanceModifier(double modifier);
 
         void setDebugCOLAOutput(const bool value);
         void setOptAutomaticGraphLayout(const bool value);
@@ -326,6 +329,7 @@ class Canvas : public QGraphicsScene
         void optChangedFitWithinPage(bool checked);
         void optChangedStructuralEditingDisabled(bool checked);
         void optChangedIdealEdgeLengthModifier(double value);
+        void optChangedSnapDistanceModifier(double value);
         void optChangedLayoutMode(int mode);
         void optChangedDirectedEdgeSeparationModifier(double modifier);
         void optChangedFlowDirection(int direction);
@@ -394,6 +398,7 @@ class Canvas : public QGraphicsScene
         bool m_force_orthogonal_connectors;
 
         double m_opt_ideal_edge_length_modifier;
+        double m_opt_snap_distance_modifier;
         double m_opt_shape_nonoverlap_padding;
         int  m_opt_connector_rounding_distance;
         bool m_opt_automatic_graph_layout;
